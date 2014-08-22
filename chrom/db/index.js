@@ -1,5 +1,7 @@
 exports.init = function init(mongoose) {
     createSeqSchema(mongoose);
+    createGeneSchema(mongoose);
+    createMrnaSchema(mongoose);
 };
 
 var seq;
@@ -17,6 +19,24 @@ function compare_ranges(a,b) {
 }
 
 exports.getSequence = function(accession, start, end, final_callback) {
+    var init_start = start;
+    var init_end = end;
+    if ( start < 0 || end < start) {
+        final_callback('Nucleotide region specified is an invalid range', null)
+        return;
+    }
+    if ( start == end ) {
+
+        final_callback(null, 
+        {
+            accession : accession, 
+            start : init_start, 
+            end : init_end, 
+            description : '-', 
+            seq : ''
+        })
+        return;
+    }
     var ranges = [];
     var processed_ranges = [];
     do {
@@ -34,21 +54,38 @@ exports.getSequence = function(accession, start, end, final_callback) {
 
     async.each(ranges, 
         function(range, callback) {
-            getSequenceFromPage(accession, range.start, range.end, function( err, seq) {
-                processed_ranges.push ( {start : range.start, end : range.end, seq : seq});
+            getSequenceFromPage(accession, range.start, range.end, function( err, page_seq) {
+                if ( err || !page_seq) {
+                    callback();
+                    return;
+                }
+                processed_ranges.push ( {start : range.start, end : range.end, seq : page_seq.seq});
                 callback();
             });
         }, function () {
+
+            if ( processed_ranges.length == 0 ) {
+                final_callback('No sequence data found');
+                return;
+            }
+
             processed_ranges.sort(compare_ranges);
             var retval = "";
             for ( i = 0; i < processed_ranges.length; i++ ) {
                 if ( processed_ranges[i].seq ) 
                     retval += processed_ranges[i].seq;
                 else {
-                    callback("Range was invalid", null);
+                    final_callback("Range was invalid", null);
                 }
             }
-            final_callback(null, retval);
+            final_callback(null, 
+                {
+                    accession : accession, 
+                    start : init_start, 
+                    end : init_end, 
+                    description : processed_ranges[0].description, 
+                    seq : retval
+                });
         }
     );
 }
@@ -57,21 +94,26 @@ function getSequenceFromPage(accession, start, end, callback) {
     var page_start = page_num(start) * page_size;
     seq.findOne({accession:accession, start : page_start}, function(err, page) {
         if ( err ) {
-            console.log(err);
             callback(err);
+            return;
         }
-        zlib.inflate(page.seq, function(err, result) {
-            if ( err ) {
-                console.log(err);
-                callback(err);
-            }
-            var retval = result.toString('ascii');
-            var mod_start = start - page_start;
-            var mod_end = end - page_start;
-            retval = retval.substring(mod_start, mod_end);
-            console.log(retval);
-            callback(null, retval);
-        })
+        if ( page ) {
+            zlib.inflate(page.seq, function(err, result) {
+                if ( err ) {
+                    console.log(err);
+                    callback(err);
+                }
+                var retval = result.toString('ascii');
+                var mod_start = start - page_start;
+                var mod_end = end - page_start;
+                retval = retval.substring(mod_start, mod_end);
+                callback(null, { accession: page.accession, description : page.description, seq : retval});
+            })
+        }
+        else {
+            callback('No sequence data');
+        }
+        
     });
 }
 
@@ -94,6 +136,29 @@ function createSeqSchema(mongoose) {
 
     exports.seq = mongoose.model('Seq', schem);
     seq = exports.seq;
+}
+
+
+function createGeneSchema(mongoose) {
+    var schem = new mongoose.Schema({
+            gene_name : String, 
+            start: Number,
+            end: Number,
+            gene_id: String,
+            chrom : String
+        }, {collection:'gene'});
+    exports.gene = mongoose.model('Gene', schem);
+}
+
+function createMrnaSchema(mongoose) {
+    var schem = new mongoose.Schema({
+            accession : String, 
+            start: Number,
+            end: Number,
+            gene_id: String,
+            chrom : String
+        }, {collection:'mrna'});
+    exports.mrna = mongoose.model('mRNA', schem);
 }
 
 
