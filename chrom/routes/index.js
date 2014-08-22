@@ -69,7 +69,7 @@ exports.gene_list = function(req, res) {
     })
 }
 
-exports.mrna = function(req, res) {
+function serve_mrna(req, res, callback) {
     var accession = req.params.accession;
     console.log("Searching for mrna " + accession );
     if ( !accession) {
@@ -81,17 +81,28 @@ exports.mrna = function(req, res) {
             res.status(404).end('mRNA could not found');
         }
         else {
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            callback(req, res, result);
         }
+    })
+
+}
+exports.mrna = function(req, res) {
+    serve_mrna(req, res, function(req, res, result) {
+        res.render("mrna", {result : result});
+    })
+}
+exports.mrna_api = function(req, res) {
+    serve_mrna(req, res, function(req, res, result) {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(result));   
     })
 }
 
 exports.mrna_list = function(req, res) {
-    var skip = req.params.skip;
-    var limit = req.params.limit;
-    
-    db.mrna.find({}, {gene_id : 1, accession : 1}, { skip: skip, limit: limit }, function(err, result){
+    var skip = req.params.skip || 0;
+    var limit = req.params.limit || 100;
+
+    db.mrna.find({}, {gene_id : 1, accession : 1, features : 1}, { skip: skip, limit: limit }, function(err, result){
         if ( err ) {
             res.status(404).end('Gene could not found');
         }

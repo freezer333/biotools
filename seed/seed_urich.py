@@ -52,8 +52,10 @@ def process_mrna(count, mrna):
                 #print (us)
                 up = dict()
                 up['u_rich_downstream'] = us
-                collect.find_and_modify({'accession' : mrna['accession']}, up)
-                print('Updated\t' , '{0: <15}'.format(mrna['accession']), " with ", len(us), ' u-rich motifs')
+                ret = collect.update({'_id':mrna['_id']}, {'$set': {'u_rich_downstream': us}})
+
+                #collect.find_and_modify({'accession' : mrna['accession']}, up)
+                print('Updated\t' , '{0: <15}'.format(mrna['accession']), " with ", len(us), ' u-rich motifs\t', ret)
 
 def get_urich_motifs(seq):
     seq = seq.replace('T', 'U')
@@ -71,7 +73,7 @@ def get_urich_motifs(seq):
         i += 1
     return motifs
 
-mcursor = collect.find({})
+mcursor = collect.find(spec={},snapshot=True)
 count = 1
 #process_mrna(mcursor[0])
 for record in mcursor:

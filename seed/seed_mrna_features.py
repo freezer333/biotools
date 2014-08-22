@@ -43,8 +43,7 @@ with open(seq_features_file) as f:
                 all_count += 1
                 features['exons'] = exons
                 up = dict()
-                up['features'] = features
-                if collect.find_and_modify({'accession' : features['accession']}, up) != None :
+                if collect.find_and_modify({'accession' : features['accession']}, {'$set': {'features': features}}) != None :
                     count+= 1
                 print ('Saved ', count, ' / ' , all_count, ' mrna features')
                 features = dict()
@@ -54,6 +53,8 @@ with open(seq_features_file) as f:
             features['definition'] = ' '.join(fields[1:])
         if fields[0] == 'VERSION':
             features['accession'] = fields[1]
+        if len(fields) >= 2 and fields[1] and fields[1].startswith('/gene='):
+            features['gene_name'] = fields[1].split('=')[1].replace('\"', "")
         if fields[1] == 'ORGANISM':
             features['organism'] = ' '.join(fields[2:]).strip()
         if fields[1] == 'CDS':
@@ -62,8 +63,8 @@ with open(seq_features_file) as f:
                 start = pts[0].strip()
                 end = pts[1].strip()
                 features['cds'] = { 'start' : start, 'end' : end}
-                features['5utr'] = { 'start' : '1', 'end' : start}
-                features['3utr'] = { 'start' : end, 'end' : features['length']}
+                features['utr_5'] = { 'start' : '1', 'end' : start}
+                features['utr_3'] = { 'start' : end, 'end' : features['length']}
         if fields[1] == 'exon':
             pts = fields[2].split("..");
             if len (pts)  > 1:

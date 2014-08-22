@@ -156,7 +156,26 @@ function createMrnaSchema(mongoose) {
             start: Number,
             end: Number,
             gene_id: String,
-            chrom : String
+            chrom : String, 
+            features : 
+                {
+                    exons : [ { start : Number, end : Number} ], 
+                    utr_3 : { start : Number, end : Number}, 
+                    utr_5 : { start : Number, end : Number}, 
+                    cds : { start : Number, end : Number}, 
+                    organism : String, 
+                    definition : String, 
+                    length : Number, 
+                    gene_name : String
+                }
+            , 
+            u_rich_downstream : [
+                {
+                    downstream_rel_pos : Number, 
+                    seq : String, 
+                    order : Number
+                }
+            ]
         }, {collection:'mrna'});
     exports.mrna = mongoose.model('mRNA', schem);
 }
