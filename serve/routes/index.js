@@ -13,7 +13,9 @@ mongoose.connect(url, { auto_reconnect: true }, function (err, res) {
   }
 });
 
-
+exports.home = function(req, res) {
+    res.render("home", {});
+}
 
 exports.chrom = function(req, res) {
     var accession = req.params.accession;

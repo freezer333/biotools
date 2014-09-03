@@ -1,0 +1,3 @@
+syntax: glob
+seed/chrom_test.py
+external_data*

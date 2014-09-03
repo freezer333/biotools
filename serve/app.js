@@ -28,6 +28,7 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(session({ secret: 'qgrs-rcnj-1986'}))
 
+app.get('/', routes.home)
 app.get('/chrom/:accession/:start/:end', routes.chrom);
 app.get('/gene/:id', routes.gene)
 app.get('/gene/:skip/:limit', routes.gene_list)
