@@ -14,8 +14,8 @@ seq_collect = db.seq
 #--------------------
 
 page_size = 10000
-root = '/Users/sfrees/projects/bio-data/chromosome_data/'
-
+root = os.getcwd() + '/external_data/chromosome_data/'
+os.makedirs(root, exist_ok=True)
 
 
 
