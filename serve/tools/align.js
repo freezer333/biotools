@@ -40,42 +40,40 @@ var perform_alignment = function(a, b, gapopen, gapextend, oncomplete, onerror) 
 
         open_jobs++;
 
-        try {
-          var spawn = require('child_process').spawn,
-              needle  = spawn('needle', 
-                  ['-asequence', a_filename, '-bsequence', b_filename, '-outfile', out_filename, '-gapopen', gapopen, '-gapextend', gapextend, '-aformat', 'fasta']);
+        
+        var spawn = require('child_process').spawn,
+            needle  = spawn('needle', 
+                ['-asequence', a_filename, '-bsequence', b_filename, '-outfile', out_filename, '-gapopen', gapopen, '-gapextend', gapextend, '-aformat', 'fasta']);
+        
+        needle.on('error', function (err) {
+          console.log("Alignment failed - " + JSON.stringify(err));
+          onerror(err);
+        })    
+        
+        needle.on('close', function (code, signal) {
+          var seqA = "";
+          var seqB = "";
+          var text = fs.readFileSync(out_filename,'utf8')
+          var firstMark = text.indexOf(">");
+          var secondMark = text.indexOf(">", firstMark+1);
 
-          needle.on('close', function (code, signal) {
-            var seqA = "";
-            var seqB = "";
+          var firstSeq = text.indexOf("\n", firstMark+1);
+          var secondSeq = text.indexOf("\n", secondMark + 1);
 
-            var text = fs.readFileSync(out_filename,'utf8')
-            var firstMark = text.indexOf(">");
-            var secondMark = text.indexOf(">", firstMark+1);
+          var seqA = text.substring(firstSeq+1, secondMark);
+          var seqB = text.substring(secondSeq+1);
 
-            var firstSeq = text.indexOf("\n", firstMark+1);
-            var secondSeq = text.indexOf("\n", secondMark + 1);
+          seqA = seqA.replace(/(\r\n|\n|\r)/gm,"");
+          seqB = seqB.replace(/(\r\n|\n|\r)/gm,"");
 
-            var seqA = text.substring(firstSeq+1, secondMark);
-            var seqB = text.substring(secondSeq+1);
-
-            seqA = seqA.replace(/(\r\n|\n|\r)/gm,"");
-            seqB = seqB.replace(/(\r\n|\n|\r)/gm,"");
-
-            open_jobs--;
-            if ( open_jobs < 1 ) {
-              temp.cleanup(function(err, stats) {
-                //console.log(stats)
-              });
-            }
-
-            oncomplete({a : seqA, b : seqB});
-          });
-        }
-        catch (e) {
-          onerror(e)
-        }  
-
+          open_jobs--;
+          if ( open_jobs < 1 ) {
+            temp.cleanup(function(err, stats) {
+              //console.log(stats)
+            });
+          }
+          oncomplete({a : seqA, b : seqB});
+        });
     });
 
   });

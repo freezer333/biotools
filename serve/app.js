@@ -12,6 +12,7 @@ var fs              = require('fs');
 var app = exports.app = express();
 var routes = require('./routes');
 var alignment_routes = require('./routes/alignment');
+var homologene_routes = require('./routes/homologene');
 
 var port = process.env.PORT || 3000;
 
@@ -41,9 +42,13 @@ app.get('/mrna/:skip/:limit', routes.mrna_list)
 app.get('/mrna/', routes.mrna_list)
 app.get('/mrna', routes.mrna_list)
 
-
 app.post('/alignment', alignment_routes.index)
 app.get('/alignment', alignment_routes.description)
 app.get('/alignment/input', alignment_routes.input)
+
+app.get('/homologene/gene/:id', homologene_routes.search_by_gene)
+app.get('/homologene/mrna/:accession', homologene_routes.search_by_mrna)
+app.get('/homologene/list/:skip/:limit', homologene_routes.index)
+app.get('/homologene/list', homologene_routes.index)
 
 http.createServer(app).listen(port);   

@@ -1,7 +1,27 @@
-exports.init = function init(mongoose) {
+var mongoose = exports.mongoose = require ("mongoose");
+var url = "mongodb://localhost:27017/chrome";
+var fs = require('fs');
+
+var mongoose = exports.mongoose = require ("mongoose");
+
+mongoose.connect(url, { auto_reconnect: true }, function (err, res) {
+  if (err) {
+    console.log ('ERROR connecting to: ' + url + '. ' + err);
+  } else {
+    init(mongoose);
+    exports.db = res;
+    exports.mongoose = mongoose;
+    console.log("Connected to mongo instance at " + url)
+  }
+});
+
+
+
+var init = function init(mongoose) {
     createSeqSchema(mongoose);
     createGeneSchema(mongoose);
     createMrnaSchema(mongoose);
+    createHomologeneSchema(mongoose);
 };
 
 var seq;
@@ -138,6 +158,33 @@ function createSeqSchema(mongoose) {
     seq = exports.seq;
 }
 
+function createHomologeneSchema(mongoose) {
+
+    var schem = new mongoose.Schema({
+        hid : String, 
+        homologs : [
+            {
+                tax_id : String, 
+                protein_length : Number, 
+                end : Number, 
+                start : Number, 
+                gene_symbol : String,
+                mrna_accession_ver : String, 
+                gi_source : String, 
+                gene_id : String, 
+                protein_gi : String, 
+                tax_name : String, 
+                protein_accession : String, 
+                strand : String
+            }
+        ]
+        }, {collection:'homologene'});
+
+
+
+    exports.homologene = mongoose.model('Homologene', schem);
+    homologene = exports.homologene;
+}
 
 function createGeneSchema(mongoose) {
     var schem = new mongoose.Schema({

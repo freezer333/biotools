@@ -1,17 +1,6 @@
 
-var mongoose = exports.mongoose = require ("mongoose");
-var db = exports.schemas = require("../db");
-var url = "mongodb://localhost:27017/chrome";
+var db = require("../db");
 var fs = require('fs');
-
-var mongoose = exports.mongoose = require ("mongoose");
-mongoose.connect(url, { auto_reconnect: true }, function (err, res) {
-  if (err) {
-    console.log ('ERROR connecting to: ' + url + '. ' + err);
-  } else {
-    db.init(mongoose);
-  }
-});
 
 exports.home = function(req, res) {
     res.render("home", {});
