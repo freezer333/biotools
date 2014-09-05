@@ -36,8 +36,8 @@ app.get('/chrom/:accession/:start/:end', routes.chrom);
 app.get('/gene/:id', routes.gene)
 app.get('/gene/:skip/:limit', routes.gene_list)
 
-app.get('/api/mrna/:accession', routes.mrna_api)
-app.get('/mrna/:accession', routes.mrna)
+app.get('/mrna/:accession', routes.mrna_api)
+app.get('/gui/mrna/:accession', routes.mrna)
 app.get('/mrna/:skip/:limit', routes.mrna_list)
 app.get('/mrna/', routes.mrna_list)
 app.get('/mrna', routes.mrna_list)

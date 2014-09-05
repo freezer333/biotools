@@ -245,10 +245,10 @@ A similar URL strategy is used for genes as well.
 ## Serving specific mRNA or Genes by id/accession number
 For mrna and genes, you can specifiy precisely which record you want to retreive by specifying the accession number for mrna, or the gene id for genes
 
-```http://localhost:3000/api/mrna/:accession```  
+```http://localhost:3000/mrna/:accession```  
 ```http://localhost:3000/gene/:geneid```  
 
-For example, request to `http://localhost:3000/gene/64109` will return a JSON representation of the CRLF2 human gene.  Requests to `http://localhost:3000/api/mrna/NM_000345.3` will return a JSON representation of the human SNCA mRNA.  Note, for the mRNA url there is an "api" in the path - which is only required temporarily.  I will remove that requirement soon.  Without the "api" part, you will get an HTML representation of the mRNA.
+For example, request to `http://localhost:3000/gene/64109` will return a JSON representation of the CRLF2 human gene.  Requests to `http://localhost:3000/api/mrna/NM_000345.3` will return a JSON representation of the human SNCA mRNA.  
 
 ## Finding Homologene Records
 The homologene records have clusters of genes with related function.  You may retrieve listings using the standard skip/limit api using the following URL.
