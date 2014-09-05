@@ -11,6 +11,7 @@ var fs              = require('fs');
 
 var app = exports.app = express();
 var routes = require('./routes');
+var alignment_routes = require('./routes/alignment');
 
 var port = process.env.PORT || 3000;
 
@@ -20,7 +21,8 @@ app.set('view engine', 'jade');
 
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
 app.use(morgan('dev'));                     
-app.use(bodyParser());    
+app.use(bodyParser.json());    
+app.use(bodyParser.urlencoded());    
 app.use(require('less-middleware')(__dirname + '/public'));
 app.use(express.static(__dirname + '/public'));   
 app.use(express.static(__dirname + '/bower_components'));   
@@ -39,5 +41,9 @@ app.get('/mrna/:skip/:limit', routes.mrna_list)
 app.get('/mrna/', routes.mrna_list)
 app.get('/mrna', routes.mrna_list)
 
+
+app.post('/alignment', alignment_routes.index)
+app.get('/alignment', alignment_routes.description)
+app.get('/alignment/input', alignment_routes.input)
 
 http.createServer(app).listen(port);   

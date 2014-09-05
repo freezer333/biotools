@@ -1,0 +1,38 @@
+########################################
+# Program: needle
+# Rundate: Wed  2 Jul 2014 21:08:14
+# Commandline: needle
+#    -asequence seqa.fasta
+#    -bsequence seqb.fasta
+#    -outfile myoutput.needle
+#    -gapopen 10
+#    -gapextend 0.5
+# Align_format: srspair
+# Report_file: myoutput.needle
+########################################
+
+#=======================================
+#
+# Aligned_sequences: 2
+# 1: sequence
+# 2: sequence
+# Matrix: EDNAFULL
+# Gap_penalty: 10.0
+# Extend_penalty: 0.5
+#
+# Length: 23
+# Identity:      20/23 (87.0%)
+# Similarity:    20/23 (87.0%)
+# Gaps:           3/23 (13.0%)
+# Score: 79.5
+# 
+#
+#=======================================
+
+sequence           1 ATCGATCGATTGGCC--AATTGG     21
+                     ||||||||||| |||  ||||||
+sequence           1 ATCGATCGATT-GCCAAAATTGG     22
+
+
+#---------------------------------------
+#---------------------------------------
