@@ -50,5 +50,6 @@ app.get('/homologene/gene/:id', homologene_routes.search_by_gene)
 app.get('/homologene/mrna/:accession', homologene_routes.search_by_mrna)
 app.get('/homologene/list/:skip/:limit', homologene_routes.index)
 app.get('/homologene/list', homologene_routes.index)
+app.get('/homologene/species', homologene_routes.species)
 
 http.createServer(app).listen(port);   

@@ -263,6 +263,13 @@ More useful however is retreiving clusters based on a gene id or mRNA accession 
 
 Note also that for accession numbers, if you do not end the accession with a version number (for example, if you simply use `http://localhost:3000/homologene/mrna/NM_006245` instead of `http://localhost:3000/homologene/mrna/NM_006245.2`), regular expression will be used to match against accession number with *any version* - and therefore results containing mRNA with accession number of - for example - NM_006245.3 would be returned.
 
+### Organisims in Homologene
+To find all organisms listed in the homologene collection, visit:
+ 
+```http://localhost:3000/homologene/species```  
+
+This URL will return a JSON array of taxon objects - containing the ID and organism name of each organism represented in the entire collection.
+
 # Step 10:  Programmatic Access
 In step 9, you've seen how URLs, when properly constructed, will returnn JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
 

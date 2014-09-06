@@ -56,3 +56,21 @@ exports.search_by_mrna = function(req, res) {
         }
     })
 }
+
+exports.species = function (req, res) {
+    var pipeline = [
+        {$unwind : '$homologs'}, 
+        {$group : {_id :{name : '$homologs.tax_name', id : '$homologs.tax_id'}}}, 
+        {$project : {id : "$_id.id", name : "$_id.name", _id:0}}
+        ];
+    db.homologene.aggregate()
+        .unwind('homologs')
+        .group({_id :{name : '$homologs.tax_name', id : '$homologs.tax_id'}})
+        .project( {id : "$_id.id", name : "$_id.name", _id:0})
+        .exec(
+        function (err, results) {
+            console.log(results);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(results));    
+        });
+}
