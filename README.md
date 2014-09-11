@@ -250,6 +250,13 @@ For mrna and genes, you can specifiy precisely which record you want to retreive
 
 For example, request to `http://localhost:3000/gene/64109` will return a JSON representation of the CRLF2 human gene.  Requests to `http://localhost:3000/api/mrna/NM_000345.3` will return a JSON representation of the human SNCA mRNA.  
 
+## Serving mRNA sequences
+For mRNA, you can easily retrieve the full sequence using the following URL:
+```http://localhost:3000/mrna/:accession/sequence```
+
+Requests to the URL will build the mRNA sequence from the chromosome source data, stitching together exon associated with the exon and performing necessary
+reverse compliment transformations as needed.
+
 ## Finding Homologene Records
 The homologene records have clusters of genes with related function.  You may retrieve listings using the standard skip/limit api using the following URL.
 
