@@ -204,9 +204,10 @@ function createMrnaSchema(mongoose) {
             end: Number,
             gene_id: String,
             chrom : String, 
+            orientation : String,
+            exons : [ { start : Number, end : Number} ], 
             features : 
                 {
-                    exons : [ { start : Number, end : Number} ], 
                     utr_3 : { start : Number, end : Number}, 
                     utr_5 : { start : Number, end : Number}, 
                     cds : { start : Number, end : Number}, 

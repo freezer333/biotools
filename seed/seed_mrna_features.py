@@ -65,10 +65,11 @@ with open(seq_features_file) as f:
                 features['cds'] = { 'start' : start, 'end' : end}
                 features['utr_5'] = { 'start' : '1', 'end' : start}
                 features['utr_3'] = { 'start' : end, 'end' : features['length']}
+        '''
         if fields[1] == 'exon':
             pts = fields[2].split("..");
             if len (pts)  > 1:
                 start = pts[0].strip()
                 end = pts[1].strip()
                 exons.append({ 'start' : start, 'end' : end})
-            
+        '''    

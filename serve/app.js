@@ -37,6 +37,7 @@ app.get('/gene/:id', routes.gene)
 app.get('/gene/:skip/:limit', routes.gene_list)
 
 app.get('/mrna/:accession', routes.mrna_api)
+app.get('/mrna/:accession/sequence', routes.mrna_sequence)
 app.get('/gui/mrna/:accession', routes.mrna)
 app.get('/mrna/:skip/:limit', routes.mrna_list)
 app.get('/mrna/', routes.mrna_list)
