@@ -39,10 +39,17 @@ collect = db.mrna
 def process_mrna(count, mrna):
     if 'chrom' in mrna and 'start' in mrna and 'end' in mrna :
         #ex. http://localhost:3000/chrom/NC_000023/149592512/149595310
-        start = int(mrna['end']) + upstream
-        end = int(mrna['end']) + downstream
-        url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end);
-        #print (url)
+        url = ""
+        if mrna['orientation'] == '+':
+            start = int(mrna['end']) + upstream
+            end = int(mrna['end']) + downstream
+            url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end);
+        else :
+            start = int(mrna['start']) - downstream
+            end = int(mrna['start']) - upstream
+            url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end) + "?orientation=-";
+        
+        print (url)
         response = requests.get(url)
         if response.status_code == requests.codes.ok :
             data = response.json()
