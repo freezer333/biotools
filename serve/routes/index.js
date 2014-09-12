@@ -10,6 +10,7 @@ exports.chrom = function(req, res) {
     var accession = req.params.accession;
     var start = req.params.start;
     var end = req.params.end;
+    var orientation = req.query.orientation || "+";
 
     if ( !accession || !start || !end ) {
         res.status(404).end('Sequence range was not specified or was invalid');
@@ -22,6 +23,9 @@ exports.chrom = function(req, res) {
         }
         else {
             res.setHeader('Content-Type', 'application/json');
+            if ( orientation == '-') {
+                result.seq = reverse_compliment(result.seq);
+            }
             res.end(JSON.stringify(result));    
         }
     });
@@ -79,6 +83,18 @@ function serve_mrna(req, res, callback) {
     })
 }
 
+function reverse_compliment(sequence){
+    rev = sequence.split("").reverse();
+    sequence = rev.map(function (c){
+                if ( c == 'A' ) return 'T';
+                if ( c == 'T' ) return 'A';
+                if ( c == 'C' ) return 'G';
+                if ( c == 'G' ) return 'C';
+                return c;
+            }).join("");
+    return sequence;
+}
+
 exports.mrna_sequence = function (req, res){
     var accession = req.params.accession;
     
@@ -114,17 +130,12 @@ exports.mrna_sequence = function (req, res){
                         sequence+= result.seq.substring(s, e);
                     }
                     if ( mrna.orientation == '-') {
-                        rev = sequence.split("").reverse();
-                        sequence = rev.map(function (c){
-                            if ( c == 'A' ) return 'T';
-                            if ( c == 'T' ) return 'A';
-                            if ( c == 'C' ) return 'G';
-                            if ( c == 'G' ) return 'C';
-                            return c;
-                        }).join("");
+                        sequence = reverse_compliment(sequence);
                     }
+
+                    mrna.seq = sequence
                     res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify({accession : accession, sequence : sequence}));    
+                    res.end(JSON.stringify({mrna : mrna, sequence : sequence}));    
                 }
             });
 

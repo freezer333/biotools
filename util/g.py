@@ -1,35 +1,42 @@
 import math
+import time
 
-def find(sequence, min_tetrads=2, min_score=13, log=False) :
+def find(sequence, min_tetrads=2, min_score=17, log=False) :
     raw_g4s = list()
 
+    before = time.time();
     cands = seedQ(sequence, min_tetrads)
-    if log:
-        print ( len(cands) , " initial candidates found at seed time")
-    
+    #if log:
+    #    print ( len(cands) , " initial candidates found at seed time")
+    #after = time.time()
+    #print("\tSeed Time:  " , (after-before));
+
+    #before = time.time();
     while len(cands) > 0:
         cand = cands.pop()
-        if log:
-            print("Candidate G4:  ", cand.asString(), "  -> ",  end="")
+    #    if log:
+    #        print("Candidate G4:  ", cand.asString(), "  -> ",  end="")
         if cand.complete():
             if cand.viable(min_score):
-                if log:
-                    print("Complete")
+    #            if log:
+    #                print("Complete")
                 raw_g4s.append(makeG4(cand))
-            elif log:
-                print("Not viable, discarded")
+    #        elif log:
+    #            print("Not viable, discarded")
         else :
             expanded = cand.expand()
-            if len(expanded) is 0 and log:
-                print("Discarded, no expansion possible")
-            elif log:
-                print("Expanded into ", len(expanded), " new candidates")
+    #       if len(expanded) is 0 and log:
+    #            print("Discarded, no expansion possible")
+    #        elif log:
+    #            print("Expanded into ", len(expanded), " new candidates")
             for c in expanded:
                 cands.append(c)
+    #after = time.time()
+    #if log:
+    #    print("Found " , len(raw_g4s) , " g4s, now grouping into families")
+    #print("\tFirst Pass Time:  " , (after-before), "      ", len(raw_g4s) , " raw g4s");
 
-    if log:
-        print("Found " , len(raw_g4s) , " g4s, now grouping into families")
-
+    #before = time.time();
     fams = list()
     for g in raw_g4s :
         newfam = True
@@ -41,11 +48,12 @@ def find(sequence, min_tetrads=2, min_score=13, log=False) :
             f = list()
             f.append(g)
             fams.append(f)
+    #after = time.time()
+    #if log:
+    #    print ("Grouped into " , len(fams) , " families, now building g4 list with overlaps")
+    #print("\tSecond Pass Time:  " , (after-before));
 
-
-    if log:
-        print ("Grouped into " , len(fams) , " families, now building g4 list with overlaps")
-
+    #before = time.time();
     g4s = list()
     for fam in fams:
         # select best
@@ -53,7 +61,8 @@ def find(sequence, min_tetrads=2, min_score=13, log=False) :
         fam.remove(best)
         best['overlaps'] = fam
         g4s.append(best)
-
+    #after = time.time()
+    #print("\tThird Pass Time:  " , (after-before));
     return g4s;
 
 
@@ -159,7 +168,7 @@ class Cand:
         self.maxLength = maximumLength(tetrads)
 
     def score(self) :
-        assert self.complete(), "Can't compute g-score for incomplete G4 candidate"
+      #  assert self.complete(), "Can't compute g-score for incomplete G4 candidate"
 
         gavg = (math.fabs(self.y1-self.y2) + math.fabs(self.y2-self.y3) + math.fabs(self.y1-self.y3))/3.0
 
@@ -169,11 +178,11 @@ class Cand:
         return self.maxLength - (self.numTetrads * 4 + 1)
 
     def length(self):
-        assert self.complete(), "Can't compute length of incomplete G4 candidate"
+       # assert self.complete(), "Can't compute length of incomplete G4 candidate"
         return 4 * self.numTetrads + self.y1 + self.y2 + self.y3
 
     def expand(self) :
-        assert not self.complete(), "Cannot expand complete G4 motif"
+       # assert not self.complete(), "Cannot expand complete G4 motif"
         cands = list()
         ys = self.findLoopLengthsFrom(self.cursor())
         for y in ys:
@@ -203,19 +212,19 @@ class Cand:
         return self.start
 
     def t2(self) :
-        assert self.y1 >= 0, "Tetrad 2 position can't be computed until loop 1 is found"
+     #   assert self.y1 >= 0, "Tetrad 2 position can't be computed until loop 1 is found"
         return self.t1() + self.numTetrads + self.y1
 
     def t3(self) :
-        assert self.y2 >= 0, "Tetrad 3 position can't be computed until loop 2 is found"
+     #   assert self.y2 >= 0, "Tetrad 3 position can't be computed until loop 2 is found"
         return self.t2() + self.numTetrads + self.y2
 
     def t4(self) :
-        assert self.y3 >= 0, "Tetrad 4 position can't be computed until loop 3 is found"
+      #  assert self.y3 >= 0, "Tetrad 4 position can't be computed until loop 3 is found"
         return self.t3() + self.numTetrads + self.y3
 
     def cursor(self):
-        assert not self.complete(), "Cursor cannot be computed on a complete G4"
+      #  assert not self.complete(), "Cursor cannot be computed on a complete G4"
         
         if self.y1 < 0 :
             return self.t1() + self.numTetrads
@@ -226,6 +235,23 @@ class Cand:
 
     def partialLength(self) :
         length = self.numTetrads * 4
+
+        # add the minimum loops left
+        if self.y1 >= 0 and self.y2 <0:
+            # only first loop is known
+            if self.y1 == 0:
+                # other two must be at least 2
+                length += 2
+            else :
+                length += 1
+
+        elif self.y2 >= 0 and self.y3 <0:
+            #first two loop lengths are known
+            if self.y1 == 0 or self.y2 == 0:
+                length+= 1
+            # if neither y1 or y2 are zero, the next loop could be 0
+
+        # add the current loops
         if self.y1 > 0 :
             length += self.y1
         if self.y2 > 0:
@@ -243,11 +269,13 @@ class Cand:
         p = i
         done = False
         while not done:
-            p = self.sequence.find(self.tstring, p)
+            p = self.sequence.find(self.tstring, p, self.start+self.maxLength+1)
             if p >= 0:
                 y = p - i
-                if y >= self.minAcceptableLoopLength() :
+                if y >= self.minAcceptableLoopLength() and (p-self.start+len(self.tstring)-1) < self.maxLength:
                     ys.append(y)
+                else :
+                    done = True
             else:
                 done = True
             p += 1
