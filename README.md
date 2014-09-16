@@ -129,6 +129,8 @@ Once the service is running, navigate (in a different terminal/command prompt fr
 ```
 $ python3 seed_urich.py
 ```
+The U-rich element records will be stored in an array named `u_rich_downstream` within each mRNA record analyzed.  Each record contains an attribute named `order` which is 3, 4, or 5 depending on number of U's.  In addition, the 5 bases are listed as a string in `seq` and the position relative to the end of the mRNA (downstream of polyA site) is listed in `downstream_rel_pos`.
+
 
 ## 7f - QGRS / G4 Data (optional)
 This script creates QGRS sub-records in the mRNA collection.  QGRS records are only created for mRNA where the feature data is present - specifically where the CDS is known.  The QGRS records are categorized by region - 5'UTR, CDS, 3'UTR, and downstrea (65 bases).  G-Score is calculated for each record, and full architectural data is stored.
@@ -141,7 +143,25 @@ Once the service is running, navigate (in a different terminal/command prompt fr
 $ python3 seed_g4.py
 ```
 
+QGRS records are stored in an array named `g4s`.  Each individual QGRS motif is contains the following attributes:
 
+* `id` - unique id for G4 (concatenation of accession /version and sequence number of motif)
+* `is5Prime` - true if motif is in the mRNA's 5'UTR
+* `isCDS` - true if motif is in the mRNA's CDS region
+* `is3Prime` - true if motif is in the mRNA's 3'UTR region
+* `isDownstream` - true if motif is downstream of poly(a) signal
+* `start` - start position (relative to beginning of mRNA) of first tetrad
+* `tetrads` - number of tetrads in motif
+* `tetrad1` - start position of first tetrad (same as start)
+* `tetrad2` - start position of second tetrad (relative to beginning of mRNA)
+*  `tetrad3` - start position of third tetrad (relative to beginning of mRNA)
+*  `tetrad4` - start position of fourth tetrad (relative to beginning of mRNA)
+*  `y1` - first loop length
+*  `y2` - second loop length
+*  `y3` - third loop length
+*  `length` - overal length of motif
+*  `gscore` - calculated G-score for motif
+*  `sequence` - motif bases
 
 
 #Step 8: Verifying your data
@@ -356,6 +376,25 @@ if response.status_code == requests.codes.ok :
     data = response.json()
     print ("The sequence data is\n", data['seq'])
 ```
+
+## Example 2:  Count U-Rich elements in mRNA in Python
+The following code illustrates counting U-rich elements in mRNA by querying MongoDB directly for all mRNA with downstream U-rich elements. 
+
+```
+from pymongo import MongoClient
+client = MongoClient()
+db = client.chrome
+collect = db.mrna
+
+mcursor = collect.find(spec={'u_rich_downstream' : {'$exists':True} },snapshot=True)
+for record in mcursor:
+    accession = record['accession']
+    u_rich_count = len(record['u_rich_downstream'])
+    print(accession, " has ", u_rich_count, " U-rich elements downstream of poly(A) site")
+```
+
+Note, counting QGRS records would be very similar to this example, just using `g4s` array.  To filter by U-rich (or G4) characteristics you can enhance the MongoDB query itself - possibly using the [aggregation framework](http://docs.mongodb.org/manual/core/aggregation/).  To filter in a more simple way (but less efficient), you could just check each motif's characteristics directly in your code - leaving the MongoDB query 'as is'.
+
 
 
 # Refreshing your data
