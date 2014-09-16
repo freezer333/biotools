@@ -28,6 +28,30 @@ Note, for Linux, you will use the package manager that comes along with your dis
 
 Once you've installed Python, please make absolutely sure you have a 3.x version (and not a 2.x) version installed.  Open up your terminal/command prompt and ensure that typing `python3 --version` results in the expected output (i.e. `Python 3.4.1`)
 
+## Step 3a:  Install Dependencies
+In order to run all scripts, you need a few python modules to be installed on your system.
+
+To install the modules below, open your terminal/command prompt.  If you downloaded and installed Python 3.4+, the package manager "pip" will be installed as well.  To install a module, simply type 
+
+```
+pip3 install [module]
+```
+
+Where [module] is replaced by the actual module name.  
+
+To run the scripts, install the following modules:
+
+```
+numpy 
+pymongo
+requests
+urllib3
+```
+
+`numpy` is a library for numeric / scientific computation.  `pymongo` is required for interacting with MongoDB.  The `requests` and `urllib3` modules are for making http requests (downloading sources from NCBI).
+
+For example, you'd type `pip3 install pymongo`
+
 # Step 4:  Install Mercurial
 The source code for this project is hosted in a Mercurial (hg) repository.  Please note, this is not the same repository as the older Java-based programs we've been using - although the rules of Mercurial, bitbucket, etc. still apply.
 
