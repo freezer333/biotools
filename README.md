@@ -116,15 +116,32 @@ $ python3 seed_mrna_features.py
 This script downloads homology data directly from Homologene (NCBI), it will run without any need for you to manually download data.  It creates a MongoDB collection called `homologene` which contains records of homologous pairs of protien coding transcripts for a variety of species.
 
 ```
-python3 seed_homologene.py
+$ python3 seed_homologene.py
 ```
 
 ## 7e - U-Rich Elements (optional) 
-This script creates a listing of sub-records in the mrna collection within each mRNA sequence for U-Rich elements.  Elements found withing 5 and 60 nucleotides past the end / poly(A) of the mRNA are recorded.
+This script creates a listing of sub-records in the mrna collection within each mRNA sequence for U-Rich elements.  Elements found withing 5 and 65 nucleotides past the end / poly(A) of the mRNA are recorded.
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
 
-Once the service is running, navigate (in a different terminal/command prompt from where you just started the web service) to `biotools/seed` and type `python3 seed_urich.py`
+Once the service is running, navigate (in a different terminal/command prompt from where you just started the web service) to `biotools/seed` and type the following:
+
+```
+$ python3 seed_urich.py
+```
+
+## 7f - QGRS / G4 Data (optional)
+This script creates QGRS sub-records in the mRNA collection.  QGRS records are only created for mRNA where the feature data is present - specifically where the CDS is known.  The QGRS records are categorized by region - 5'UTR, CDS, 3'UTR, and downstrea (65 bases).  G-Score is calculated for each record, and full architectural data is stored.
+
+To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
+
+Once the service is running, navigate (in a different terminal/command prompt from where you just started the web service) to `biotools/seed` and type the following: 
+
+```
+$ python3 seed_g4.py
+```
+
+
 
 
 #Step 8: Verifying your data
@@ -301,6 +318,22 @@ To find all organisms listed in the homologene collection, visit:
 
 This URL will return a JSON array of taxon objects - containing the ID and organism name of each organism represented in the entire collection.
 
+## Performing Alignments (Semi-Global)
+The Node.js web app has an additional service that can perform semi-global alignment of any two sequences given their raw sequence data.  To use this service, you must install Emboss's `needle` program however.
+
+Please visit [sourceforge](http://emboss.sourceforge.net/download) for full installation instructions.  **Unfortunately, `needle` does not work on Windows - only Linux or Mac OS X**.
+
+Background information about the `needle` program can be found [here](http://emboss.sourceforge.net/apps/release/6.6/emboss/apps/needle.html) and [here](http://www.ebi.ac.uk/Tools/psa/emboss_needle/help/index-protein.html)
+
+Once you've verified needle is installed correctly, you can access the alignment module over http using the following URL
+
+```
+http://localhost:3000/alignment
+```
+
+The URL responds to POST messages with `seqa` and `seqb` parameters.  The response will be JSON containing the resulting sequences with gaps (-) injected.
+
+To test, you can also visit `http://localhost:3000/alignment/input` and enter sequences manually.
 # Step 10:  Programmatic Access
 In step 9, you've seen how URLs, when properly constructed, will returnn JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
 
