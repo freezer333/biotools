@@ -164,6 +164,8 @@ QGRS records are stored in an array named `g4s`.  Each individual QGRS motif is 
 *  `sequence` - motif bases
 
 
+
+
 #Step 8: Verifying your data
 Once your sources have been seeded, you should get familiar with the layout with MongoDB - although most of the time you will work with the data through web services, occasionally it will be very helpful for you to understand how to work directly in MongoDB. The MongoDB instance is named "chrome".  The collection listings should be as shown below (you enter the "show collections" command)
 
@@ -281,7 +283,29 @@ The `homologene` collection contains records representing a group of homologous 
 
 In this listing, you can see all data associated with each transcript.  Linking these listing to mRNA and gene collections can be done through `gene_id` and `mrna_accession_ver`.  Note however, currently this data set only includes mrna/gene/sequence data for humans.
 
-# Step 9:  Serving your data
+#Step 9:  Create Indexes
+You should create additional indexes to speed up the access time of your MongoDB database.  To do so, open your terminal/command prompts and type
+
+```
+$ mongo chrome
+```
+Then, at the mongo shell, type the following to create an index of the chromosome sequence data's accession/start position.  
+
+```
+>  db.seq.ensureIndex({'accession':1, 'start':1})
+```
+Note, that command may take a few minutes to complete.
+
+Additional useful indexes are:
+
+*  `db.mrna.ensureIndex({'accession':1})`
+*  `db.gene.ensureIndex({'gene_id':1})`
+*  `db.homologene.ensureIndex({'mrna_accession_ver':1})`
+
+You can create indexes on any commonly searched attributes to support your projects.
+
+
+# Step 10:  Serving your data
 While you will also be able to access this data directly through MongoDB, some of the datasets (especially sequence data) is easier to access through web services.   In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
 
 The following URL's can be used to access data:
@@ -354,8 +378,8 @@ http://localhost:3000/alignment
 The URL responds to POST messages with `seqa` and `seqb` parameters.  The response will be JSON containing the resulting sequences with gaps (-) injected.
 
 To test, you can also visit `http://localhost:3000/alignment/input` and enter sequences manually.
-# Step 10:  Programmatic Access
-In step 9, you've seen how URLs, when properly constructed, will returnn JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
+# Step 11:  Programmatic Access
+In step 10, you've seen how URLs, when properly constructed, will return JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
 
 ## Example 1:  Accession sequence data through Python
 The following code uses python's url request facilities to get sequence data.
@@ -395,6 +419,11 @@ for record in mcursor:
 
 Note, counting QGRS records would be very similar to this example, just using `g4s` array.  To filter by U-rich (or G4) characteristics you can enhance the MongoDB query itself - possibly using the [aggregation framework](http://docs.mongodb.org/manual/core/aggregation/).  To filter in a more simple way (but less efficient), you could just check each motif's characteristics directly in your code - leaving the MongoDB query 'as is'.
 
+## Example 3:  Finding Homologs for each Human mRNA in Python
+TODO
+
+## Example 4:  Performing a semi-global alignment on two mRNA sequences in Python
+TODO
 
 
 # Refreshing your data
