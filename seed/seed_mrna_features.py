@@ -12,7 +12,7 @@ import re
 #------------------------------------------------------------
 # Sequence features download variables
 #------------------------------------------------------------
-root = '/Users/sfrees/projects/bio-data/mRNA-Features-Human/'
+root = os.getcwd() + '/external_data/'
 seq_features_file = root + 'mRNA-Features-Human'
 #------------------------------------------------------------
 

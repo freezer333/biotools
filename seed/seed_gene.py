@@ -1,6 +1,7 @@
 
 import pymongo
 import sys
+import os
 #--------------------
 # database stuff...
 from pymongo import MongoClient
@@ -10,8 +11,7 @@ gene_collect = db.gene
 mrna_collect = db.mrna
 #--------------------
 
-
-file = '/Users/sfrees/projects/bio-data/top_level'
+file = os.getcwd() + '/external_data/top_level'
 num_genes = 0;
 num_mRNA = 0;
 current_mrna = None

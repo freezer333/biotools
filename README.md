@@ -419,10 +419,13 @@ for record in mcursor:
 
 Note, counting QGRS records would be very similar to this example, just using `g4s` array.  To filter by U-rich (or G4) characteristics you can enhance the MongoDB query itself - possibly using the [aggregation framework](http://docs.mongodb.org/manual/core/aggregation/).  To filter in a more simple way (but less efficient), you could just check each motif's characteristics directly in your code - leaving the MongoDB query 'as is'.
 
-## Example 3:  Finding Homologs for each Human mRNA in Python
+## Example 3:  Getting a list of all mRNA in Python
 TODO
 
-## Example 4:  Performing a semi-global alignment on two mRNA sequences in Python
+## Example 4:  Finding Homologs for each Human mRNA in Python
+TODO
+
+## Example 5:  Performing a semi-global alignment on two mRNA sequences in Python
 TODO
 
 
