@@ -65,10 +65,10 @@ You are now ready to download the source code (some Node.js code, and some pytho
 Navigate to a directory where you wish to host your code (~/projects, C:/projects) and type the following command to pull the source:
 
 ```
-$ hg clone https://sfrees@bitbucket.org/sfrees/biotools
+$ hg clone https://username@bitbucket.org/sfrees/biotools
 
 ```
-Note, you will be prompted to enter your username and password for your bitbucket account.
+**Note, you need to replace 'username' (before the @ symbol) with your own bitbucket username**.  You will be prompted to enter your password for your bitbucket account.
 
 Once complete, move to the biotools directory `cd biotools` and update `hg update`
 
