@@ -15,6 +15,7 @@ seq_collect = db.seq
 
 page_size = 10000
 root = os.getcwd() + '/external_data/chromosome_data/'
+print ("HERE --->", root)
 os.makedirs(root, exist_ok=True)
 
 
@@ -49,6 +50,8 @@ def processFile(filename):
     buffer = ""
     page_count = 0
     acc = ''
+    if not filename.endswith (".fa"):
+        return
     with open(root + filename) as f:
         for line in f:
             if line_num == 0:
@@ -88,5 +91,6 @@ def processFile(filename):
 
 from os import listdir
 files = os.listdir(root)
+print (root)
 for file in files :
     processFile(file)
