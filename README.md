@@ -429,17 +429,95 @@ for record in mcursor:
 Note, counting QGRS records would be very similar to this example, just using `g4s` array.  To filter by U-rich (or G4) characteristics you can enhance the MongoDB query itself - possibly using the [aggregation framework](http://docs.mongodb.org/manual/core/aggregation/).  To filter in a more simple way (but less efficient), you could just check each motif's characteristics directly in your code - leaving the MongoDB query 'as is'.
 
 ## Example 3:  Getting a list of all mRNA in Python
-TODO
+The following code will print all accession numbers for *Homo sapien* mRNA.  Note, you can also filter by build, if necessary.
+
+```
+from pymongo import MongoClient
+client = MongoClient()
+db = client.chrome_test
+collect = db.mrna
+
+mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)
+for record in mcursor:
+    print(record['accession'])
+```
 
 ## Example 4:  Finding Homologs for each Human mRNA in Python
-TODO
+Building on the example above, for each human mRNA, you could use the following code to access the homologene service
+to obtain a list of homologous mRNA found in other species.  Note, this example uses the homologen web service, which makes these types of queries a bit easier.  Alternatively, you could also query the `homologene` collection directly.
+
+**Make sure you service (localhost) is running!**
+
+```
+import urllib.request
+import shutil  
+import requests
+
+from pymongo import MongoClient
+client = MongoClient()
+db = client.chrome_test
+collect = db.mrna
+
+mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)
+for record in mcursor:
+    print(record['accession'])
+    url = 'http://localhost:3000/homologene/mrna/' + record['accession']
+    response = requests.get(url)
+    if response.status_code == requests.codes.ok :
+        data = response.json()
+        if len(data) > 0 and 'homologs' in data[0]:
+            for homolog in data[0]['homologs'] :
+                print ("\t", homolog['tax_name'] + " -> ", homolog['mrna_accession_ver'])
+
+```
 
 ## Example 5:  Performing a semi-global alignment on two mRNA sequences in Python
-TODO
+The following python code utilizes the mrna sequence URL, and the needle alignment URL to perform an alignment of two mRNA sequences.
+
+```
+import urllib.request
+import shutil  
+import requests
+
+human = 'NM_003196.1'  # human TCEA3 transcript
+mouse = 'NM_011542.2'  # mouse TCEA3 transcript
+
+human_sequence = None
+mouse_sequence = None
+
+url = 'http://localhost:3000/mrna/' + human + "/sequence"
+response = requests.get(url)
+if response.status_code == requests.codes.ok :
+    data = response.json()
+    human_sequence = data['sequence'];
+
+url = 'http://localhost:3000/mrna/' + mouse + "/sequence"
+response = requests.get(url)
+if response.status_code == requests.codes.ok :
+    data = response.json()
+    mouse_sequence = data['sequence'];
+
+post_data = { 'seqa' : human_sequence,
+              'seqb' : mouse_sequence}
+
+if human_sequence is not None and mouse_sequence is not None:
+    url = 'http://localhost:3000/alignment/'
+    response = requests.post(url, data=post_data)
+    if response.status_code == requests.codes.ok :
+        data = response.json()
+        print("Sequence Alignment Result")
+        print("=======================\nSequence A\n=======================")
+        print(data['a'])
+        print("=======================\nSequence B\n=======================")
+        print(data['b'])
+
+else:
+    print ('Sequences could not be found')
+```
 
 
 # Refreshing your data
-For many of these scripts, if you re-run them they will create **duplicate** data within the database, which could be *disasterours* for statistical analysis!  If you wish to re-run these scripts, be sure to delete the database collections that will be affected.  For example, to delete the mrna collection, you can log into MongoDB from your command line / terminal:
+For many of these scripts, if you re-run them they will create **duplicate** data within the database, which could be *very... very bad* for statistical analysis!  If you wish to re-run these scripts, be sure to delete the database collections that will be affected.  For example, to delete the mrna collection, you can log into MongoDB from your command line / terminal:
 
 ```
 $ mongo chrome

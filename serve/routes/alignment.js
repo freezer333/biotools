@@ -2,21 +2,19 @@ exports.index = function(req, res) {
     var options = req.body.options;
     var seqa = req.body.seqa;
     var seqb = req.body.seqb;
-    if ( !options ) {
-        res.render("alignment/error", {reason : "Alignment options [options] were not specified"});
+    
+    if ( !seqa ) {
+        res.status(400).end('Sequence A [seqa] was not specified');
+        console.log("No seq a")
+        return;
     }
-    if ( !seqa || !seqa.raw) {
-        res.render("alignment/error", {reason : "Sequence A [seqa] was not specified"});
+    if ( !seqb ) {
+        res.status(400).end('Sequence B [seqb] was not specified');
+        return;
     }
-    if ( !seqb || !seqb.raw) {
-        res.render("alignment/error", {reason : "Sequence B [seqb] was not specified"});
-    }
-    if ( options.method != 'needle' ) {
-        res.render("alignment/error", {reason : "Method [options.method] refers to unsupported alignment method"});
-    }
-
+    
     var aligner = require('../tools/align')
-    var result = aligner.run(seqa.raw, seqb.raw, { gapopen : 10, gapextend : 0.5}, 
+    var result = aligner.run(seqa, seqb, { gapopen : 10, gapextend : 0.5}, 
         function(result) {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(result));    

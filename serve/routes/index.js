@@ -99,8 +99,9 @@ exports.mrna_sequence = function (req, res){
     var accession = req.params.accession;
     
     db.mrna.findOne({ accession : accession}, function(err, mrna){
-        if ( err ) {
+        if ( err || mrna == null ) {
             res.status(404).end('mRNA could not found');
+            return
         }
         else {
             if ( !mrna.exons) {

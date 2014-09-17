@@ -6,11 +6,11 @@ block content
     form(name='align', action="/alignment", method="post", enctype="application/x-www-form-urlencoded")
         div
             label(for='seqa') Sequence A (raw)
-                textarea(name='seqa[raw]', id='seqa.raw')
+                textarea(name='seqa', id='seqa')
 
         div
             label(for='seqb') Sequence B (raw)
-                textarea(name='seqb[raw]', id='seqb.raw')
+                textarea(name='seqb', id='seqb')
 
         input(type='hidden' name='options[method]', value ='needle')
 
