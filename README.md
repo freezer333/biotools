@@ -75,14 +75,22 @@ Once complete, move to the biotools directory `cd biotools` and update `hg updat
 # Step 6:  Download NCBI data sources
 Some of the scripts you will need to run require you to download files from NCBI first.  You must download these (large) files before continuing.
 
+
 ## 6a - Download Chromosome sequence data
-Soon a script will be added to automatically handle this step.  For now, I have pre-packaged the sequence data into a single zip file that can be downloaded from by Dropbox account.  The file is *large* - about 3GB zipped.  [Download it](https://www.dropbox.com/s/p12v4c8doj1sfny/chromosome_data.zip?dl=0) and extract it to your `biotools/seed/external_data/chromosome_data` folder.  Once the entire unzipping process is complete, the folter `chromosome_data` **directly** under the `external_data` folder should have a total of 23 *.fa files - ex chr4.fa.
+~~Soon a script will be added to automatically handle this step.  For now, I have pre-packaged the sequence data into a single zip file that can be downloaded from by Dropbox account.  The file is *large* - about 3GB zipped.  [Download it](https://www.dropbox.com/s/p12v4c8doj1sfny/chromosome_data.zip?dl=0) and extract it to your `biotools/seed/external_data/chromosome_data` folder.  Once the entire unzipping process is complete, the folter `chromosome_data` **directly** under the `external_data` folder should have a total of 23 *.fa files - ex chr4.fa.
+~~
+
+*As of 9/17/2014, this step is not required - the chromosome seeding script automatically downoads the correct files directly from NCBI.*
 
 ## 6b - Download the mRNA top-level source file
-The mRNA top level source file contains basic information about all human mRNA and genes.  [Download](https://www.dropbox.com/s/mupq3qtb7m8xojc/top_level.zip?dl=0) and extract the file to `biotools/seed/external_data` folder.  You should end up with the file named "top_level" directly within the external_data folder.
+~~The mRNA top level source file contains basic information about all human mRNA and genes.  [Download](https://www.dropbox.com/s/mupq3qtb7m8xojc/top_level.zip?dl=0) and extract the file to `biotools/seed/external_data` folder.  You should end up with the file named "top_level" directly within the external_data folder.
+~~
+
+*As of 9/17/2014, this step is not required - the chromosome seeding script automatically downoads the correct files directly from NCBI.*
 
 ## 6c - Download the mRNA features source file.
-The features file contains information such as exons and poly(a) signals.  [Download](https://www.dropbox.com/s/hb31s298636wj8w/mRNA-Features-Human.zip?dl=0) the file from my Dropbox account and extract the zip file.  You should have a file called "mRNA-Features-Human" directly withinn the external_data folder.
+The features file contains information such as transcript definition and region information (cds start/end).  [Download](https://www.dropbox.com/s/hb31s298636wj8w/mRNA-Features-Human.zip?dl=0) the file from my Dropbox account and extract the zip file.  You should have a file called "mRNA-Features-Human" directly withinn the external_data folder.
+
 
 # Step 7:  Seed the data sources
 Note, we'll be adding more data sources and seeding scripts continually, so keep an eye on this page!  Also, please note that the order in which you do these steps is absolutely critical!  Some data sources rely on the sources built in previous steps
@@ -107,7 +115,8 @@ $ python3 seed_gene.py
 ```
 
 ## 7c - mRNA Sequence Features
-This script will attach sequence feature data to many of the mRNA built from step 7b.  The sequence features include organism name and exon positions  
+This script will attach sequence feature data to many of the mRNA built from step 7b.  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
+
 
 ```
 $ python3 seed_mrna_features.py 
