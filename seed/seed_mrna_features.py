@@ -61,7 +61,7 @@ for data in seq_features_file:
 
             if collect.find_and_modify(
                       {'accession' : features['accession']}, 
-                      {'$set': features }) != None :
+                      {'$set': features 5}) != None :
                 count+= 1
             print ('Saved ', count, ' / ' , all_count, ' mrna features')
             features = dict()

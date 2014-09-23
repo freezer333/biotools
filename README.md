@@ -367,6 +367,67 @@ http://localhost:3000/alignment
 The URL responds to POST messages with `seqa` and `seqb` parameters.  The response will be JSON containing the resulting sequences with gaps (-) injected.
 
 To test, you can also visit `http://localhost:3000/alignment/input` and enter sequences manually.
+
+
+## Finding QGRS Density
+If you've populated your data base with G4 (QGRS) data, then you can use the following URL pattern to calculate QGRS density for specific mRNA.
+
+
+```
+http://localhost:3000/qgrs/mrna/:acccession/density
+```
+
+In the url, `:accession` identifies the mRNA.  The URL responds to both GET and POST requests, and accespts the following filtering parameters:
+
+
+For example, requests to: 
+
+`http://localhost:3000/qgrs/mrna/NM_020713.2/density?maxGScore=35&minGScore=17&minTetrad=2&maxTetrad=2&maxLength=14` 
+
+will return the following JSON object descripting QGRS density for the mRNA, broken down by region.
+
+```
+{
+	"density_criteria": {
+		"minTetrad":"2",
+		"maxTetrad":"2",
+		"minGScore":"17",
+		"maxGScore":"35",
+		"maxLength":"14",
+		"minLength":8
+	},
+	"accession":"NM_020713.2",
+	"cds":{
+		"end":2738,
+		"start":60
+	},
+	"density":{ 
+		"overall":{
+			"total":9,  // total number of QGRS matching the filtering criteria
+			"length":5938,
+			"density":0.0015156618390030313
+		},
+		"utr3":{
+			"total":5,  // total number of QGRS matching the filtering criteria in 3'UTR
+			"length":3200,
+			"density":0.0015625
+		},
+		"cds":{
+			"total":3,
+			"length":2678,
+			"density":0.0011202389843166542
+		},
+		"utr5":	{
+			"total":0,
+			"length":60,
+			"density":0
+		}
+	}
+}
+```
+
+*Note, the density calculation is will soon be changed to better reflect "G4P", rather than a straight calculation.*
+
 # Step 10:  Programmatic Access
 In step 10, you've seen how URLs, when properly constructed, will return JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
 
@@ -495,6 +556,24 @@ else:
     print ('Sequences could not be found')
 ```
 
+## Example 5:  Finding QGRS Density in Python
+The following finds the QGRS density of a particular mRNA, while filtering to include only motifs with 3 tetrads.
+
+```
+import urllib.request
+import shutil  
+import requests
+
+accession = 'NM_015719.3'
+url = 'http://localhost:3000/qgrs/mrna/' + accession + '/density'
+filter = {'minTetrad' : 3, 'maxTetrad': 3}
+response = requests.get(url, params=filter)
+if response.status_code == requests.codes.ok :
+    data = response.json()
+    print("Density of QGRS (minimum of 3 tetrads) in 3'UTR is " , data['density']['utr3']['density'])
+else:
+    print("Density of QGRS could not be calculated")
+```
 
 # Refreshing your data
 For many of these scripts, if you re-run them they will create **duplicate** data within the database, which could be *very... very bad* for statistical analysis!  If you wish to re-run these scripts, be sure to delete the database collections that will be affected.  For example, to delete the mrna collection, you can log into MongoDB from your command line / terminal:

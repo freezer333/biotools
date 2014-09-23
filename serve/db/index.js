@@ -206,22 +206,60 @@ function createMrnaSchema(mongoose) {
             chrom : String, 
             orientation : String,
             exons : [ { start : Number, end : Number} ], 
-            features : 
-                {
-                    utr_3 : { start : Number, end : Number}, 
-                    utr_5 : { start : Number, end : Number}, 
-                    cds : { start : Number, end : Number}, 
-                    organism : String, 
-                    definition : String, 
-                    length : Number, 
-                    gene_name : String
-                }
-            , 
+            cds : { start : Number, end : Number}, 
+            utr_3 : { start : Number, end : Number}, 
+            utr_5 : { start : Number, end : Number}, 
+            organism : String, 
+            definition : String, 
+            length : Number, 
+            gene_name : String,
             u_rich_downstream : [
                 {
                     downstream_rel_pos : Number, 
                     seq : String, 
                     order : Number
+                }
+            ], 
+            g4s : [
+                {   
+                    id : String, 
+                    gscore : Number, 
+                    start : Number, 
+                    is5Prime : Boolean, 
+                    isCDS : Boolean, 
+                    is3Prime : Boolean, 
+                    isDownstream : Boolean, 
+                    tetrads : Number, 
+                    tetrad1: Number, 
+                    tetrad2 : Number, 
+                    tetrad3: Number, 
+                    tetrad4: Number, 
+                    y1: Number, 
+                    y2 : Number, 
+                    y3 : Number, 
+                    sequence: String, 
+                    length : Number, 
+                    overlaps : [
+                        {
+                            id : String, 
+                            gscore : Number, 
+                            start : Number, 
+                            is5Prime : Boolean, 
+                            isCDS : Boolean, 
+                            is3Prime : Boolean, 
+                            isDownstream : Boolean, 
+                            tetrads : Number, 
+                            tetrad1: Number, 
+                            tetrad2 : Number, 
+                            tetrad3: Number, 
+                            tetrad4: Number, 
+                            y1: Number, 
+                            y2 : Number, 
+                            y3 : Number, 
+                            sequence: String, 
+                            length : Number
+                        }
+                    ]
                 }
             ]
         }, {collection:'mrna'});

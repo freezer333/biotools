@@ -13,6 +13,7 @@ var app = exports.app = express();
 var routes = require('./routes');
 var alignment_routes = require('./routes/alignment');
 var homologene_routes = require('./routes/homologene');
+var qgrs_routes = require('./routes/qgrs');
 
 var port = process.env.PORT || 3000;
 
@@ -52,5 +53,8 @@ app.get('/homologene/mrna/:accession', homologene_routes.search_by_mrna)
 app.get('/homologene/list/:skip/:limit', homologene_routes.index)
 app.get('/homologene/list', homologene_routes.index)
 app.get('/homologene/species', homologene_routes.species)
+
+app.get('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
+app.post('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
 
 http.createServer(app).listen(port);   
