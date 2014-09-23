@@ -72,33 +72,13 @@ $ hg clone https://username@bitbucket.org/sfrees/biotools
 
 Once complete, move to the biotools directory `cd biotools` and update `hg update`
 
-# Step 6:  Download NCBI data sources
-Some of the scripts you will need to run require you to download files from NCBI first.  You must download these (large) files before continuing.
-
-
-## 6a - Download Chromosome sequence data
-~~Soon a script will be added to automatically handle this step.  For now, I have pre-packaged the sequence data into a single zip file that can be downloaded from by Dropbox account.  The file is *large* - about 3GB zipped.  [Download it](https://www.dropbox.com/s/p12v4c8doj1sfny/chromosome_data.zip?dl=0) and extract it to your `biotools/seed/external_data/chromosome_data` folder.  Once the entire unzipping process is complete, the folter `chromosome_data` **directly** under the `external_data` folder should have a total of 23 *.fa files - ex chr4.fa.
-~~
-
-*As of 9/17/2014, this step is not required - the chromosome seeding script automatically downoads the correct files directly from NCBI.*
-
-## 6b - Download the mRNA top-level source file
-~~The mRNA top level source file contains basic information about all human mRNA and genes.  [Download](https://www.dropbox.com/s/mupq3qtb7m8xojc/top_level.zip?dl=0) and extract the file to `biotools/seed/external_data` folder.  You should end up with the file named "top_level" directly within the external_data folder.
-~~
-
-*As of 9/17/2014, this step is not required - the chromosome seeding script automatically downoads the correct files directly from NCBI.*
-
-## 6c - Download the mRNA features source file.
-The features file contains information such as transcript definition and region information (cds start/end).  [Download](https://www.dropbox.com/s/hb31s298636wj8w/mRNA-Features-Human.zip?dl=0) the file from my Dropbox account and extract the zip file.  You should have a file called "mRNA-Features-Human" directly withinn the external_data folder.
-
-
-# Step 7:  Seed the data sources
+# Step 6:  Seed the data sources
 Note, we'll be adding more data sources and seeding scripts continually, so keep an eye on this page!  Also, please note that the order in which you do these steps is absolutely critical!  Some data sources rely on the sources built in previous steps
 
 **Before continuting**, you __must__ start your MongoDB server.  Type `mongod` into your terminal or command prompt.  Please read the output carefully to make sure the server is running without error.  Once you confirmed this, you can proceed in running the seeding scripts.
 
 ***To execute these scripts, you must navigate to the `biotools/seed` directory.***
-## 7a - Chromosome Sequence Data
+## 6a - Chromosome Sequence Data
 This script builds the sequence database from the FASTA files downloaded in step 6a.  
 
 ```
@@ -107,28 +87,28 @@ $ python3 seed_chrome.py
 
 Please note, this step will take quite some time to complete.  Follow all directions provided by the interactive script.
 
-## 7b - Basic mRNA and Gene Data
+## 6b - Basic mRNA and Gene Data
 This script will build the gene and mrna data collections from the file download in step 6b.  
 
 ```
 $ python3 seed_gene.py 
 ```
 
-## 7c - mRNA Sequence Features
+## 6c - mRNA Sequence Features
 This script will attach sequence feature data to many of the mRNA built from step 7b.  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
 
 
 ```
 $ python3 seed_mrna_features.py 
 ```
-## 7d - Homologene (optional)
+## 6d - Homologene (optional)
 This script downloads homology data directly from Homologene (NCBI), it will run without any need for you to manually download data.  It creates a MongoDB collection called `homologene` which contains records of homologous pairs of protien coding transcripts for a variety of species.
 
 ```
 $ python3 seed_homologene.py
 ```
 
-## 7e - U-Rich Elements (optional) 
+## 6e - U-Rich Elements (optional) 
 This script creates a listing of sub-records in the mrna collection within each mRNA sequence for U-Rich elements.  Elements found withing 5 and 65 nucleotides past the end / poly(A) of the mRNA are recorded.
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
@@ -141,7 +121,7 @@ $ python3 seed_urich.py
 The U-rich element records will be stored in an array named `u_rich_downstream` within each mRNA record analyzed.  Each record contains an attribute named `order` which is 3, 4, or 5 depending on number of U's.  In addition, the 5 bases are listed as a string in `seq` and the position relative to the end of the mRNA (downstream of polyA site) is listed in `downstream_rel_pos`.
 
 
-## 7f - QGRS / G4 Data (optional)
+## 6f - QGRS / G4 Data (optional)
 This script creates QGRS sub-records in the mRNA collection.  QGRS records are only created for mRNA where the feature data is present - specifically where the CDS is known.  The QGRS records are categorized by region - 5'UTR, CDS, 3'UTR, and downstrea (65 bases).  G-Score is calculated for each record, and full architectural data is stored.
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
@@ -175,7 +155,7 @@ QGRS records are stored in an array named `g4s`.  Each individual QGRS motif is 
 
 
 
-#Step 8: Verifying your data
+#Step 7: Verifying your data
 Once your sources have been seeded, you should get familiar with the layout with MongoDB - although most of the time you will work with the data through web services, occasionally it will be very helpful for you to understand how to work directly in MongoDB. The MongoDB instance is named "chrome".  The collection listings should be as shown below (you enter the "show collections" command)
 
 ```
@@ -292,7 +272,7 @@ The `homologene` collection contains records representing a group of homologous 
 
 In this listing, you can see all data associated with each transcript.  Linking these listing to mRNA and gene collections can be done through `gene_id` and `mrna_accession_ver`.  Note however, currently this data set only includes mrna/gene/sequence data for humans.
 
-#Step 9:  Create Indexes
+#Step 8:  Create Indexes
 You should create additional indexes to speed up the access time of your MongoDB database.  To do so, open your terminal/command prompts and type
 
 ```
@@ -314,7 +294,7 @@ Additional useful indexes are:
 You can create indexes on any commonly searched attributes to support your projects.
 
 
-# Step 10:  Serving your data
+# Step 9:  Serving your data
 While you will also be able to access this data directly through MongoDB, some of the datasets (especially sequence data) is easier to access through web services.   In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
 
 The following URL's can be used to access data:
@@ -387,7 +367,7 @@ http://localhost:3000/alignment
 The URL responds to POST messages with `seqa` and `seqb` parameters.  The response will be JSON containing the resulting sequences with gaps (-) injected.
 
 To test, you can also visit `http://localhost:3000/alignment/input` and enter sequences manually.
-# Step 11:  Programmatic Access
+# Step 10:  Programmatic Access
 In step 10, you've seen how URLs, when properly constructed, will return JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
 
 ## Example 1:  Accession sequence data through Python
