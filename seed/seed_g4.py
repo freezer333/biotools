@@ -13,6 +13,9 @@ import g
 
 
 
+skip_existing = True
+
+
 
 
 config = configparser.ConfigParser()
@@ -42,17 +45,32 @@ db = client[config['db']['name']]
 collect = db[config['g4']['collection']]
 #------------------------------------------------------------
 
+def valid_position(s):
+    try:
+        return int(s)
+    except ValueError:
+        return -1
+    
 def process_mrna(count, mrna, start_time):
     start = int(mrna['end'])
     end = int(mrna['end'])
     url = seq_url + '/mrna/' + mrna['accession'] + '/sequence'
+    if 'cds' not in mrna : 
+        return False
+    if valid_position(mrna['cds']['start']) < 0 :
+        return False
+    if valid_position(mrna['cds']['end']) < 0 :
+        return False
+    if 'g4s' in mrna and skip_existing:
+        print('Skipping ', mrna['accession'], " - g4s already exist")
+        return True
     time_sum = 0
     transcript_end = 0
     response = requests.get(url)
     if response.status_code == requests.codes.ok :
         data = response.json()
 
-        if  'sequence' in data and 'mrna' in data and 'features' in data['mrna'] and 'cds' in data['mrna']['features']:
+        if  'sequence' in data:
             before = time.time()
             sequence = data['sequence']
             transcript_end = len(sequence)
@@ -85,8 +103,8 @@ def process_mrna(count, mrna, start_time):
             id = 1
             for g4 in g4s :
                 g4['id'] = mrna['accession'] + '.' + str(id)
-                cds_start = int(mrna['features']['cds']['start'])
-                cds_end = int(mrna['features']['cds']['end'])
+                cds_start = int(mrna['cds']['start'])
+                cds_end = int(mrna['cds']['end'])
                 g4_start = int(g4['start'])
                 g4_end = g4_start + int(g4['length'])
                 g4['is5Prime'] = g4_start <= cds_start
@@ -102,14 +120,15 @@ def process_mrna(count, mrna, start_time):
             after = time.time()
             time_avg = (after-start_time) / count
             print ("Processed ", '{0: <15}'.format(mrna['accession']), "  ->  ", '{0: <5}'.format(str(len(g4s))), " G4s found, in " , '{0:.4f}'.format(after-before), " secs (count = ", '{0:<9}'.format(count), "avg = " , '{0:.4f}'.format(time_avg), " secs)")
-
-    return True
+            return True
+        else:
+            return False
 
 start = time.time()
-mcursor = collect.find(spec={},snapshot=True)
+mcursor = collect.find(spec={},snapshot=True, timeout=False)
 count = 1
 for record in mcursor:
     if process_mrna(count, record, start):
         count += 1
-
+mcursor.close()
 print ('Processed ', count, " mRNA ->  G4 Seeding Complete")

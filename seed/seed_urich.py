@@ -80,9 +80,10 @@ def get_urich_motifs(seq):
         i += 1
     return motifs
 
-mcursor = collect.find(spec={},snapshot=True)
+mcursor = collect.find(spec={},snapshot=True, , timeout=False)
 count = 1
 #process_mrna(mcursor[0])
 for record in mcursor:
     process_mrna(count, record)
     count += 1
+mcursor.close()
