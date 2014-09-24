@@ -239,6 +239,10 @@ function createMrnaSchema(mongoose) {
                     y3 : Number, 
                     sequence: String, 
                     length : Number, 
+                    range : {
+                        start : Number, 
+                        end : Number
+                    },
                     overlaps : [
                         {
                             id : String, 

@@ -11,11 +11,7 @@ import time
 sys.path.append("../util")
 import g
 
-
-
 skip_existing = True
-
-
 
 
 config = configparser.ConfigParser()
@@ -58,7 +54,7 @@ def findRange(g4):
 
     if 'overlaps' not in g4 :
         return retval;
-        
+
     for o in g4['overlaps'] :
         if o['start'] < retval['start']:
             retval['start'] = o['start'];
@@ -135,6 +131,7 @@ def process_mrna(count, mrna, start_time):
                 g4.pop("overlaps", None);
 
                 g4_list.append(g4)
+                id += 1;
                 
             collect.update({'_id':mrna['_id']}, {'$set': {'g4s': g4_list}})
 
