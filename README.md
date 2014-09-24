@@ -475,7 +475,7 @@ The following code will print all accession numbers for *Homo sapien* mRNA.  Not
 ```
 from pymongo import MongoClient
 client = MongoClient()
-db = client.chrome_test
+db = client.chrome
 collect = db.mrna
 
 mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)
@@ -496,7 +496,7 @@ import requests
 
 from pymongo import MongoClient
 client = MongoClient()
-db = client.chrome_test
+db = client.chrome
 collect = db.mrna
 
 mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)

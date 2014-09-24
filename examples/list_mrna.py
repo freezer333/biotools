@@ -5,7 +5,7 @@ import requests
 
 from pymongo import MongoClient
 client = MongoClient()
-db = client.chrome_test
+db = client.chrome
 collect = db.mrna
 
 mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)

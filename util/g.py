@@ -6,37 +6,16 @@ def find(sequence, min_tetrads=2, min_score=17, log=False) :
 
     before = time.time();
     cands = seedQ(sequence, min_tetrads)
-    #if log:
-    #    print ( len(cands) , " initial candidates found at seed time")
-    #after = time.time()
-    #print("\tSeed Time:  " , (after-before));
-
-    #before = time.time();
     while len(cands) > 0:
         cand = cands.pop()
-    #    if log:
-    #        print("Candidate G4:  ", cand.asString(), "  -> ",  end="")
         if cand.complete():
             if cand.viable(min_score):
-    #            if log:
-    #                print("Complete")
                 raw_g4s.append(makeG4(cand))
-    #        elif log:
-    #            print("Not viable, discarded")
         else :
             expanded = cand.expand()
-    #       if len(expanded) is 0 and log:
-    #            print("Discarded, no expansion possible")
-    #        elif log:
-    #            print("Expanded into ", len(expanded), " new candidates")
             for c in expanded:
                 cands.append(c)
-    #after = time.time()
-    #if log:
-    #    print("Found " , len(raw_g4s) , " g4s, now grouping into families")
-    #print("\tFirst Pass Time:  " , (after-before), "      ", len(raw_g4s) , " raw g4s");
-
-    #before = time.time();
+    
     fams = list()
     for g in raw_g4s :
         newfam = True
@@ -48,21 +27,13 @@ def find(sequence, min_tetrads=2, min_score=17, log=False) :
             f = list()
             f.append(g)
             fams.append(f)
-    #after = time.time()
-    #if log:
-    #    print ("Grouped into " , len(fams) , " families, now building g4 list with overlaps")
-    #print("\tSecond Pass Time:  " , (after-before));
-
-    #before = time.time();
+    
     g4s = list()
     for fam in fams:
-        # select best
         best = select_best(fam)
         fam.remove(best)
         best['overlaps'] = fam
         g4s.append(best)
-    #after = time.time()
-    #print("\tThird Pass Time:  " , (after-before));
     return g4s;
 
 

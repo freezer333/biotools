@@ -51,6 +51,24 @@ def valid_position(s):
     except ValueError:
         return -1
     
+def findRange(g4):
+    retval = dict()
+    retval['start'] = g4['start'];
+    retval['end']= g4['start'] + g4['length'];
+
+    if 'overlaps' not in g4 :
+        return retval;
+        
+    for o in g4['overlaps'] :
+        if o['start'] < retval['start']:
+            retval['start'] = o['start'];
+
+        end = o['start']+o['length']
+        if end > retval['end']:
+            retval['end'] = end;
+
+    return retval;
+
 def process_mrna(count, mrna, start_time):
     start = int(mrna['end'])
     end = int(mrna['end'])
@@ -111,6 +129,10 @@ def process_mrna(count, mrna, start_time):
                 g4['isCDS'] = g4_start >= cds_start and g4_start <= cds_end or g4_end >= cds_start and g4_end <= cds_end
                 g4['is3Prime'] = g4_start >= cds_end and g4_start <= transcript_end or g4_end >= cds_end and g4_end <= transcript_end
                 g4['isDownstream'] = g4_end >= transcript_end
+
+                # we won't put the overlaps in the database
+                g4['range'] = findRange(g4);
+                g4.pop("overlaps", None);
 
                 g4_list.append(g4)
                 
