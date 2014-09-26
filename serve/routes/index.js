@@ -68,7 +68,6 @@ exports.gene_list = function(req, res) {
 
 function serve_mrna(req, res, callback) {
     var accession = req.params.accession;
-    console.log("Searching for mrna " + accession );
     if ( !accession) {
         res.status(404).end('mRNA accession was not specified or was invalid');
         return ;
@@ -95,17 +94,16 @@ function reverse_compliment(sequence){
     return sequence;
 }
 
-exports.mrna_sequence = function (req, res){
-    var accession = req.params.accession;
-    
+
+exports.build_mrna_sequence = function (accession, downstream, error, success) {
     db.mrna.findOne({ accession : accession}, function(err, mrna){
         if ( err || mrna == null ) {
-            res.status(404).end('mRNA could not found');
+            error('mRNA could not found');
             return
         }
         else {
             if ( !mrna.exons) {
-                res.status(404).end('mRNA sequence data not available, exons data is missing for this record.');
+                error('mRNA sequence data not available, exons data is missing for this record.');
                 return;
             }
 
@@ -119,7 +117,7 @@ exports.mrna_sequence = function (req, res){
 
             db.getSequence(mrna.chrom, mrna.start-1, mrna.end, function(err, result) {
                 if ( err ) {
-                    res.status(404).end('Sequence range could not found');
+                    error('Sequence range could not found');
                 }
                 else {
                     var sequence = "";
@@ -134,16 +132,61 @@ exports.mrna_sequence = function (req, res){
                         sequence = reverse_compliment(sequence);
                     }
 
-                    mrna.seq = sequence
-                    res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify({mrna : mrna, sequence : sequence}));    
+                    // now pull the downstream sequence data, if it was specified...
+                    if ( downstream ) {
+                        var r = { start : 0, end : 0}
+                        if ( mrna.orientation == '-') {
+                            r.start = mrna.start-1 - downstream;
+                            r.end = mrna.start-1;
+                        }
+                        else {
+                            r.start = mrna.end;
+                            r.end = mrna.end + downstream;
+                        }
+                        db.getSequence(mrna.chrom, r.start, r.end, function(err, result) {
+                            if ( err ) {
+                                res.status(404).end('Sequence range could not found');
+                            }
+                            else {
+                                var ds = result.seq;
+                                if ( mrna.orientation == '-') {
+                                    ds =  reverse_compliment(ds);
+                                }
+                                sequence += ds;
+                                success(mrna, sequence);
+                            }
+                        });
+                    }
+                    else {
+                        success(mrna, sequence);
+                    }
                 }
             });
-
-        }
+        } 
     })
+}
 
-    
+
+exports.mrna_sequence = function (req, res){
+    var accession = req.params.accession;
+    var downstream = req.query.downstream | 0
+    var start = req.params.start || 0;
+    var end = req.params.end || -1;
+    exports.build_mrna_sequence(accession, downstream, 
+        function (err) {
+            res.status(404).end(err);
+        }, 
+        function (mrna, sequence) {
+            if ( start > 0 && end < 0 ) {
+                sequence = sequence.substring(start);
+            }
+            if ( start > 0 && end > start ) {
+                sequence = sequence.substring(start, end);
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({mrna : mrna, sequence : sequence}));
+        }
+    );
 }
 
 
