@@ -56,6 +56,7 @@ app.get('/homologene/list/:skip/:limit', homologene_routes.index)
 app.get('/homologene/list', homologene_routes.index)
 app.get('/homologene/species', homologene_routes.species)
 
+app.get('/qgrs/:g4id', qgrs_routes.qgrs);
 app.get('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 app.post('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 

@@ -29,7 +29,32 @@ function makeFilter(req){
 }
 
 
+exports.qgrs = function(req, res){
+    var g4id = req.params.g4id;
+    var g4;
 
+    var splits = g4id.split(".");
+    splits.pop();
+    var accession = splits.join(".");
+    db.mrna.findOne({ accession : accession}, function(err, mrna){
+        if ( err ) {
+            res.status(404).end('mRNA could not be found');
+        }
+        else {
+            g4 = mrna.g4s.filter(function (g4) {
+                return g4.id == g4id;
+            })[0];
+            if ( !g4 ) {
+                res.status(404).end('QGRS could not be found');
+            }
+            else {
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(g4));  
+            }
+        }
+    });
+
+}
 exports.qgrs_overlaps = function(req, res){
     var filter = makeFilter(req);
     var g4id = req.params.g4id;
