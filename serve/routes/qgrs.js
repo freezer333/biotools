@@ -103,6 +103,37 @@ exports.qgrs_overlaps = function(req, res){
         }
     });
 }
+
+
+function merge_range_set (ranges, new_range) {
+    for ( var i = 0; i < ranges.length; i++ ) {
+        r = ranges[i];
+        if ( new_range.start >= r.start && new_range.start <= r.end ) {
+            // starts within a range... see if we should extend this range
+            if ( new_range.end > r.end ) {
+                r.end = new_range.end;
+            }
+            return;
+        }
+        else if ( new_range.end >= r.start && new_range.end <= r.end) {
+            // ends within a range, see if we should extend this range
+            if ( new_range.start < r.start ) {
+                r.start = new_range.start;
+            }
+            return;
+        }
+    }
+    ranges.push(new_range);
+}
+
+function computeTotal(ranges) {
+    var total = 0;
+    for ( var i = 0; i < ranges.length; i++ ) {
+        r = ranges[i];
+        total += r.end-r.start;
+    }
+    return total;
+}
 exports.qgrs_density = function(req, res) {
     var filter = makeFilter(req);
     var accession = req.params.accession;
@@ -143,12 +174,6 @@ exports.qgrs_density = function(req, res) {
             })
         },
         function(g4s, callback){
-            var total = 0;
-            var total_5utr = 0;
-            var total_cds = 0;
-            var total_3utr = 0;
-            var total_downstream = 0;
-
             var cds_start = parent_mrna.cds.start;
             var cds_end = parent_mrna.cds.end
             var transcript_end = parent_mrna.length;
@@ -166,42 +191,48 @@ exports.qgrs_density = function(req, res) {
                 return g4.end >= transcript_end
             }
 
-            var nt = 0;
-            for ( nt = 0; nt < (parent_mrna.length + downstream); nt++) {
-                var in_any = false;
-                var in_5utr = false;
-                var in_3utr = false;
-                var in_cds = false;
-                var in_downstream = false;
+            var any = [];
+            var u3 = [];
+            var u5 = [];
+            var cds = [];
+            var down = [];
 
-                var process_motif = function (g4) {
-                    if ( filter.apply(g4) && nt >= g4.start && nt <= (g4.start+g4.length)) {
-                            if ( in3(g4)|| in5(g4) || inCds(g4)) in_any = true;
-                            if ( in3(g4) ) in_3utr = true;
-                            if ( in5(g4) ) in_5utr = true;
-                            if ( inCds(g4) ) in_cds= true;
-                            if ( inDown(g4)) in_downstream = true;
-                        }
-                    }
-
-                for ( i in g4s ) {
-                    g4 = g4s[i];
-                    process_motif(g4);
-                    for ( j in g4s[i].overlaps) {
-                        g4 = g4s[i].overlaps[j];
-                        process_motif(g4);
-                    }
+            var process_motif = function (g4) {
+                var in_any = false, in_5utr = false, in_3utr = false, in_cds = false, in_downstream = false;
+                if ( filter.apply(g4)) {
+                    if ( in3(g4)|| in5(g4) || inCds(g4)) in_any = true;
+                    if ( in3(g4) ) in_3utr = true;
+                    if ( in5(g4) ) in_5utr = true;
+                    if ( inCds(g4) ) in_cds= true;
+                    if ( inDown(g4)) in_downstream = true;
                 }
-                if ( in_any ) total++;
-                if ( in_3utr ) total_3utr++;
-                if ( in_5utr ) total_5utr++;
-                if ( in_cds ) total_cds++;
-                if ( in_downstream ) total_downstream++;
+                if (in_any) merge_range_set(any, {start: g4.start, end: g4.start+g4.length});
+                if (in_5utr) merge_range_set(u3, {start: g4.start, end: g4.start+g4.length});
+                if (in_3utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length});
+                if (in_cds) merge_range_set(cds, {start: g4.start, end: g4.start+g4.length})
+                if (in_downstream) merge_range_set(down, {start: g4.start, end: g4.start+g4.length})
             }
+
+            for ( i in g4s ) {
+                g4 = g4s[i];
+                process_motif(g4);
+                for ( j in g4s[i].overlaps) {
+                    g4 = g4s[i].overlaps[j];
+                    process_motif(g4);
+                }
+            }
+            
+            var total = computeTotal(any);
+            var total_5utr = computeTotal(u5);
+            var total_cds = computeTotal(cds);
+            var total_3utr = computeTotal(u3);
+            var total_downstream = computeTotal(down);
+
             var overall_length = parent_mrna.length;
             var utr5_length = parent_mrna.cds.start;
             var cds_length = parent_mrna.length - parent_mrna.cds.end;
             var utr3_length = parent_mrna.cds.end - parent_mrna.cds.start;
+            
             var d_result = {
                 density_criteria : filter,
                 accession : parent_mrna.accession,
