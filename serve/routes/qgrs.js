@@ -37,7 +37,7 @@ exports.qgrs = function(req, res){
     splits.pop();
     var accession = splits.join(".");
     db.mrna.findOne({ accession : accession}, function(err, mrna){
-        if ( err ) {
+        if ( err || !mrna) {
             res.status(404).end('mRNA could not be found');
         }
         else {

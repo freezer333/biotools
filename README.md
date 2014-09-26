@@ -369,8 +369,26 @@ The URL responds to POST messages with `seqa` and `seqb` parameters.  The respon
 To test, you can also visit `http://localhost:3000/alignment/input` and enter sequences manually.
 
 
-## Finding QGRS Density
-If you've populated your data base with G4 (QGRS) data, then you can use the following URL pattern to calculate QGRS density for specific mRNA.
+## QGRS Data
+Each QGRS motif within an mRNA is assigned a unique ID number which is the mRNA accession number appended with a sequence number.  For example, the fours QGRS found within mRNA with accession number `NM_001010889.2` would be assigned an ID of `NM_001010889.2.4`.
+
+To retrieve the record for a specific QGRS motif, you may use the following URL.
+
+```
+http://localhost:3000/qgrs/:qgrs_id
+```
+
+### Finding overlapping motifs
+The database itself does not store overlapping motifs, it only picks the motif with the highest g-score among a group of overlapping motifs (called families).  To get a listing of the overlaps, you may access the following url.
+
+```
+http://localhost:3000/qgrs/:qgrs_id/overlaps
+```
+
+This will re-compute the motifs and return all the overlapping motifs for that particular QGRS identified by the motif id.
+
+### Finding QGRS Density
+If you've populated your data base with G4 (QGRS) data, then you can use the following URL pattern to calculate QGRS density for specific mRNA.  Density is defined by the number of nt. contained by any matching (by criteria) qgrs motif divided by the total nt. length of the sequence (or region)
 
 
 ```
@@ -426,7 +444,7 @@ will return the following JSON object descripting QGRS density for the mRNA, bro
 }
 ```
 
-*Note, the density calculation is will soon be changed to better reflect "G4P", rather than a straight calculation.*
+
 
 # Step 10:  Programmatic Access
 In step 10, you've seen how URLs, when properly constructed, will return JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
