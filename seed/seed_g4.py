@@ -11,7 +11,7 @@ import time
 sys.path.append("../util")
 import g
 
-skip_existing = True
+skip_existing = False
 
 
 config = configparser.ConfigParser()
@@ -46,7 +46,7 @@ def valid_position(s):
         return int(s)
     except ValueError:
         return -1
-    
+
 def findRange(g4):
     retval = dict()
     retval['start'] = g4['start'];
@@ -68,8 +68,9 @@ def findRange(g4):
 def process_mrna(count, mrna, start_time):
     start = int(mrna['end'])
     end = int(mrna['end'])
-    url = seq_url + '/mrna/' + mrna['accession'] + '/sequence'
-    if 'cds' not in mrna : 
+
+    url = seq_url + '/qgrs/mrna/' + mrna['accession'] + '/map?downstream=65'
+    if 'cds' not in mrna :
         return False
     if valid_position(mrna['cds']['start']) < 0 :
         return False
@@ -80,36 +81,13 @@ def process_mrna(count, mrna, start_time):
         return True
     time_sum = 0
     transcript_end = 0
+    before = time.time()
     response = requests.get(url)
     if response.status_code == requests.codes.ok :
         data = response.json()
 
-        if  'sequence' in data:
-            before = time.time()
-            sequence = data['sequence']
-            transcript_end = len(sequence)
-            # get downstream sequence data from chrom
-            # Note, this is a little tricky because some of these mrna are reverse-compliment.
-            start = 0
-            end = 0
-            
-            if data['mrna']['orientation'] == '+':
-                start = int(mrna['end'])
-                end = int(mrna['end']) + downstream
-                url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end)
-            else:
-                start = int(mrna['start']) - downstream
-                end = int(mrna['start'])
-                url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end) + "?orientation=-";
-            
-            response = requests.get(url)
-            if response.status_code == requests.codes.ok :
-                data = response.json()
-                if  'seq' in data :
-                    sequence += data['seq']
-
-            # Find all the G4
-            g4s = g.find(sequence)
+        if  'result' in data:
+            g4s = data['result'];
 
             g4_list = list()
             # Now annotate all the G4 based on region [Promoter, 5'UTR, CDS, 3'UTR, Downstream, Intron]
@@ -132,10 +110,10 @@ def process_mrna(count, mrna, start_time):
 
                 g4_list.append(g4)
                 id += 1;
-                
+
             collect.update({'_id':mrna['_id']}, {'$set': {'g4s': g4_list}})
 
-            
+
             after = time.time()
             time_avg = (after-start_time) / count
             print ("Processed ", '{0: <15}'.format(mrna['accession']), "  ->  ", '{0: <5}'.format(str(len(g4s))), " G4s found, in " , '{0:.4f}'.format(after-before), " secs (count = ", '{0:<9}'.format(count), "avg = " , '{0:.4f}'.format(time_avg), " secs)")

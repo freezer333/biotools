@@ -19,14 +19,14 @@ exports.chrom = function(req, res) {
 
     db.getSequence(accession, start, end, function(err, result) {
         if ( err ) {
-            res.status(404).end('Sequence range could not found');
+            res.status(404).end('Sequence range on chromosome ' + accession + ' could not be found');
         }
         else {
             res.setHeader('Content-Type', 'application/json');
             if ( orientation == '-') {
                 result.seq = reverse_compliment(result.seq);
             }
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     });
 }
@@ -46,7 +46,7 @@ exports.gene = function(req, res) {
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     })
 }
@@ -54,14 +54,14 @@ exports.gene = function(req, res) {
 exports.gene_list = function(req, res) {
     var skip = req.params.skip;
     var limit = req.params.limit;
-    
+
     db.gene.find({}, {gene_id : 1, gene_name : 1}, { skip: skip, limit: limit }, function(err, result){
         if ( err ) {
             res.status(404).end('Gene could not found');
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     })
 }
@@ -98,7 +98,7 @@ function reverse_compliment(sequence){
 exports.build_mrna_sequence = function (accession, downstream, error, success) {
     db.mrna.findOne({ accession : accession}, function(err, mrna){
         if ( err || mrna == null ) {
-            error('mRNA could not found');
+            error('the mRNA could not be found in the database.');
             return
         }
         else {
@@ -117,7 +117,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
 
             db.getSequence(mrna.chrom, mrna.start-1, mrna.end, function(err, result) {
                 if ( err ) {
-                    error('Sequence range could not found');
+                    error('Sequence range on chromosome ' + mrna.chrom + ' could not found');
                 }
                 else {
                     var sequence = "";
@@ -162,7 +162,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                     }
                 }
             });
-        } 
+        }
     })
 }
 
@@ -172,10 +172,11 @@ exports.mrna_sequence = function (req, res){
     var downstream = req.query.downstream | 0
     var start = req.params.start || 0;
     var end = req.params.end || -1;
-    exports.build_mrna_sequence(accession, downstream, 
+    exports.build_mrna_sequence(accession, downstream,
         function (err) {
+            console.log(err);
             res.status(404).end(err);
-        }, 
+        },
         function (mrna, sequence) {
             if ( start > 0 && end < 0 ) {
                 sequence = sequence.substring(start);
@@ -198,7 +199,7 @@ exports.mrna = function(req, res) {
 exports.mrna_api = function(req, res) {
     serve_mrna(req, res, function(req, res, result) {
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(result));   
+        res.end(JSON.stringify(result));
     })
 }
 
@@ -212,8 +213,7 @@ exports.mrna_list = function(req, res) {
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     })
 }
-

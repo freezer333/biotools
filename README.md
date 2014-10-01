@@ -393,6 +393,19 @@ To retrieve the record for a specific QGRS motif, you may use the following URL.
 http://localhost:3000/qgrs/:qgrs_id
 ```
 
+### Mapping QGRS motifs
+To map QGRS motifs on arbitrary sequence data, the following URL accepts POST messages with a `sequence` parameter, which should contain the sequence to map.
+
+```
+http://localhost:3000/qgrs
+```
+
+To map QGRS on mRNA, you may also issue GET requests to the following URL, which will return the motifs found within the specified mRNA (`:accession`), including 65 nt. downstream of the poly(A) site.
+
+```
+http://localhost:3000/qgrs/mrna/:accession/map
+```
+
 ### Finding overlapping motifs
 The database itself does not store overlapping motifs, it only picks the motif with the highest g-score among a group of overlapping motifs (called families).  To get a listing of the overlaps, you may access the following url.
 

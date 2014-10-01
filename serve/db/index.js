@@ -47,12 +47,12 @@ exports.getSequence = function(accession, start, end, final_callback) {
     }
     if ( start == end ) {
 
-        final_callback(null, 
+        final_callback(null,
         {
-            accession : accession, 
-            start : init_start, 
-            end : init_end, 
-            description : '-', 
+            accession : accession,
+            start : init_start,
+            end : init_end,
+            description : '-',
             seq : ''
         })
         return;
@@ -72,17 +72,20 @@ exports.getSequence = function(accession, start, end, final_callback) {
         }
     } while ( start_page != end_page)
 
-    async.each(ranges, 
+    async.each(ranges,
         function(range, callback) {
             getSequenceFromPage(accession, range.start, range.end, function( err, page_seq) {
                 if ( err || !page_seq) {
-                    callback();
+                    callback('Page not found');
                     return;
                 }
                 processed_ranges.push ( {start : range.start, end : range.end, seq : page_seq.seq});
                 callback();
             });
-        }, function () {
+        }, function (err) {
+            if ( err ) {
+                final_callback(err);
+            }
 
             if ( processed_ranges.length == 0 ) {
                 final_callback('No sequence data found');
@@ -92,18 +95,18 @@ exports.getSequence = function(accession, start, end, final_callback) {
             processed_ranges.sort(compare_ranges);
             var retval = "";
             for ( i = 0; i < processed_ranges.length; i++ ) {
-                if ( processed_ranges[i].seq ) 
+                if ( processed_ranges[i].seq )
                     retval += processed_ranges[i].seq;
                 else {
                     final_callback("Range was invalid", null);
                 }
             }
-            final_callback(null, 
+            final_callback(null,
                 {
-                    accession : accession, 
-                    start : init_start, 
-                    end : init_end, 
-                    description : processed_ranges[0].description, 
+                    accession : accession,
+                    start : init_start,
+                    end : init_end,
+                    description : processed_ranges[0].description,
                     seq : retval
                 });
         }
@@ -120,7 +123,6 @@ function getSequenceFromPage(accession, start, end, callback) {
         if ( page ) {
             zlib.inflate(page.seq, function(err, result) {
                 if ( err ) {
-                    console.log(err);
                     callback(err);
                 }
                 var retval = result.toString('ascii');
@@ -133,7 +135,7 @@ function getSequenceFromPage(accession, start, end, callback) {
         else {
             callback('No sequence data');
         }
-        
+
     });
 }
 
@@ -145,7 +147,7 @@ function page_num(position) {
 function createSeqSchema(mongoose) {
 
     var schem = new mongoose.Schema({
-        accession : String, 
+        accession : String,
             start: Number,
             end: Number,
             seq: Buffer,
@@ -161,20 +163,20 @@ function createSeqSchema(mongoose) {
 function createHomologeneSchema(mongoose) {
 
     var schem = new mongoose.Schema({
-        hid : String, 
+        hid : String,
         homologs : [
             {
-                tax_id : String, 
-                protein_length : Number, 
-                end : Number, 
-                start : Number, 
+                tax_id : String,
+                protein_length : Number,
+                end : Number,
+                start : Number,
                 gene_symbol : String,
-                mrna_accession_ver : String, 
-                gi_source : String, 
-                gene_id : String, 
-                protein_gi : String, 
-                tax_name : String, 
-                protein_accession : String, 
+                mrna_accession_ver : String,
+                gi_source : String,
+                gene_id : String,
+                protein_gi : String,
+                tax_name : String,
+                protein_accession : String,
                 strand : String
             }
         ]
@@ -188,7 +190,7 @@ function createHomologeneSchema(mongoose) {
 
 function createGeneSchema(mongoose) {
     var schem = new mongoose.Schema({
-            gene_name : String, 
+            gene_name : String,
             start: Number,
             end: Number,
             gene_id: String,
@@ -199,68 +201,68 @@ function createGeneSchema(mongoose) {
 
 function createMrnaSchema(mongoose) {
     var schem = new mongoose.Schema({
-            accession : String, 
+            accession : String,
             start: Number,
             end: Number,
             gene_id: String,
-            chrom : String, 
+            chrom : String,
             orientation : String,
-            exons : [ { start : Number, end : Number} ], 
-            cds : { start : Number, end : Number}, 
-            utr_3 : { start : Number, end : Number}, 
-            utr_5 : { start : Number, end : Number}, 
-            organism : String, 
-            definition : String, 
-            length : Number, 
+            exons : [ { start : Number, end : Number} ],
+            cds : { start : Number, end : Number},
+            utr_3 : { start : Number, end : Number},
+            utr_5 : { start : Number, end : Number},
+            organism : String,
+            definition : String,
+            length : Number,
             gene_name : String,
             u_rich_downstream : [
                 {
-                    downstream_rel_pos : Number, 
-                    seq : String, 
+                    downstream_rel_pos : Number,
+                    seq : String,
                     order : Number
                 }
-            ], 
+            ],
             g4s : [
-                {   
-                    id : String, 
-                    gscore : Number, 
-                    start : Number, 
-                    is5Prime : Boolean, 
-                    isCDS : Boolean, 
-                    is3Prime : Boolean, 
-                    isDownstream : Boolean, 
-                    tetrads : Number, 
-                    tetrad1: Number, 
-                    tetrad2 : Number, 
-                    tetrad3: Number, 
-                    tetrad4: Number, 
-                    y1: Number, 
-                    y2 : Number, 
-                    y3 : Number, 
-                    sequence: String, 
-                    length : Number, 
+                {
+                    id : String,
+                    gscore : Number,
+                    start : Number,
+                    is5Prime : Boolean,
+                    isCDS : Boolean,
+                    is3Prime : Boolean,
+                    isDownstream : Boolean,
+                    tetrads : Number,
+                    tetrad1: Number,
+                    tetrad2 : Number,
+                    tetrad3: Number,
+                    tetrad4: Number,
+                    y1: Number,
+                    y2 : Number,
+                    y3 : Number,
+                    sequence: String,
+                    length : Number,
                     range : {
-                        start : Number, 
+                        start : Number,
                         end : Number
                     },
                     overlaps : [
                         {
-                            id : String, 
-                            gscore : Number, 
-                            start : Number, 
-                            is5Prime : Boolean, 
-                            isCDS : Boolean, 
-                            is3Prime : Boolean, 
-                            isDownstream : Boolean, 
-                            tetrads : Number, 
-                            tetrad1: Number, 
-                            tetrad2 : Number, 
-                            tetrad3: Number, 
-                            tetrad4: Number, 
-                            y1: Number, 
-                            y2 : Number, 
-                            y3 : Number, 
-                            sequence: String, 
+                            id : String,
+                            gscore : Number,
+                            start : Number,
+                            is5Prime : Boolean,
+                            isCDS : Boolean,
+                            is3Prime : Boolean,
+                            isDownstream : Boolean,
+                            tetrads : Number,
+                            tetrad1: Number,
+                            tetrad2 : Number,
+                            tetrad3: Number,
+                            tetrad4: Number,
+                            y1: Number,
+                            y2 : Number,
+                            y3 : Number,
+                            sequence: String,
                             length : Number
                         }
                     ]
@@ -269,5 +271,3 @@ function createMrnaSchema(mongoose) {
         }, {collection:'mrna'});
     exports.mrna = mongoose.model('mRNA', schem);
 }
-
-
