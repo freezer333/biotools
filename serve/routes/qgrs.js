@@ -3,13 +3,17 @@ var async = require('async');
 var spawn = require('child_process').spawn;
 var core_routes = require('./index');
 
+var qgrs_module = require('qgrs');
+var qgrs_version = require('qgrs/package.json').version;
+
+
 function makeFilter(req){
     var p_minTetrad = req.body.minTetrad || req.query.minTetrad || 2;
     var p_maxTetrad = req.body.maxTetrad || req.query.maxTetrad || Number.MAX_VALUE; // unlikely...
     var p_minGScore = req.body.minGScore || req.query.minGScore || 13;
-    var p_maxGScore = req.body.maxGScore || req.query.maxGScore || Number.MAX_VALUE; 
-    var p_maxLength = req.body.maxLength || req.query.maxLength || Number.MAX_VALUE; 
-    var p_minLength = req.body.minLength || req.query.minLength || p_minTetrad * 4;     
+    var p_maxGScore = req.body.maxGScore || req.query.maxGScore || Number.MAX_VALUE;
+    var p_maxLength = req.body.maxLength || req.query.maxLength || Number.MAX_VALUE;
+    var p_minLength = req.body.minLength || req.query.minLength || p_minTetrad * 4;
 
     var filter = {
         minTetrad : p_minTetrad,
@@ -23,16 +27,17 @@ function makeFilter(req){
                 g4.gscore >= p_minGScore && g4.gscore <= p_maxGScore &&
                 g4.length >= p_minLength && g4.length <= p_maxLength);
         }
-    }   
+    }
 
     return filter;
 }
 
 
+
+
 exports.qgrs = function(req, res){
     var g4id = req.params.g4id;
     var g4;
-
     var splits = g4id.split(".");
     splits.pop();
     var accession = splits.join(".");
@@ -49,7 +54,7 @@ exports.qgrs = function(req, res){
             }
             else {
                 res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify(g4));  
+                res.end(JSON.stringify(g4));
             }
         }
     });
@@ -82,36 +87,17 @@ exports.qgrs_overlaps = function(req, res){
 
             downstream = g4.isDownstream ? 65 : 0;
 
-            core_routes.build_mrna_sequence(mrna.accession, downstream, 
+            core_routes.build_mrna_sequence(mrna.accession, downstream,
                 function(err) {
                     res.status(404).end('mRNA sequence data could not be found');
-                }, 
+                },
                 function(mrna, sequence) {
                     callback(null, sequence.substring(g4.range.start, g4.range.end));
                 });
         },
         function(sequence, callback){
-            console.log("Sequence for G4 = " + sequence)
-            var result = "";
-            var nts = sequence;
-            var g = spawn('python3',['../util/grun.py']);
-            g.stdin.setEncoding('utf8');
-            g.stdout.setEncoding('utf8');
-            g.stdin.write(nts);
-            g.stdin.end()
-
-            g.stdout.on('data', function(data) {
-                result += data;
-                
-            })
-                    
-            g.on('err', function(err){
-                callback(err, null);
-            })
-
-            g.on('exit', function(code){
-                callback(null, JSON.parse(result));
-            })
+            result = qgrs_module.find(sequence);
+            callback(null, JSON.parse(result));
         },
         function(g4s, callback){
             var g = g4s[0];
@@ -124,13 +110,21 @@ exports.qgrs_overlaps = function(req, res){
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(g4));   
+            res.end(JSON.stringify(g4));
         }
     });
 }
 
 
-function merge_range_set (ranges, new_range) {
+function merge_range_set (ranges, new_range, clip) {
+
+    if ( clip && clip.start && new_range.start < clip.start) {
+      new_range.start = clip.start;
+    }
+    if ( clip && clip.end && new_range.end > clip.end) {
+      new_range.end = clip.end;
+    }
+
     for ( var i = 0; i < ranges.length; i++ ) {
         r = ranges[i];
         if ( new_range.start >= r.start && new_range.start <= r.end ) {
@@ -151,7 +145,52 @@ function merge_range_set (ranges, new_range) {
     ranges.push(new_range);
 }
 
-function computeTotal(ranges) {
+exports.input = function(req, res) {
+    res.render("qgrs/input", {});
+}
+
+exports.qgrs_mrna = function(req, res) {
+  var accession = req.params.accession;
+  var downstream = 65;
+  core_routes.build_mrna_sequence(accession, downstream,
+      function(err) {
+          res.status(404).end('mRNA sequence data could not be found');
+      },
+      function(mrna, sequence) {
+          var output = {
+            time : new Date(),
+            qgrs_map_version : qgrs_version,
+            accession : accession,
+            sequence: sequence,
+            result : ""
+          }
+          var r = JSON.parse(qgrs_module.find(sequence));
+          output.result = r.results;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify(output));
+      });
+}
+
+exports.qgrs_find = function (req, res) {
+  var sequence = req.body.sequence;
+  var output = {
+    time : new Date(),
+    qgrs_map_version : qgrs_version,
+    input : sequence,
+    result : ""
+  }
+  var r = JSON.parse(qgrs_module.find(sequence));
+  output.result = r.results;
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify(output));
+}
+
+function computeTotal(first_pass_ranges) {
+    var ranges = [];
+    for ( var i = 0; i < first_pass_ranges.length; i++ ) {
+      merge_range_set(ranges, first_pass_ranges[i]);
+    }
+
     var total = 0;
     for ( var i = 0; i < ranges.length; i++ ) {
         r = ranges[i];
@@ -159,50 +198,35 @@ function computeTotal(ranges) {
     }
     return total;
 }
+
+
 exports.qgrs_density = function(req, res) {
     var filter = makeFilter(req);
     var accession = req.params.accession;
     var parent_mrna;
     var downstream = 65;
+
     async.waterfall([
         function(callback){
             // now grab the entire sequence, along with some downstream data.
-            core_routes.build_mrna_sequence(accession, downstream, 
+            core_routes.build_mrna_sequence(accession, downstream,
                 function(err) {
                     res.status(404).end('mRNA sequence data could not be found');
-                }, 
+                },
                 function(mrna, sequence) {
                     parent_mrna = mrna;
                     callback(null, sequence);
                 });
         },
         function(sequence, callback){
-            var result = "";
-            var nts = sequence;
-            var g = spawn('python3',['../util/grun.py']);
-            g.stdin.setEncoding('utf8');
-            g.stdout.setEncoding('utf8');
-            g.stdin.write(nts);
-            g.stdin.end()
-
-            g.stdout.on('data', function(data) {
-                result += data;
-                
-            })
-                    
-            g.on('err', function(err){
-                callback(err, null);
-            })
-
-            g.on('exit', function(code){
-                callback(null, JSON.parse(result));
-            })
+          result = JSON.parse(qgrs_module.find(sequence));
+          callback(null, result.results);
         },
         function(g4s, callback){
+
             var cds_start = parent_mrna.cds.start;
             var cds_end = parent_mrna.cds.end
             var transcript_end = parent_mrna.length;
-
             var in3 = function(g4) {
                 return g4.start >= cds_end && g4.start <= transcript_end || g4.end >= cds_end && g4.end <= transcript_end
             }
@@ -232,10 +256,10 @@ exports.qgrs_density = function(req, res) {
                     if ( inDown(g4)) in_downstream = true;
                 }
                 if (in_any) merge_range_set(any, {start: g4.start, end: g4.start+g4.length});
-                if (in_5utr) merge_range_set(u3, {start: g4.start, end: g4.start+g4.length});
-                if (in_3utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length});
-                if (in_cds) merge_range_set(cds, {start: g4.start, end: g4.start+g4.length})
-                if (in_downstream) merge_range_set(down, {start: g4.start, end: g4.start+g4.length})
+                if (in_5utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length}, {start : 0, end : parent_mrna.cds_start});
+                if (in_3utr) merge_range_set(u3, {start: g4.start, end: g4.start+g4.length}, {start : cds_end, end : transcript_end});
+                if (in_cds) merge_range_set(cds, {start: g4.start, end: g4.start+g4.length}, {start : cds_start, end : cds_end})
+                if (in_downstream) merge_range_set(down, {start: g4.start, end: g4.start+g4.length}, {start : transcript_end})
             }
 
             for ( i in g4s ) {
@@ -246,7 +270,7 @@ exports.qgrs_density = function(req, res) {
                     process_motif(g4);
                 }
             }
-            
+
             var total = computeTotal(any);
             var total_5utr = computeTotal(u5);
             var total_cds = computeTotal(cds);
@@ -255,14 +279,14 @@ exports.qgrs_density = function(req, res) {
 
             var overall_length = parent_mrna.length;
             var utr5_length = parent_mrna.cds.start;
-            var cds_length = parent_mrna.length - parent_mrna.cds.end;
-            var utr3_length = parent_mrna.cds.end - parent_mrna.cds.start;
-            
+            var utr3_length = parent_mrna.length - parent_mrna.cds.end;
+            var cds_length = parent_mrna.cds.end - parent_mrna.cds.start;
+
             var d_result = {
                 density_criteria : filter,
                 accession : parent_mrna.accession,
                 build : parent_mrna.build,
-                cds : parent_mrna.cds, 
+                cds : parent_mrna.cds,
                 density : {
                     overall : {
                         total : total,
@@ -270,31 +294,31 @@ exports.qgrs_density = function(req, res) {
                         density : total / overall_length
                     },
                     utr3 : {
-                        total : total_3utr, 
-                        length : utr3_length, 
+                        total : total_3utr,
+                        length : utr3_length,
                         density : total_3utr / utr3_length
                     },
                     cds : {
-                        total : total_cds, 
-                        length : cds_length, 
+                        total : total_cds,
+                        length : cds_length,
                         density : total_cds / cds_length
                     },
                     utr5 : {
-                        total : total_5utr, 
-                        length : utr5_length, 
+                        total : total_5utr,
+                        length : utr5_length,
                         density : total_5utr / utr5_length
-                    }, 
+                    },
                     downstream : {
-                        total : total_downstream, 
-                        length : downstream, 
+                        total : total_downstream,
+                        length : downstream,
                         density : total_downstream / downstream
                     }
                 }
 
             }
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(d_result)); 
-   
+            res.end(JSON.stringify(d_result));
+
         }
     ]);
 }

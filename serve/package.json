@@ -18,10 +18,11 @@
     "express-session": "~1.0.2",
     "mongoose": "~3.8.8",
     "async": "~0.2.10",
-    "vacant": "~0.0.4", 
-    "multiparty": "*", 
-    "mime" : "*", 
-    "temp" : "*"
+    "vacant": "~0.0.4",
+    "multiparty": "*",
+    "mime" : "*",
+    "temp" : "*",
+    "qgrs" : "0.2.4"
   },
   "devDependencies": {
     "chai": "~1.9.1"

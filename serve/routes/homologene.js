@@ -5,14 +5,13 @@ var fs = require('fs');
 exports.index = function(req, res) {
     var skip = req.params.skip || 0;
     var limit = req.params.limit || 50;
-    console.log("Homologene listing")
     db.homologene.find({}, {}, { skip: skip, limit: limit }, function(err, result){
         if ( err ) {
             res.status(404).end('Homologene records could not found');
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     })
 }
@@ -22,14 +21,13 @@ exports.search_by_gene = function(req, res) {
     var q = {}
     q["$elemMatch"] = {gene_id : gene_id.toString()};
     var find = {homologs : q};
-    console.log(find);
     db.homologene.find(find, {}, { }, function(err, result){
         if ( err ) {
             res.status(404).end('Homologene records could not found');
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     })
 }
@@ -43,24 +41,23 @@ exports.search_by_mrna = function(req, res) {
     else {
         q["$elemMatch"] = {mrna_accession_ver : mrna_accession_ver.toString()};
     }
-    
+
     var find = {homologs : q};
-    console.log(find);
     db.homologene.find(find, {}, { }, function(err, result){
         if ( err ) {
             res.status(404).end('Homologene records could not found');
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));    
+            res.end(JSON.stringify(result));
         }
     })
 }
 
 exports.species = function (req, res) {
     var pipeline = [
-        {$unwind : '$homologs'}, 
-        {$group : {_id :{name : '$homologs.tax_name', id : '$homologs.tax_id'}}}, 
+        {$unwind : '$homologs'},
+        {$group : {_id :{name : '$homologs.tax_name', id : '$homologs.tax_id'}}},
         {$project : {id : "$_id.id", name : "$_id.name", _id:0}}
         ];
     db.homologene.aggregate()
@@ -71,6 +68,6 @@ exports.species = function (req, res) {
         function (err, results) {
             console.log(results);
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(results));    
+            res.end(JSON.stringify(results));
         });
 }

@@ -22,13 +22,13 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
-app.use(morgan('dev'));                     
-app.use(bodyParser.json());    
-app.use(bodyParser.urlencoded());    
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
 app.use(require('less-middleware')(__dirname + '/public'));
-app.use(express.static(__dirname + '/public'));   
-app.use(express.static(__dirname + '/bower_components'));   
-app.use(methodOverride());  
+app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/bower_components'));
+app.use(methodOverride());
 app.use(cookieParser());
 app.use(session({ secret: 'qgrs-rcnj-1986'}))
 
@@ -56,11 +56,14 @@ app.get('/homologene/list/:skip/:limit', homologene_routes.index)
 app.get('/homologene/list', homologene_routes.index)
 app.get('/homologene/species', homologene_routes.species)
 
+app.get('/qgrs/input', qgrs_routes.input)
+app.post('/qgrs', qgrs_routes.qgrs_find);
 app.get('/qgrs/:g4id', qgrs_routes.qgrs);
 app.get('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 app.post('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 
+app.get('/qgrs/mrna/:accession/map', qgrs_routes.qgrs_mrna)
 app.get('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
 app.post('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
 
-http.createServer(app).listen(port);   
+http.createServer(app).listen(port);

@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+    h1 QGRS Motif Mapping
+
+    form(name='qgrs', action="/qgrs", method="post", enctype="application/x-www-form-urlencoded")
+        div
+            label(for='sequence') Enter nt. seqeunce
+                textarea(name='sequence', id='sequence')
+
+            input(type='hidden' value='C++' name='lang')
+        div
+            button(type='submit') Map
