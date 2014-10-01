@@ -152,11 +152,15 @@ exports.input = function(req, res) {
 exports.qgrs_mrna = function(req, res) {
   var accession = req.params.accession;
   var downstream = req.query.downstream | 0;
+  var error = false;
   core_routes.build_mrna_sequence(accession, downstream,
       function(err) {
+          error = true;
           res.status(404).end('mRNA sequence data could not be found');
+          return;
       },
       function(mrna, sequence) {
+        if ( !error) {
           var output = {
             time : new Date(),
             qgrs_map_version : qgrs_version,
@@ -168,6 +172,7 @@ exports.qgrs_mrna = function(req, res) {
           output.result = r.results;
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(output));
+        }
       });
 }
 

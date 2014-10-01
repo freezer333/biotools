@@ -98,8 +98,9 @@ function reverse_compliment(sequence){
 exports.build_mrna_sequence = function (accession, downstream, error, success) {
     db.mrna.findOne({ accession : accession}, function(err, mrna){
         if ( err || mrna == null ) {
+            
             error('the mRNA could not be found in the database.');
-            return
+            return;
         }
         else {
             if ( !mrna.exons) {
@@ -118,6 +119,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
             db.getSequence(mrna.chrom, mrna.start-1, mrna.end, function(err, result) {
                 if ( err ) {
                     error('Sequence range on chromosome ' + mrna.chrom + ' could not found');
+                    return;
                 }
                 else {
                     var sequence = "";
@@ -145,7 +147,8 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                         }
                         db.getSequence(mrna.chrom, r.start, r.end, function(err, result) {
                             if ( err ) {
-                                res.status(404).end('Sequence range could not found');
+                                error('Sequence range on chromosome ' + mrna.chrom + ' could not found');
+                                return;
                             }
                             else {
                                 var ds = result.seq;
