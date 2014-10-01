@@ -29,12 +29,13 @@ Note, for Linux, you will use the package manager that comes along with your dis
 Once you've installed Python, please make absolutely sure you have a 3.x version (and not a 2.x) version installed.  Open up your terminal/command prompt and ensure that typing `python3 --version` results in the expected output (i.e. `Python 3.4.1`)
 
 ## Step 3a:  Install Dependencies
-In order to run all scripts, you need a few python modules to be installed on your system.
+In order to run all scripts, you need a few python and node modules to be installed on your system.
 
-To install the modules below, open your terminal/command prompt.  If you downloaded and installed Python 3.4+, the package manager "pip" will be installed as well.  To install a module, simply type 
+### Python Dependencies
+To install the modules below, open your terminal/command prompt.  If you downloaded and installed Python 3.4+, the package manager "pip" will be installed as well.  To install a module, simply type
 
 ```
-pip3 install [module]
+$ pip3 install [module]
 ```
 
 Where [module] is replaced by the actual module name.  
@@ -42,7 +43,7 @@ Where [module] is replaced by the actual module name.
 To run the scripts, install the following modules:
 
 ```
-numpy 
+numpy
 pymongo
 requests
 urllib3
@@ -51,6 +52,13 @@ urllib3
 `numpy` is a library for numeric / scientific computation.  `pymongo` is required for interacting with MongoDB.  The `requests` and `urllib3` modules are for making http requests (downloading sources from NCBI).
 
 For example, you'd type `pip3 install pymongo`
+
+### Node.js dependencies
+To use the C++ implementation of the qgrs mapping algorithm, you will need to install node-gyp.  
+
+```
+$ sudo npm install node-gyp -g
+```
 
 # Step 4:  Install Mercurial
 The source code for this project is hosted in a Mercurial (hg) repository.  Please note, this is not the same repository as the older Java-based programs we've been using - although the rules of Mercurial, bitbucket, etc. still apply.
@@ -72,6 +80,13 @@ $ hg clone https://username@bitbucket.org/sfrees/biotools
 
 Once complete, move to the biotools directory `cd biotools` and update `hg update`
 
+Next, be sure to update all dependencies for the node.js web services.  
+
+```
+$ cd serve
+$ npm install
+```
+
 # Step 6:  Seed the data sources
 Note, we'll be adding more data sources and seeding scripts continually, so keep an eye on this page!  Also, please note that the order in which you do these steps is absolutely critical!  Some data sources rely on the sources built in previous steps
 
@@ -82,7 +97,7 @@ Note, we'll be adding more data sources and seeding scripts continually, so keep
 This script builds the sequence database from the FASTA files downloaded in step 6a.  
 
 ```
-$ python3 seed_chrome.py 
+$ python3 seed_chrome.py
 ```
 
 Please note, this step will take quite some time to complete.  Follow all directions provided by the interactive script.
@@ -91,7 +106,7 @@ Please note, this step will take quite some time to complete.  Follow all direct
 This script will build the gene and mrna data collections from the file download in step 6b.  
 
 ```
-$ python3 seed_gene.py 
+$ python3 seed_gene.py
 ```
 
 ## 6c - mRNA Sequence Features
@@ -99,7 +114,7 @@ This script will attach sequence feature data to many of the mRNA built from ste
 
 
 ```
-$ python3 seed_mrna_features.py 
+$ python3 seed_mrna_features.py
 ```
 ## 6d - Homologene (optional)
 This script downloads homology data directly from Homologene (NCBI), it will run without any need for you to manually download data.  It creates a MongoDB collection called `homologene` which contains records of homologous pairs of protien coding transcripts for a variety of species.
@@ -108,7 +123,7 @@ This script downloads homology data directly from Homologene (NCBI), it will run
 $ python3 seed_homologene.py
 ```
 
-## 6e - U-Rich Elements (optional) 
+## 6e - U-Rich Elements (optional)
 This script creates a listing of sub-records in the mrna collection within each mRNA sequence for U-Rich elements.  Elements found withing 5 and 65 nucleotides past the end / poly(A) of the mRNA are recorded.
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
@@ -126,7 +141,7 @@ This script creates QGRS sub-records in the mRNA collection.  QGRS records are o
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
 
-Once the service is running, navigate (in a different terminal/command prompt from where you just started the web service) to `biotools/seed` and type the following: 
+Once the service is running, navigate (in a different terminal/command prompt from where you just started the web service) to `biotools/seed` and type the following:
 
 ```
 $ python3 seed_g4.py
@@ -308,11 +323,11 @@ Where :start and :end are nucleotide positions on the chromosome, and :accession
 ## Serving mRNA Records
 ```http://localhost:3000/mrna```  
 ```http://localhost:3000/mrna/:skip/:limit```  
-The mrna url without an additional path part returns a list of mrna - currently limited to about 100.  When the optional skip and limit path parts are included, a given number of mrna sequences can be skipped, and the amount of mrna returned can be specified. 
+The mrna url without an additional path part returns a list of mrna - currently limited to about 100.  When the optional skip and limit path parts are included, a given number of mrna sequences can be skipped, and the amount of mrna returned can be specified.
 
 
 ## Serving Gene Records
-```http://localhost:3000/gene```      
+```http://localhost:3000/gene```
 ```http://localhost:3000/gene/:skip/:limit```  
 A similar URL strategy is used for genes as well.
 
@@ -334,8 +349,8 @@ reverse compliment transformations as needed.
 ## Finding Homologene Records
 The homologene records have clusters of genes with related function.  You may retrieve listings using the standard skip/limit api using the following URL.
 
-```http://localhost:3000/homologene/list```   
-```http://localhost:3000/homologene/list/:skip/:limit``` 
+```http://localhost:3000/homologene/list```
+```http://localhost:3000/homologene/list/:skip/:limit```
 
 More useful however is retreiving clusters based on a gene id or mRNA accession number.  Requests to the following URL's will return all homologene records which contain either the gene referenced by the gene id or mRNA referenced by accession number.  This makes it very easy to find genes/mRNA that are homologous to sequences you might be working with.
 
@@ -346,7 +361,7 @@ Note also that for accession numbers, if you do not end the accession with a ver
 
 ### Organisims in Homologene
 To find all organisms listed in the homologene collection, visit:
- 
+
 ```http://localhost:3000/homologene/species```  
 
 This URL will return a JSON array of taxon objects - containing the ID and organism name of each organism represented in the entire collection.
@@ -398,9 +413,9 @@ http://localhost:3000/qgrs/mrna/:acccession/density
 In the url, `:accession` identifies the mRNA.  The URL responds to both GET and POST requests, and accespts the following filtering parameters:
 
 
-For example, requests to: 
+For example, requests to:
 
-`http://localhost:3000/qgrs/mrna/NM_020713.2/density?maxGScore=35&minGScore=17&minTetrad=2&maxTetrad=2&maxLength=14` 
+`http://localhost:3000/qgrs/mrna/NM_020713.2/density?maxGScore=35&minGScore=17&minTetrad=2&maxTetrad=2&maxLength=14`
 
 will return the following JSON object descripting QGRS density for the mRNA, broken down by region.
 
@@ -419,7 +434,7 @@ will return the following JSON object descripting QGRS density for the mRNA, bro
 		"end":2738,
 		"start":60
 	},
-	"density":{ 
+	"density":{
 		"overall":{
 			"total":9,  // total number of QGRS matching the filtering criteria
 			"length":5938,
@@ -470,7 +485,7 @@ if response.status_code == requests.codes.ok :
 ```
 
 ## Example 2:  Count U-Rich elements in mRNA in Python
-The following code illustrates counting U-rich elements in mRNA by querying MongoDB directly for all mRNA with downstream U-rich elements. 
+The following code illustrates counting U-rich elements in mRNA by querying MongoDB directly for all mRNA with downstream U-rich elements.
 
 ```
 from pymongo import MongoClient
@@ -598,5 +613,5 @@ For many of these scripts, if you re-run them they will create **duplicate** dat
 
 ```
 $ mongo chrome
-> db.mrna.drop() 
+> db.mrna.drop()
 ```
