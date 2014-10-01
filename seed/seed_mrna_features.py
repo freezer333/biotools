@@ -1,6 +1,6 @@
  # This program will add mRNA sequence features to mRNA listings into a MongoDb.
- # Note - the mRNA listings must already be present - if the mRNA referred to 
- # in the sequence file read does not already exist in the mRNA collection, it 
+ # Note - the mRNA listings must already be present - if the mRNA referred to
+ # in the sequence file read does not already exist in the mRNA collection, it
  # is ignored.
 import urllib.request
 import shutil
@@ -54,18 +54,18 @@ for data in seq_features_file:
     fields = re.split('\s+', line)
     fields = [x.strip() for x in fields]
     if fields[0] == 'LOCUS':
-        if len(features ) > 0: 
+        if len(features ) > 0:
             # save features
             all_count += 1
             up = dict()
 
             if collect.find_and_modify(
-                      {'accession' : features['accession']}, 
-                      {'$set': features 5}) != None :
+                      {'accession' : features['accession']},
+                      {'$set': features}) != None :
                 count+= 1
             print ('Saved ', count, ' / ' , all_count, ' mrna features')
             features = dict()
-        
+
         features['length'] = fields[2];
     if fields[0] == 'DEFINITION':
         features['definition'] = ' '.join(fields[1:])
