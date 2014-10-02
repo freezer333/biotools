@@ -168,7 +168,13 @@ QGRS records are stored in an array named `g4s`.  Each individual QGRS motif is 
 *  `sequence` - motif bases
 
 
+## 6g - Gene Ontology (optional)
+This scripts will create ontology subrecords within the mRNA and gene collections containing lists of associated function, process, and component GO terms.
 
+```
+$ python3 seed_go.py
+```
+This script only populated GO terms for human genes/mRNA.
 
 #Step 7: Verifying your data
 Once your sources have been seeded, you should get familiar with the layout with MongoDB - although most of the time you will work with the data through web services, occasionally it will be very helpful for you to understand how to work directly in MongoDB. The MongoDB instance is named "chrome".  The collection listings should be as shown below (you enter the "show collections" command)
