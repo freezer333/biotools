@@ -1,6 +1,7 @@
 
 var db = require("../db");
 var fs = require('fs');
+var _ = require('underscore');
 
 exports.home = function(req, res) {
     res.render("home", {});
@@ -98,7 +99,7 @@ function reverse_compliment(sequence){
 exports.build_mrna_sequence = function (accession, downstream, error, success) {
     db.mrna.findOne({ accession : accession}, function(err, mrna){
         if ( err || mrna == null ) {
-            
+
             error('the mRNA could not be found in the database.');
             return;
         }
@@ -169,6 +170,47 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
     })
 }
 
+exports.mrna_species = function(req, res) {
+  db.mrna.collection.distinct('organism', function (err, result) {
+    if ( err ) {
+        res.status(404).end(JSON.stringify(err));
+    }
+    else {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({species : result}));
+    }
+  });
+}
+
+exports.mrna_ontology = function(req, res) {
+  var c, p, f;
+  db.mrna.collection.distinct('ontology.components', function (err, result) {
+    if ( err ) {
+        res.status(404).end(JSON.stringify(err));
+    }
+    else {
+      c = result;
+      db.mrna.collection.distinct('ontology.processes', function (err, result) {
+        if ( err ) {
+            res.status(404).end(JSON.stringify(err));
+        }
+        else {
+          p = result;
+          db.mrna.collection.distinct('ontology.functions', function (err, result) {
+            if ( err ) {
+                res.status(404).end(JSON.stringify(err));
+            }
+            else {
+              f = result;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ontology : _.union(c, p, f)}));
+            }
+          });
+        }
+      });
+    }
+  });
+}
 
 exports.mrna_sequence = function (req, res){
     var accession = req.params.accession;
@@ -206,11 +248,58 @@ exports.mrna_api = function(req, res) {
     })
 }
 
+exports.build_mrna_query = function (req, additional) {
+  var accession_list = req.query.accession || "";
+  var ontology_list = req.query.ontology || "";
+  var accessions = accession_list ? accession_list.split(';').map(function(str){ return str.trim()}) : null;
+  var ontology_terms = ontology_list ? ontology_list.split(';').map(function(str) { return str.trim()}) : null;
+  var selections = [];
+  console.log(additional);
+  if ( accessions )                       selections.push({accession: {'$in' : accessions} });
+  if ( req.query.annotations == 'true')   selections.push({cds : {'$exists': true}});
+  if ( req.query.organism)                selections.push({organism: req.query.organism});
+  if ( ontology_terms)   {
+      var matches = [];
+      var q = { '$in' : ontology_terms }
+      var o = {}; o['ontology.components'] = q; matches.push(o);
+          o = {}; o['ontology.processes'] = q; matches.push(o);
+          o = {}; o['ontology.functions'] = q; matches.push(o);
+      var or = {'$or' : matches};
+      selections.push(or);
+  }
+
+  if ( additional) {
+    selections = selections.concat(additional);
+  }
+
+  var query = {};
+  if ( selections.length == 1 ) {
+    query = selections[0]
+  }
+  else if ( selections.length > 1) {
+    query['$and'] = selections;
+  }
+  return query;
+}
+
+exports.analysis_status = function (req, res) {
+  var job = req.params.jobid;
+  db.jobs.findOne({'_id':job}, function (err, result) {
+    if ( err ) {
+        res.status(404).end('Job could not found');
+    }
+    else {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(result));
+    }
+  });
+}
 exports.mrna_list = function(req, res) {
     var skip = req.params.skip || 0;
     var limit = req.params.limit || 100;
+    var query = exports.build_mrna_query(req);
 
-    db.mrna.find({}, {gene_id : 1, accession : 1, features : 1}, { skip: skip, limit: limit }, function(err, result){
+    db.mrna.find(query, {gene_id : 1, accession : 1, gene_name : 1, organism:1, definition:1}, { skip: skip, limit: limit }, function(err, result){
         if ( err ) {
             res.status(404).end('Gene could not found');
         }

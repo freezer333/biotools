@@ -1,0 +1,20 @@
+mixin mrna_search_filter()
+  .row
+    .col-sm-8
+      .form-group
+        label.control-label(for='accession') Accession (separate by spaces or semi-colons)
+        textarea.form-control(ng-model='accession')
+    .col-sm-4
+      .form-group
+        label.control-label(for='organism') Organism
+        select.form-control(ng-model="organism", ng-options="species for species in species")
+  .row
+    .col-sm-8
+      .form-group
+        label.control-label(for='ontology') Ontology terms (separate by semi-colons)
+        textarea.form-control(ng-model='ontology', data-role="tagsinput")
+    .col-sm-4
+      .checkbox
+        label
+          input(type="checkbox" ng-model="annotations_only")
+          |  show mRNA with annotations only

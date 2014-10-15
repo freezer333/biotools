@@ -48,7 +48,7 @@ def process_mrna(count, mrna):
             start = int(mrna['start']) - downstream
             end = int(mrna['start']) - upstream
             url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end) + "?orientation=-";
-        
+
         print (url)
         response = requests.get(url)
         if response.status_code == requests.codes.ok :
@@ -69,7 +69,7 @@ def get_urich_motifs(seq):
     #sliding window of 5, count U's.  if >= 3, add to return array.
     motifs = []
     i = 0
-    while i <= len(seq) - 5:  
+    while i <= len(seq) - 5:
         hexamer = seq[i:(i+5)]
         if hexamer.count('U') >= 3 :
             motif = dict()
@@ -80,7 +80,7 @@ def get_urich_motifs(seq):
         i += 1
     return motifs
 
-mcursor = collect.find(spec={},snapshot=True, , timeout=False)
+mcursor = collect.find(spec={},snapshot=True, timeout=False)
 count = 1
 #process_mrna(mcursor[0])
 for record in mcursor:

@@ -14,8 +14,15 @@ var routes = require('./routes');
 var alignment_routes = require('./routes/alignment');
 var homologene_routes = require('./routes/homologene');
 var qgrs_routes = require('./routes/qgrs');
+var urich_routes = require('./routes/urich');
+var mrna_routes = require('./routes/mrna');
 
 var port = process.env.PORT || 3000;
+
+if (app.get('env') === 'development') {
+  app.locals.pretty = true;
+}
+
 
 app.set('port', port);
 app.set('views', __dirname + '/views');
@@ -26,6 +33,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(require('less-middleware')(__dirname + '/public'));
+app.use(require('less-middleware')(__dirname + '/bower_components'));
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/bower_components'));
 app.use(methodOverride());
@@ -37,18 +45,24 @@ app.get('/chrom/:accession/:start/:end', routes.chrom);
 app.get('/gene/:id', routes.gene)
 app.get('/gene/:skip/:limit', routes.gene_list)
 
+app.get('/mrna/info/species', routes.mrna_species);
+app.get('/mrna/info/ontology', routes.mrna_ontology);
 app.get('/mrna/:accession', routes.mrna_api)
 app.get('/mrna/:accession/sequence', routes.mrna_sequence)
 app.get('/mrna/:accession/sequence/:start/:end', routes.mrna_sequence)
 app.get('/mrna/:accession/sequence/:start', routes.mrna_sequence)
-app.get('/gui/mrna/:accession', routes.mrna)
 app.get('/mrna/:skip/:limit', routes.mrna_list)
 app.get('/mrna/', routes.mrna_list)
 app.get('/mrna', routes.mrna_list)
 
+app.get('/gui/mrna', mrna_routes.index)
+app.get('/gui/mrna/:accession', routes.mrna)
+
+
 app.post('/alignment', alignment_routes.index)
-app.get('/alignment', alignment_routes.description)
-app.get('/alignment/input', alignment_routes.input)
+app.get('/alignment', alignment_routes.input)
+app.get('/alignment/not_configured', alignment_routes.not_configured)
+app.get('/alignment/interactive', alignment_routes.input)
 
 app.get('/homologene/gene/:id', homologene_routes.search_by_gene)
 app.get('/homologene/mrna/:accession', homologene_routes.search_by_mrna)
@@ -65,5 +79,9 @@ app.post('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 app.get('/qgrs/mrna/:accession/map', qgrs_routes.qgrs_mrna)
 app.get('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
 app.post('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
+
+app.get('/analysis/:jobid', routes.analysis_status);
+app.get('/ugcorrelate',urich_routes.index);
+app.get('/ugcorrelate/analysis', urich_routes.uganalysis)
 
 http.createServer(app).listen(port);

@@ -24,10 +24,10 @@ exports.index = function(req, res) {
 }
 
 
-exports.description = function(req, res) {
-    res.render("alignment/description", {});
-}
 
+exports.not_configured = function(req, res) {
+    res.render("alignment/not_configured", {});
+}
 exports.input = function(req, res) {
     res.render("alignment/input", {});
 }

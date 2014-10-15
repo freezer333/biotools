@@ -1,6 +1,11 @@
 extends ../layout
 
 block content
-    h1 Alignment facilities not configured
-    p Alignment facilities are not properly configured on this server.  Please consult the documentation for proper setup
-    p Note, the most common reason for this happening is that the server does not have the alignment (i.e. needle) executable properly installed.
+  .container(ng-controller='NeedleCtrl')
+    .page-header
+      h1
+        | needle 
+        small.text-danger could not be executed
+      .well
+        p needle is not properly configured on this server.
+        p Please consult the documentation for proper setup.  Note that needle is only supported on unix-based systems

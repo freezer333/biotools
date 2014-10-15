@@ -1,13 +1,17 @@
 extends ../layout
 
 block content
-    h1 QGRS Motif Mapping
-
-    form(name='qgrs', action="/qgrs", method="post", enctype="application/x-www-form-urlencoded")
-        div
-            label(for='sequence') Enter nt. seqeunce
-                textarea(name='sequence', id='sequence')
-
+  .container(ng-controller='QgrsCtrl')
+    .page-header
+      h1
+        | qgrs 
+        small.text-primary motif mapping
+      .well
+        form.form-horizntal
+          fieldset
+            .form-group
+              label.control-label(for='sequence') Enter nt. sequence
+              textarea.nt.form-control#seqa(ng-model='sequence')
             input(type='hidden' value='C++' name='lang')
-        div
-            button(type='submit') Map
+            .form-group
+              button.btn.btn-primary(ng-click='map()') Map

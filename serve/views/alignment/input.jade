@@ -1,18 +1,29 @@
 extends ../layout
+block title
+  title needle
 
 block content
-    h1 Needle Input
-
-    form(name='align', action="/alignment", method="post", enctype="application/x-www-form-urlencoded")
-        div
-            label(for='seqa') Sequence A (raw)
-                textarea(name='seqa', id='seqa')
-
-        div
-            label(for='seqb') Sequence B (raw)
-                textarea(name='seqb', id='seqb')
-
-        input(type='hidden' name='options[method]', value ='needle')
-
-        div
-            button(type='submit') Align
+    .container(ng-controller='NeedleCtrl')
+      .page-header
+        h1
+          | needle 
+          small.text-primary semi-global alignment
+        .well
+          form.form-horizntal
+            fieldset
+              legend input sequences (raw sequence data)
+              .form-group
+                label.control-label(for='seqa') Sequence A
+                textarea.nt.form-control#seqa(ng-model='seqa')
+              .form-group
+                label.control-label(for='seqb') Sequence B
+                textarea.nt.form-control#seqa(ng-model='seqb')
+              .form-group
+                button.btn.btn-primary(ng-click='align()') Align
+        div(ng-show='show_alignment')
+          h2 Aligned Sequence
+          .well
+            p.nt {{ aligned_a }}
+            p.nt {{ aligned_b }}
+block scripts
+  script(src='/scripts/needle.js')

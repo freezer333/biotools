@@ -22,6 +22,7 @@ var init = function init(mongoose) {
     createGeneSchema(mongoose);
     createMrnaSchema(mongoose);
     createHomologeneSchema(mongoose);
+    createJobsSchema(mongoose);
 };
 
 var seq;
@@ -159,6 +160,27 @@ function createSeqSchema(mongoose) {
     exports.seq = mongoose.model('Seq', schem);
     seq = exports.seq;
 }
+
+function createJobsSchema(mongoose) {
+
+    var schem = new mongoose.Schema({
+        type : String,
+            progress: Number,
+            status: String,
+            complete: Boolean,
+            error : Boolean,
+            error_message: String,
+            date : Date,
+            owner : String,
+            result : mongoose.Schema.Types.Mixed
+        }, {collection:'jobs'});
+
+
+
+    exports.jobs = mongoose.model('Jobs', schem);
+    jobs = exports.jobs;
+}
+
 
 function createHomologeneSchema(mongoose) {
 

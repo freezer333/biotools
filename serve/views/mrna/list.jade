@@ -1,0 +1,44 @@
+extends ../layout
+block title
+  title mRNA
+
+block content
+    .container(ng-controller='mRNACtrl')
+      .page-header
+        h1
+          | mRNA
+          small.text-primary search
+        .well
+          form.form-horizntal
+            fieldset
+              legend search filters
+              +mrna_search_filter
+              .row
+                .col-sm-1
+                  .form-group
+                    button.btn.btn-primary(ng-click='search()') Search
+
+
+
+
+        div(ng-show='listings.length > 0')
+          h1 Search Results
+          table.table.table-striped.table-hover.table-bordered.table-condensed
+            thead
+              tr
+                th gene name
+                th accession
+                th gene id
+                th organism
+                th description
+            tbody
+              tr(ng-repeat="mrna in listings")
+                td {{mrna.gene_name}}
+                td {{mrna.accession}}
+                td {{mrna.gene_id}}
+                td {{mrna.organism}}
+                td {{mrna.definition}}
+
+
+block scripts
+  script(src='/scripts/mrna.js')
