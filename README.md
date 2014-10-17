@@ -60,12 +60,22 @@ $ sudo npm install node-gyp -g
 ```
 
 # Step 4:  Install git
-The source code for this project is hosted on github.com.  In order get the code, and to submit your changes, you need to install git on your own machine.  Instructions for installing git on Mac OS X, Linux, and Windows can be found here.
+The source code for this project is hosted on github.com.  In order get the code, and to submit your changes, you need to install git on your own machine.  Instructions for installing git on Mac OS X, Linux, and Windows can be found [here](http://git-scm.com/book/en/Getting-Started-Installing-Git).
 
-If you plan on using a graphical user interface for git, rather than using the command line, take a look at the following - which make this very easy to work with:
+**Alternatively**, if you plan on using a graphical user interface for git, rather than using the command line, take a look at the following - which make this very easy to work with:
 
-If you are not familiar with git, please review this tutorial.  git is similar to mercurial, but has some important differences.
+* [GitHub Mac](https://mac.github.com/)
+* [GitHub Windows](https://windows.github.com/)
 
+These programs will take care of installing git automatically, so you don't need to do it yourself.
+
+If you are using linux, you can choose from some of the clients listed [here](http://git-scm.com/downloads/guis)
+
+If you are not familiar with git, please take a look at some of the following tutorials:
+
+* [git for beginners](http://readwrite.com/2013/09/30/understanding-github-a-journey-for-beginners-part-1) - very simple, for beginners.  Very helpful!
+* [atlassian](https://www.atlassian.com/git/tutorials/setting-up-a-repository) - read through "setting up a repository" (git clone is most relevant), "saving changes", "inspecting a repository" under "Getting Started" and the syncing section under "Collaborating".
+* [github's interactive tutorial](https://try.github.io/levels/1/challenges/1) - lets you experiment a little on a demo.
 
 # Step 5:  Download the source code
 You are now ready to download the source code (some Node.js code, and some python seeding scripts).  Navigate to a directory where you wish to host your code (~/projects, C:/projects) and type the following command to pull the source:
@@ -319,22 +329,28 @@ The following URL's can be used to access data:
 
 
 ## Serving Chromosome Sequence Data
+Chromosome sequence data can be obtained based on the chromosome accession number and a start and end nt. location within the chromosome.
 
 ```http://localhost:3000/chrom/:accession/:start/:end```  
+
 Where :start and :end are nucleotide positions on the chromosome, and :accession is the accession number corresponding to the human chromosome.
 
 
 ## Serving mRNA Records
+mRNA records can be listed by accessing the following URL's.  
 
 ```http://localhost:3000/mrna```  
 ```http://localhost:3000/mrna/:skip/:limit```  
+
 The mrna url without an additional path part returns a list of mrna - currently limited to about 100.  When the optional skip and limit path parts are included, a given number of mrna sequences can be skipped, and the amount of mrna returned can be specified.
 
 
 ## Serving Gene Records
+Similarly, you can obtain lists of genes using the same patter.
 
 ```http://localhost:3000/gene```
 ```http://localhost:3000/gene/:skip/:limit```  
+
 A similar URL strategy is used for genes as well.
 
 ## Serving specific mRNA or Genes by id/accession number
