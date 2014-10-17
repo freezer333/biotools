@@ -331,7 +331,9 @@ The following URL's can be used to access data:
 ## Serving Chromosome Sequence Data
 Chromosome sequence data can be obtained based on the chromosome accession number and a start and end nt. location within the chromosome.
 
-```http://localhost:3000/chrom/:accession/:start/:end```  
+```
+http://localhost:3000/chrom/:accession/:start/:end
+```  
 
 Where :start and :end are nucleotide positions on the chromosome, and :accession is the accession number corresponding to the human chromosome.
 
@@ -339,8 +341,10 @@ Where :start and :end are nucleotide positions on the chromosome, and :accession
 ## Serving mRNA Records
 mRNA records can be listed by accessing the following URL's.  
 
-```http://localhost:3000/mrna```  
-```http://localhost:3000/mrna/:skip/:limit```  
+```
+http://localhost:3000/mrna  
+http://localhost:3000/mrna/:skip/:limit
+```  
 
 The mrna url without an additional path part returns a list of mrna - currently limited to about 100.  When the optional skip and limit path parts are included, a given number of mrna sequences can be skipped, and the amount of mrna returned can be specified.
 
@@ -348,22 +352,28 @@ The mrna url without an additional path part returns a list of mrna - currently 
 ## Serving Gene Records
 Similarly, you can obtain lists of genes using the same patter.
 
-```http://localhost:3000/gene```
-```http://localhost:3000/gene/:skip/:limit```  
+```
+http://localhost:3000/gene
+http://localhost:3000/gene/:skip/:limit
+```  
 
 A similar URL strategy is used for genes as well.
 
 ## Serving specific mRNA or Genes by id/accession number
 For mrna and genes, you can specifiy precisely which record you want to retreive by specifying the accession number for mrna, or the gene id for genes
 
-```http://localhost:3000/mrna/:accession```  
-```http://localhost:3000/gene/:geneid```  
+```
+http://localhost:3000/mrna/:accession
+http://localhost:3000/gene/:geneid
+```  
 
 For example, request to `http://localhost:3000/gene/64109` will return a JSON representation of the CRLF2 human gene.  Requests to `http://localhost:3000/api/mrna/NM_000345.3` will return a JSON representation of the human SNCA mRNA.  
 
 ## Serving mRNA sequences
 For mRNA, you can easily retrieve the full sequence using the following URL:
-```http://localhost:3000/mrna/:accession/sequence```
+```
+http://localhost:3000/mrna/:accession/sequence
+```
 
 Requests to the URL will build the mRNA sequence from the chromosome source data, stitching together exon associated with the exon and performing necessary
 reverse compliment transformations as needed.
@@ -371,20 +381,26 @@ reverse compliment transformations as needed.
 ## Finding Homologene Records
 The homologene records have clusters of genes with related function.  You may retrieve listings using the standard skip/limit api using the following URL.
 
-```http://localhost:3000/homologene/list```
-```http://localhost:3000/homologene/list/:skip/:limit```
+```
+http://localhost:3000/homologene/list
+http://localhost:3000/homologene/list/:skip/:limit
+```
 
 More useful however is retreiving clusters based on a gene id or mRNA accession number.  Requests to the following URL's will return all homologene records which contain either the gene referenced by the gene id or mRNA referenced by accession number.  This makes it very easy to find genes/mRNA that are homologous to sequences you might be working with.
 
-```http://localhost:3000/homologene/mrna/:accession```  
-```http://localhost:3000/homologene/gene/:geneid```
+```
+http://localhost:3000/homologene/mrna/:accession
+http://localhost:3000/homologene/gene/:geneid
+```
 
 Note also that for accession numbers, if you do not end the accession with a version number (for example, if you simply use `http://localhost:3000/homologene/mrna/NM_006245` instead of `http://localhost:3000/homologene/mrna/NM_006245.2`), regular expression will be used to match against accession number with *any version* - and therefore results containing mRNA with accession number of - for example - NM_006245.3 would be returned.
 
 ### Organisms in Homologene
 To find all organisms listed in the homologene collection, visit:
 
-```http://localhost:3000/homologene/species```  
+```
+http://localhost:3000/homologene/species
+```  
 
 This URL will return a JSON array of taxon objects - containing the ID and organism name of each organism represented in the entire collection.
 
@@ -518,6 +534,7 @@ if response.status_code == requests.codes.ok :
     data = response.json()
     print ("The sequence data is\n", data['seq'])
 ```
+
 
 ## Example 2:  Count U-Rich elements in mRNA in Python
 The following code illustrates counting U-rich elements in mRNA by querying MongoDB directly for all mRNA with downstream U-rich elements.
