@@ -1,6 +1,5 @@
 # Instructions for setting up bioinformatics data sources
 
-
 # Step 1:  Install Node.js
 The data sources run locally as a web service on your machine.  The web services are served from a Node.js application, which is very easy to run.  Later in this document you will see how to initialize the services, in this step you should simply ensure that Node.js is installed and running.
 
@@ -60,25 +59,23 @@ To use the C++ implementation of the qgrs mapping algorithm, you will need to in
 $ sudo npm install node-gyp -g
 ```
 
-# Step 4:  Install Mercurial
-The source code for this project is hosted in a Mercurial (hg) repository.  Please note, this is not the same repository as the older Java-based programs we've been using - although the rules of Mercurial, bitbucket, etc. still apply.
+# Step 4:  Install git
+The source code for this project is hosted on github.com.  In order get the code, and to submit your changes, you need to install git on your own machine.  Instructions for installing git on Mac OS X, Linux, and Windows can be found here.
 
-Download TortoiseHg from their [main page](http://tortoisehg.bitbucket.org/) and install it. Again, be careful to download the correct version. For Mac OS X users, go to the bottom of their download page and download the correct OS X package.
+If you plan on using a graphical user interface for git, rather than using the command line, take a look at the following - which make this very easy to work with:
 
-To ensure that the program is installed correctly, open up (a new) command prompt window and type `hg -v`. You should see information about hg print out.
+If you are not familiar with git, please review this tutorial.  git is similar to mercurial, but has some important differences.
+
 
 # Step 5:  Download the source code
-You are now ready to download the source code (some Node.js code, and some python seeding scripts).  You will need access to the repository through your bitbucket.org account (if you have trouble with this step, contact Dr. Frees).  
-
-Navigate to a directory where you wish to host your code (~/projects, C:/projects) and type the following command to pull the source:
+You are now ready to download the source code (some Node.js code, and some python seeding scripts).  Navigate to a directory where you wish to host your code (~/projects, C:/projects) and type the following command to pull the source:
 
 ```
-$ hg clone https://username@bitbucket.org/sfrees/biotools
+$ git clone https://github.com/freezer333/biotools.git
 
 ```
-**Note, you need to replace 'username' (before the @ symbol) with your own bitbucket username**.  You will be prompted to enter your password for your bitbucket account.
 
-Once complete, move to the biotools directory `cd biotools` and update `hg update`
+Once complete, move to the biotools directory `cd biotools` and update `git checkout HEAD`
 
 Next, be sure to update all dependencies for the node.js web services.  
 
@@ -322,17 +319,20 @@ The following URL's can be used to access data:
 
 
 ## Serving Chromosome Sequence Data
+
 ```http://localhost:3000/chrom/:accession/:start/:end```  
 Where :start and :end are nucleotide positions on the chromosome, and :accession is the accession number corresponding to the human chromosome.
 
 
 ## Serving mRNA Records
+
 ```http://localhost:3000/mrna```  
 ```http://localhost:3000/mrna/:skip/:limit```  
 The mrna url without an additional path part returns a list of mrna - currently limited to about 100.  When the optional skip and limit path parts are included, a given number of mrna sequences can be skipped, and the amount of mrna returned can be specified.
 
 
 ## Serving Gene Records
+
 ```http://localhost:3000/gene```
 ```http://localhost:3000/gene/:skip/:limit```  
 A similar URL strategy is used for genes as well.
@@ -365,7 +365,7 @@ More useful however is retreiving clusters based on a gene id or mRNA accession 
 
 Note also that for accession numbers, if you do not end the accession with a version number (for example, if you simply use `http://localhost:3000/homologene/mrna/NM_006245` instead of `http://localhost:3000/homologene/mrna/NM_006245.2`), regular expression will be used to match against accession number with *any version* - and therefore results containing mRNA with accession number of - for example - NM_006245.3 would be returned.
 
-### Organisims in Homologene
+### Organisms in Homologene
 To find all organisms listed in the homologene collection, visit:
 
 ```http://localhost:3000/homologene/species```  
