@@ -69,7 +69,7 @@ def process_mrna(count, mrna, start_time):
     start = int(mrna['end'])
     end = int(mrna['end'])
 
-    url = seq_url + '/qgrs/mrna/' + mrna['accession'] + '/map?downstream=65'
+    url = seq_url + '/qgrs/mrna/' + mrna['accession'] + '/map?downstream=200'
     if 'cds' not in mrna :
         return False
     if valid_position(mrna['cds']['start']) < 0 :
