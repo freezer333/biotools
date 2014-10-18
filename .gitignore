@@ -1,0 +1,6 @@
+serve/node_modules/*
+seed/chrom_test.py
+external_data*
+*.DS_Store
+seed/tmp/*
+util/gccp/build/*
