@@ -21,18 +21,17 @@ function makeFilter(req){
         minGScore : p_minGScore,
         maxGScore : p_maxGScore,
         maxLength : p_maxLength,
-        minLength : p_maxLength,
+        minLength : p_minLength,
         apply : function(g4)  {
             return (g4.tetrads >= p_minTetrad && g4.tetrads <= p_maxTetrad &&
                 g4.gscore >= p_minGScore && g4.gscore <= p_maxGScore &&
                 g4.length >= p_minLength && g4.length <= p_maxLength);
         }
     }
-
     return filter;
 }
 
-
+exports.makeQgrsFilter = makeFilter;
 
 
 exports.qgrs = function(req, res){

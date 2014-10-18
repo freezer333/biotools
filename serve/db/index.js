@@ -172,6 +172,7 @@ function createJobsSchema(mongoose) {
             error_message: String,
             date : Date,
             owner : String,
+            query : mongoose.Schema.Types.Mixed,
             result : mongoose.Schema.Types.Mixed
         }, {collection:'jobs'});
 

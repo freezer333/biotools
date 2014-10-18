@@ -1,0 +1,19 @@
+mixin qgrs_search_filter()
+  .row
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.minTetrad') Min tetrads
+        input.form-control(type='number', min='2', step='1', ng-model='filter.minTetrad')
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.maxTetrad') Max tetrads
+        input.form-control(type='number', min='2', step='1', ng-model="filter.maxTetrad")
+  .row
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.minGScore') Min GScore
+        input.form-control(type='number', min='13', step='1', ng-model='filter.minGScore')
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.maxGScore') Max GScore
+        input.form-control(type='number', min='13', step='1', ng-model="filter.maxGScore")

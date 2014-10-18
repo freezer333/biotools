@@ -2,13 +2,9 @@
 var app = angular.module('app', []);
 var UGCorrelateService = app.factory('UGCorrelateService', function($http) {
   return {
-    run : function(accession, organism, ontology, annotations) {
-      return $http({method:"GET", url: '/ugcorrelate/analysis', params: {
-          accession : accession,
-          organism : organism,
-          ontology : ontology,
-          annotations : annotations
-      }}).then(function(result) {
+    run : function(filter) {
+      return $http({method:"GET", url: '/ugcorrelate/analysis', params: filter
+      }).then(function(result) {
           return result.data._id;
       });
     },
@@ -42,7 +38,7 @@ app.controller('UGCorrelateCtrl', function($scope, $interval, UGCorrelateService
     $scope.complete = false;
     $scope.progress = 0;
     $scope.status = "Starting:   ";
-    UGCorrelateService.run($scope.accession, $scope.organism, $scope.ontology, $scope.annotations_only).then(function(result) {
+    UGCorrelateService.run($scope.filter).then(function(result) {
         task = $interval( function () {
           var id = result;
           UGCorrelateService.update(id).then(function (status) {

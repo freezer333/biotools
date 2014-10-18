@@ -36,7 +36,6 @@ exports.chrom = function(req, res) {
 
 exports.gene = function(req, res) {
     var id = req.params.id;
-    console.log("Searching for gene " + id );
     if ( !id) {
         res.status(404).end('Gene id was not specified or was invalid');
         return ;
@@ -254,7 +253,6 @@ exports.build_mrna_query = function (req, additional) {
   var accessions = accession_list ? accession_list.split(';').map(function(str){ return str.trim()}) : null;
   var ontology_terms = ontology_list ? ontology_list.split(';').map(function(str) { return str.trim()}) : null;
   var selections = [];
-  console.log(additional);
   if ( accessions )                       selections.push({accession: {'$in' : accessions} });
   if ( req.query.annotations == 'true')   selections.push({cds : {'$exists': true}});
   if ( req.query.organism)                selections.push({organism: req.query.organism});

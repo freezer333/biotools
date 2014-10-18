@@ -1,4 +1,5 @@
 var core_routes = require('../index');
+var qgrs_routes = require('../qgrs');
 var db = require("../../db");
 
 exports.index = function(req, res) {
@@ -6,11 +7,9 @@ exports.index = function(req, res) {
 }
 
 
-function do_ug_analyssi(query, job_id) {
-
-}
 exports.uganalysis = function(req, res) {
   var query = core_routes.build_mrna_query(req, [{g4s : {'$exists' : true}}, {u_rich_downstream : {'$exists':true}}]);
+  var base_g_filter = qgrs_routes.makeQgrsFilter(req);
 
   var job = new db.jobs ( {
       type : "Urich QGRS Correlation Analysis",
@@ -20,6 +19,7 @@ exports.uganalysis = function(req, res) {
       error : false,
       error_message: "",
       date : new Date(),
+      query : { 'qgrs' : base_g_filter },
       owner : "scott.frees@gmail.com",
   });
   job.save(function (saved) {
@@ -45,7 +45,11 @@ exports.uganalysis = function(req, res) {
   var with_neither = 0;
 
   stream.on('data', function (doc) {
-    var num_gs = doc.g4s.filter(function (g4) { return g4.isDownstream }).length;
+    var num_gs = doc.g4s
+                  .filter(function (g4) { return g4.isDownstream })
+                  .filter(base_g_filter.apply)
+                  .length;
+
     var num_us = doc.u_rich_downstream.length;
 
     if ( num_gs > 0 && num_us > 0 ) with_both++;
