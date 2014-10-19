@@ -12,6 +12,7 @@ var fs              = require('fs');
 var app = exports.app = express();
 var routes = require('./routes');
 var alignment_routes = require('./routes/alignment');
+var job_routes = require('./routes/jobs');
 var homologene_routes = require('./routes/homologene');
 var qgrs_routes = require('./routes/qgrs');
 var urich_routes = require('./routes/urich');
@@ -83,5 +84,7 @@ app.post('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
 app.get('/analysis/:jobid', routes.analysis_status);
 app.get('/ugcorrelate',urich_routes.index);
 app.get('/ugcorrelate/analysis', urich_routes.uganalysis)
+
+app.get('/jobs', job_routes.list)
 
 http.createServer(app).listen(port);
