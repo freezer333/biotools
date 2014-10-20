@@ -11,7 +11,6 @@ exports.list = function (req, res) {
   if ( type ) q.type = type;
   if ( complete) q.complete = complete;
 
-  console.log(JSON.stringify(q));
   db.jobs.find(q, function(err, result){
       if ( err ) {
           res.status(404).end('Job listing could not found');
