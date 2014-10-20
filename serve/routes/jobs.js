@@ -2,11 +2,12 @@
 var db = require("../db");
 
 exports.list = function (req, res) {
-  var owner = req.params.ownder;
+  var owner = req.query.owner;
   var q = {};
   if ( owner) {
       q.owner = owner;
   }
+  console.log(q);
   db.jobs.find(q, function(err, result){
       if ( err ) {
           res.status(404).end('Job listing could not found');
