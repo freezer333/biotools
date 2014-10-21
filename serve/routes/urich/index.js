@@ -6,10 +6,26 @@ exports.index = function(req, res) {
     res.render("urich/ugcorrelate");
 }
 
+function makeURichFilter(req) {
+  var p_minU = req.body.minUs || req.query.minUs || 3;
+  var p_maxU = req.body.maxUs || req.query.maxUs || 5;
+
+
+  var filter = {
+      minU : p_minU,
+      maxU : p_maxU,
+      apply : function(motif)  {
+          return (motif.order >= p_minU && motif.order <= p_maxU);
+      }
+  }
+  return filter;
+}
+exports.makeURichFilter = makeURichFilter;
 
 exports.uganalysis = function(req, res) {
   var query = core_routes.build_mrna_query(req, [{g4s : {'$exists' : true}}, {u_rich_downstream : {'$exists':true}}]);
   var base_g_filter = qgrs_routes.makeQgrsFilter(req);
+  var base_u_filter = makeURichFilter(req);
 
   var job = new db.jobs ( {
       type : "Urich QGRS Correlation Analysis",
@@ -19,7 +35,7 @@ exports.uganalysis = function(req, res) {
       error : false,
       error_message: "",
       date : new Date(),
-      query : { 'qgrs' : base_g_filter },
+      query : { 'qgrs' : base_g_filter, 'urich' : base_u_filter },
       owner : "scott.frees@gmail.com",
   });
   job.save(function (saved) {
@@ -50,7 +66,7 @@ exports.uganalysis = function(req, res) {
                   .filter(base_g_filter.apply)
                   .length;
 
-    var num_us = doc.u_rich_downstream.length;
+    var num_us = doc.u_rich_downstream.filter(base_u_filter.apply).length;
 
     if ( num_gs > 0 && num_us > 0 ) with_both++;
     else if ( num_gs > 0 ) with_g_count_only++;

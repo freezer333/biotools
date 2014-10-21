@@ -1,0 +1,10 @@
+mixin urich_search_filter()
+  .row
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.minUs') Minimum number of U's
+        input.form-control(type='number', min='3', max='5' step='1', ng-model='filter.minUs')
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.maxUs') Maximum number of U's
+        input.form-control(type='number', min='2', max='5', step='1', ng-model="filter.maxUs")
