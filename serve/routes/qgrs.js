@@ -12,8 +12,8 @@ function makeFilter(req){
     var p_maxTetrad = req.body.maxTetrad || req.query.maxTetrad || Number.MAX_VALUE; // unlikely...
     var p_minGScore = req.body.minGScore || req.query.minGScore || 13;
     var p_maxGScore = req.body.maxGScore || req.query.maxGScore || Number.MAX_VALUE;
-    var p_maxLength = req.body.maxLength || req.query.maxLength || Number.MAX_VALUE;
     var p_minLength = req.body.minLength || req.query.minLength || p_minTetrad * 4;
+    var p_maxLength = req.body.maxLength || req.query.maxLength || Number.MAX_VALUE;
 
     var filter = {
         minTetrad : p_minTetrad,

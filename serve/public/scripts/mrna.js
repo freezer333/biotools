@@ -12,6 +12,11 @@ var mRNAService = app.factory('mRNAService', function($http) {
           return result.data;
       });
     },
+    getRecord : function(accession) {
+      return $http.get('/mrna/' + accession, {}).then(function(result) {
+        return result.data;
+      })
+    },
     getSpecies : function(accession, organism, ontology, skip, limit) {
       return $http.get('/mrna/info/species', {})
                       .then(function(result) {
@@ -40,4 +45,13 @@ app.controller('mRNACtrl', function($scope, mRNAService) {
   }
 
   $scope.search();
+});
+
+app.controller('mRNARecordCtrl', function($scope, mRNAService) {
+  $scope.fetchRecord = function(accession) {
+    mRNAService.getRecord(accession).then(function(result) {
+        $scope.mrna = result;
+        $scope.loaded = result != null;
+      });
+  }
 });

@@ -1,0 +1,57 @@
+extends ../layout
+block title
+  title= mrna.accession
+
+block content
+    .container(ng-controller='mRNARecordCtrl' ng-init="fetchRecord('"+mrna.accession+"');")
+      .page-header
+        h1
+          | mRNA&nbsp;
+          small.text-primary {{mrna.gene_name}} - {{mrna.accession}}
+        p {{mrna.definition}}
+
+      .info_table
+        p
+          label Organisim:
+          {{mrna.organism}}
+        p
+          label Gene Locus:
+          a(title='Click for full genomic sequence (includes introns)', href='/chrom/{{mrna.chrom}}/{{mrna.start}}/{{mrna.end}}?orientation={{mrna.orientation}}', target='_blank')
+            | {{mrna.chrom}} (build {{mrna.build}}) &nbsp;
+            | {{mrna.start}} - {{mrna.end}} ( {{mrna.orientation}} )
+        p
+          label Exons
+          {{mrna.exons.length}} exons, {{mrna.length}} nt.
+
+        p
+          label 5'UTR
+          {{mrna.utr_5.start}} - {{mrna.utr_5.end}} ({{mrna.utr_5.end-mrna.utr_5.start}})
+        p
+          label CDS
+          {{mrna.cds.start}} - {{mrna.cds.end}} ({{mrna.cds.end-mrna.cds.start}})
+        p
+          label 3'UTR
+          {{mrna.utr_3.start}} - {{mrna.utr_3.end}} ({{mrna.utr_3.end-mrna.utr_3.start}})
+
+        a(href='/mrna/{{mrna.accession}}/sequence', target='_blank', title='Click for transcript sequence (includes 5\' and 3\'UTR, and CDS of mRNA)') Full mRNA Sequence
+
+      legend Ontology
+      .info_table
+        p
+          label Components
+          br
+          span.label.label-default(ng-repeat="o in mrna.ontology.components") {{o}}
+        p
+          label Processes
+          br
+          span.label.label-default(ng-repeat="o in mrna.ontology.processes") {{o}}
+        p
+          label Functions
+          br
+          span.label.label-default(ng-repeat="o in mrna.ontology.functions") {{o}}
+
+      legend Motifs
+
+
+block scripts
+  script(src='/scripts/mrna.js')

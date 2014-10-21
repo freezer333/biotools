@@ -57,7 +57,7 @@ app.get('/mrna/', routes.mrna_list)
 app.get('/mrna', routes.mrna_list)
 
 app.get('/gui/mrna', mrna_routes.index)
-app.get('/gui/mrna/:accession', routes.mrna)
+app.get('/gui/mrna/:accession', mrna_routes.record)
 
 
 app.post('/alignment', alignment_routes.index)
