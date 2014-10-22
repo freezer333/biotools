@@ -21,3 +21,15 @@ exports.list = function (req, res) {
       }
   })
 }
+exports.analysis_status = function (req, res) {
+  var job = req.params.jobid;
+  db.jobs.findOne({'_id':job}, function (err, result) {
+    if ( err ) {
+        res.status(404).end('Job could not found');
+    }
+    else {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(result));
+    }
+  });
+}

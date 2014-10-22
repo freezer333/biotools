@@ -280,18 +280,7 @@ exports.build_mrna_query = function (req, additional) {
   return query;
 }
 
-exports.analysis_status = function (req, res) {
-  var job = req.params.jobid;
-  db.jobs.findOne({'_id':job}, function (err, result) {
-    if ( err ) {
-        res.status(404).end('Job could not found');
-    }
-    else {
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(result));
-    }
-  });
-}
+
 exports.mrna_list = function(req, res) {
     var skip = req.params.skip || 0;
     var limit = req.params.limit || 100;

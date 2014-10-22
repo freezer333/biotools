@@ -80,11 +80,14 @@ app.post('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 app.get('/qgrs/mrna/:accession/map', qgrs_routes.qgrs_mrna)
 app.get('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
 app.post('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
+app.get('/qgrs/mrna/density', qgrs_routes.qgrs_enrichment)
+app.get('/qgrs/mrna/density/analysis', qgrs_routes.qgrs_enrichment_analysis)
 
-app.get('/analysis/:jobid', routes.analysis_status);
 app.get('/ugcorrelate',urich_routes.index);
 app.get('/ugcorrelate/analysis', urich_routes.uganalysis)
 
 app.get('/jobs', job_routes.list)
+app.get('/jobs/:jobid', job_routes.analysis_status);
+
 
 http.createServer(app).listen(port);

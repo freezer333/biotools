@@ -9,7 +9,7 @@ var UGCorrelateService = app.factory('UGCorrelateService', function($http) {
       });
     },
     update : function(id) {
-      return $http.get('/analysis/' + id, {}).then (function (status) {
+      return $http.get('/jobs/' + id, {}).then (function (status) {
         return status.data
       },
       function(data) {

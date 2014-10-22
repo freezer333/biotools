@@ -84,7 +84,7 @@ exports.qgrs_overlaps = function(req, res){
                 return g4.id == g4id;
             })[0];
 
-            downstream = g4.isDownstream ? 65 : 0;
+            downstream = g4.isDownstream ? 200 : 0;
 
             core_routes.build_mrna_sequence(mrna.accession, downstream,
                 function(err) {
@@ -204,11 +204,244 @@ function computeTotal(first_pass_ranges) {
 }
 
 
+
+
+
+
+exports.qgrs_enrichment = function(req, res) {
+  res.render("qgrs/enrichment");
+}
+
+exports.qgrs_enrichment_analysis = function(req, res) {
+  var query = core_routes.build_mrna_query(req, [{g4s : {'$exists' : true}}, {u_rich_downstream : {'$exists':true}}]);
+  var base_g_filter = makeFilter(req);
+
+  var job = new db.jobs ( {
+      type : "QGRS Enrichment Analysis",
+      progress: 0,
+      status: "Starting",
+      complete: false,
+      error : false,
+      error_message: "",
+      date : new Date(),
+      query : { 'qgrs' : base_g_filter},
+      owner : "scott.frees@gmail.com",
+  });
+  job.save(function (saved) {
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(job));
+  });
+
+
+  var total_to_be_processed = 0
+  var status_increment = 100000;
+
+  db.mrna.count(query, function (err, doc){
+    total_to_be_processed = parseInt(doc);
+    status_increment = Math.floor(total_to_be_processed / 100);
+  });
+
+  var stream = db.mrna.find(query).stream();
+  var mrna_count = 0;
+  var all_den = 0, utr5_den = 0, cds_den = 0, utr3_den = 0, downstream_den = 0;
+  var all_total = 0, utr5_total = 0, cds_total = 0, utr3_total = 0, downstream_total = 0;
+  var all_count = 0, utr5_count = 0, cds_count = 0, utr3_count = 0, downstream_count = 0;
+
+  stream.on('data', function (doc) {
+    var g4s = doc.g4s.filter(base_g_filter.apply);
+
+    var d = calc_density(doc, base_g_filter, 200, g4s);
+    all_den += d.density.overall.density;
+    all_total += d.density.overall.total;
+    all_count++;
+    if ( d.density.utr5.length > 0 ) {
+      utr5_den += d.density.utr5.density;
+      utr5_total += d.density.utr5.total;
+      utr5_count++;
+    }
+    if ( d.density.cds.length > 0 ) {
+      cds_den += d.density.cds.density;
+      cds_total += d.density.cds.total;
+      cds_count++;
+    }
+    if ( d.density.utr3.length > 0 ) {
+      utr3_den += d.density.utr3.density;
+      utr3_total += d.density.utr3.total;
+      utr3_count++;
+    }
+    downstream_den += d.density.downstream.density;
+    downstream_total += d.density.downstream.total;
+    downstream_count++;
+
+
+    if ( mrna_count % status_increment == 0 ) {
+      if ( total_to_be_processed == 0 ) {
+        job.progress = 0;
+      }
+      else {
+          job.progress = mrna_count / total_to_be_processed;
+      }
+      job.status = "Processed " + mrna_count + " mRNA of " + total_to_be_processed;
+      job.save();
+    }
+
+    mrna_count++;
+  });
+
+  stream.on('close', function() {
+    job.progress = 100;
+    job.status = "Analysis Complete";
+    job.complete = true;
+
+    job.result  = {
+      avg_density : {
+          all : all_den / all_count,
+          utr5 : utr5_den / utr5_count,
+          cds : cds_den / cds_count,
+          utr3 : utr3_den / utr3_count,
+          downstream : downstream_den / downstream_count
+      },
+      counts :{
+        all : all_count,
+        utr5 : utr5_count,
+        cds : cds_count,
+        utr3 : utr3_count,
+        downstream : downstream_count
+      },
+      totals :{
+        all : all_total,
+        utr5 : utr5_total,
+        cds : cds_total,
+        utr3 : utr3_total,
+        downstream : downstream_total
+      }
+    }
+    job.save();
+  });
+
+  stream.on('error', function(err) {
+    job.progress = 0;
+    job.status = "Analysis Failed";
+    job.error = true;
+    job.complete = false;
+    job.error_message = JSON.stringify(err);
+    job.save();
+  });
+
+}
+
+
+
+
+
+function calc_density(parent_mrna, filter, downstream, g4s) {
+  var cds_start = parent_mrna.cds.start;
+  var cds_end = parent_mrna.cds.end
+  var transcript_end = parent_mrna.length;
+
+  var in3 = function(g4) {
+    g4.end = g4.start+g4.length;
+    return g4.start >= cds_end && g4.start <= transcript_end || g4.end >= cds_end && g4.end <= transcript_end
+  }
+  var in5 = function (g4) {
+    g4.end = g4.start+g4.length;
+    return g4.start <= cds_start;
+  }
+  var inCds = function(g4) {
+    g4.end = g4.start+g4.length;
+    return g4.start >= cds_start && g4.start <= cds_end || g4.end >= cds_start && g4.end <= cds_end
+  }
+  var inDown = function(g4) {
+    g4.end = g4.start+g4.length;
+    return g4.end >= transcript_end
+  }
+
+  var any = [];
+  var u3 = [];
+  var u5 = [];
+  var cds = [];
+  var down = [];
+
+  var process_motif = function (g4) {
+      var in_any = false, in_5utr = false, in_3utr = false, in_cds = false, in_downstream = false;
+      if ( filter.apply(g4)) {
+          if ( in3(g4)|| in5(g4) || inCds(g4)) in_any = true;
+          if ( in3(g4) ) in_3utr = true;
+          if ( in5(g4) ) in_5utr = true;
+          if ( inCds(g4) ) in_cds= true;
+          if ( inDown(g4)) in_downstream = true;
+      }
+      if (in_any) merge_range_set(any, {start: g4.start, end: g4.start+g4.length});
+      if (in_5utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length}, {start : 0, end : parent_mrna.cds_start});
+      if (in_3utr) merge_range_set(u3, {start: g4.start, end: g4.start+g4.length}, {start : cds_end, end : transcript_end});
+      if (in_cds) merge_range_set(cds, {start: g4.start, end: g4.start+g4.length}, {start : cds_start, end : cds_end})
+      if (in_downstream) merge_range_set(down, {start: g4.start, end: g4.start+g4.length}, {start : transcript_end})
+  }
+
+  for ( i in g4s ) {
+      g4 = g4s[i];
+      process_motif(g4);
+      for ( j in g4s[i].overlaps) {
+          g4 = g4s[i].overlaps[j];
+          process_motif(g4);
+      }
+  }
+
+  var total = computeTotal(any);
+  var total_5utr = computeTotal(u5);
+  var total_cds = computeTotal(cds);
+  var total_3utr = computeTotal(u3);
+  var total_downstream = computeTotal(down);
+
+  var overall_length = parent_mrna.length;
+  var utr5_length = parent_mrna.cds.start;
+  var utr3_length = parent_mrna.length - parent_mrna.cds.end;
+  var cds_length = parent_mrna.cds.end - parent_mrna.cds.start;
+
+  var d_result = {
+      density_criteria : filter,
+      accession : parent_mrna.accession,
+      build : parent_mrna.build,
+      cds : parent_mrna.cds,
+      density : {
+          overall : {
+              total : total,
+              length : overall_length,
+              density : total / overall_length
+          },
+          utr3 : {
+              total : total_3utr,
+              length : utr3_length,
+              density : total_3utr / utr3_length
+          },
+          cds : {
+              total : total_cds,
+              length : cds_length,
+              density : total_cds / cds_length
+          },
+          utr5 : {
+              total : total_5utr,
+              length : utr5_length,
+              density : total_5utr / utr5_length
+          },
+          downstream : {
+              total : total_downstream,
+              length : downstream,
+              density : total_downstream / downstream
+          }
+      }
+
+  }
+  return d_result;
+}
+
+
+// Performs deep analysis - overlaps are re-mapped with C++ module
 exports.qgrs_density = function(req, res) {
     var filter = makeFilter(req);
     var accession = req.params.accession;
     var parent_mrna;
-    var downstream = 65;
+    var downstream = 200;
 
     async.waterfall([
         function(callback){
@@ -227,99 +460,7 @@ exports.qgrs_density = function(req, res) {
           callback(null, result.results);
         },
         function(g4s, callback){
-
-            var cds_start = parent_mrna.cds.start;
-            var cds_end = parent_mrna.cds.end
-            var transcript_end = parent_mrna.length;
-            var in3 = function(g4) {
-                return g4.start >= cds_end && g4.start <= transcript_end || g4.end >= cds_end && g4.end <= transcript_end
-            }
-            var in5 = function (g4) {
-                return g4.start <= cds_start;
-            }
-            var inCds = function(g4) {
-                return g4.start >= cds_start && g4.start <= cds_end || g4.end >= cds_start && g4.end <= cds_end
-            }
-            var inDown = function(g4) {
-                return g4.end >= transcript_end
-            }
-
-            var any = [];
-            var u3 = [];
-            var u5 = [];
-            var cds = [];
-            var down = [];
-
-            var process_motif = function (g4) {
-                var in_any = false, in_5utr = false, in_3utr = false, in_cds = false, in_downstream = false;
-                if ( filter.apply(g4)) {
-                    if ( in3(g4)|| in5(g4) || inCds(g4)) in_any = true;
-                    if ( in3(g4) ) in_3utr = true;
-                    if ( in5(g4) ) in_5utr = true;
-                    if ( inCds(g4) ) in_cds= true;
-                    if ( inDown(g4)) in_downstream = true;
-                }
-                if (in_any) merge_range_set(any, {start: g4.start, end: g4.start+g4.length});
-                if (in_5utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length}, {start : 0, end : parent_mrna.cds_start});
-                if (in_3utr) merge_range_set(u3, {start: g4.start, end: g4.start+g4.length}, {start : cds_end, end : transcript_end});
-                if (in_cds) merge_range_set(cds, {start: g4.start, end: g4.start+g4.length}, {start : cds_start, end : cds_end})
-                if (in_downstream) merge_range_set(down, {start: g4.start, end: g4.start+g4.length}, {start : transcript_end})
-            }
-
-            for ( i in g4s ) {
-                g4 = g4s[i];
-                process_motif(g4);
-                for ( j in g4s[i].overlaps) {
-                    g4 = g4s[i].overlaps[j];
-                    process_motif(g4);
-                }
-            }
-
-            var total = computeTotal(any);
-            var total_5utr = computeTotal(u5);
-            var total_cds = computeTotal(cds);
-            var total_3utr = computeTotal(u3);
-            var total_downstream = computeTotal(down);
-
-            var overall_length = parent_mrna.length;
-            var utr5_length = parent_mrna.cds.start;
-            var utr3_length = parent_mrna.length - parent_mrna.cds.end;
-            var cds_length = parent_mrna.cds.end - parent_mrna.cds.start;
-
-            var d_result = {
-                density_criteria : filter,
-                accession : parent_mrna.accession,
-                build : parent_mrna.build,
-                cds : parent_mrna.cds,
-                density : {
-                    overall : {
-                        total : total,
-                        length : overall_length,
-                        density : total / overall_length
-                    },
-                    utr3 : {
-                        total : total_3utr,
-                        length : utr3_length,
-                        density : total_3utr / utr3_length
-                    },
-                    cds : {
-                        total : total_cds,
-                        length : cds_length,
-                        density : total_cds / cds_length
-                    },
-                    utr5 : {
-                        total : total_5utr,
-                        length : utr5_length,
-                        density : total_5utr / utr5_length
-                    },
-                    downstream : {
-                        total : total_downstream,
-                        length : downstream,
-                        density : total_downstream / downstream
-                    }
-                }
-
-            }
+            d_result = calc_density(parent_mrna, filter, downstream, g4s);
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(d_result));
 
