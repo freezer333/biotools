@@ -80,7 +80,6 @@ def process_mrna(count, mrna, start_time):
         print('Skipping ', mrna['accession'], " - g4s already exist")
         return True
     time_sum = 0
-    transcript_end = 0
     before = time.time()
     response = requests.get(url)
     if response.status_code == requests.codes.ok :
@@ -101,8 +100,8 @@ def process_mrna(count, mrna, start_time):
                 g4_end = g4_start + int(g4['length'])
                 g4['is5Prime'] = g4_start <= cds_start
                 g4['isCDS'] = g4_start >= cds_start and g4_start <= cds_end or g4_end >= cds_start and g4_end <= cds_end
-                g4['is3Prime'] = g4_start >= cds_end and g4_start <= transcript_end or g4_end >= cds_end and g4_end <= transcript_end
-                g4['isDownstream'] = g4_end >= transcript_end
+                g4['is3Prime'] = g4_start >= cds_end and g4_start <= end or g4_end >= cds_end and g4_end <= end
+                g4['isDownstream'] = g4_end >= end
 
                 # we won't put the overlaps in the database
                 g4['range'] = findRange(g4);
