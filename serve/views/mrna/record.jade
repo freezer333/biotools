@@ -35,7 +35,7 @@ block content
 
         a(href='/mrna/{{mrna.accession}}/sequence', target='_blank', title='Click for transcript sequence (includes 5\' and 3\'UTR, and CDS of mRNA)') Full mRNA Sequence
 
-      legend Ontology
+      legend.text-primary Ontology
       .info_table
         p
           label Components
@@ -51,7 +51,7 @@ block content
           span.badge_label(ng-repeat="o in mrna.ontology.functions") {{o}}
 
       div(ng-show='mrna.g4s && mrna.g4s.length > 0')
-        legend QGRS Motifs
+        legend.text-primary QGRS Motifs
         p The following QGRS motifs were found within this mRNA sequence
         table.table.table-striped.table-hover.table-bordered.table-condensed
           thead
@@ -82,6 +82,25 @@ block content
               td.centered_col
                 i.fa.fa-check-circle-o(ng-show='g4.isDownstream')
               td {{g4.start}} - {{g4.start + g4.length}}
+
+      div(ng-show='mrna.u_rich_downstream && mrna.u_rich_downstream.length > 0')
+        legend.text-primary U-Rich Motifs
+        p.
+          The following U-Rich motifs were found downstream of this transcript's
+          poly(a) site.
+        table.table.table-striped.table-hover.table-bordered.table-condensed
+          thead
+            tr
+              th Sequence
+              th Order (# U's)
+              th Position (bases downstream from poly(a) site)
+
+          tbody
+            tr(ng-repeat="u in mrna.u_rich_downstream")
+              td.usequence {{u.seq}}
+              td {{u.order}}
+              td {{u.downstream_rel_pos}}
+
 
 block scripts
   script(src='/scripts/mrna.js')
