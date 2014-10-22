@@ -34,7 +34,8 @@ block content
             tbody
               tr(ng-repeat="mrna in listings")
                 td {{mrna.gene_name}}
-                td {{mrna.accession}}
+                td
+                  a(href='/gui/mrna/{{mrna.accession}}'){{mrna.accession}}
                 td {{mrna.gene_id}}
                 td {{mrna.organism}}
                 td {{mrna.definition}}
