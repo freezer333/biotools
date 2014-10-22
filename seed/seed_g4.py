@@ -66,10 +66,9 @@ def findRange(g4):
     return retval;
 
 def process_mrna(count, mrna, start_time):
-    start = int(mrna['end'])
-    end = int(mrna['end'])
-
     url = seq_url + '/qgrs/mrna/' + mrna['accession'] + '/map?downstream=200'
+    if 'length' not in mrna :  #added by the features script - with cds
+        return False
     if 'cds' not in mrna :
         return False
     if valid_position(mrna['cds']['start']) < 0 :
@@ -79,6 +78,8 @@ def process_mrna(count, mrna, start_time):
     if 'g4s' in mrna and skip_existing:
         print('Skipping ', mrna['accession'], " - g4s already exist")
         return True
+
+    end = int(mrna['length'])
     time_sum = 0
     before = time.time()
     response = requests.get(url)
