@@ -250,6 +250,7 @@ exports.mrna_api = function(req, res) {
 exports.build_mrna_query = function (req, additional) {
   var accession_list = req.query.accession || "";
   var ontology_list = req.query.ontology || "";
+  console.log("Building mrna query - accessions:  " + accession_list);
   var accessions = accession_list ? accession_list.split(';').map(function(str){ return str.trim()}) : null;
   var ontology_terms = ontology_list ? ontology_list.split(';').map(function(str) { return str.trim()}) : null;
   var selections = [];

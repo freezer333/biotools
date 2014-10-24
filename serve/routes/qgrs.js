@@ -2,6 +2,7 @@ var db = require("../db");
 var async = require('async');
 var spawn = require('child_process').spawn;
 var core_routes = require('./index');
+var _ = require('underscore');
 
 var qgrs_module = require('qgrs');
 var qgrs_version = require('qgrs/package.json').version;
@@ -34,6 +35,17 @@ function makeFilter(req){
 exports.makeQgrsFilter = makeFilter;
 
 
+exports.record = function(req, res) {
+  var page = {
+    qgrs : {
+      id : req.params.g4id
+    }
+  };
+  res.render("qgrs/record", page);
+}
+
+
+
 exports.qgrs = function(req, res){
     var g4id = req.params.g4id;
     var g4;
@@ -63,6 +75,8 @@ exports.qgrs_overlaps = function(req, res){
     var filter = makeFilter(req);
     var g4id = req.params.g4id;
     var g4;
+    var g4_record;
+
 
     async.waterfall([
         function(callback){
@@ -85,7 +99,7 @@ exports.qgrs_overlaps = function(req, res){
             })[0];
 
             downstream = g4.isDownstream ? 200 : 0;
-
+            g4_record = g4;
             core_routes.build_mrna_sequence(mrna.accession, downstream,
                 function(err) {
                     res.status(404).end('mRNA sequence data could not be found');
@@ -96,9 +110,10 @@ exports.qgrs_overlaps = function(req, res){
         },
         function(sequence, callback){
             result = qgrs_module.find(sequence);
-            callback(null, JSON.parse(result));
+            callback(null, JSON.parse(result).results);
         },
         function(g4s, callback){
+            console.log(g4s);
             var g = g4s[0];
             g.overlaps = g.overlaps.filter(filter.apply);
             callback(null, g);
@@ -109,7 +124,8 @@ exports.qgrs_overlaps = function(req, res){
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(g4));
+            g4_record.overlaps = g4.overlaps;
+            res.end(JSON.stringify(g4_record));
         }
     });
 }

@@ -1,0 +1,66 @@
+extends ../layout
+block title
+  title= qgrs.id
+
+block content
+    .container(ng-controller='QGRSRecordCtrl' ng-init="fetchRecord('"+qgrs.id+"');")
+      .page-header
+        h1
+          | QGRS&nbsp;
+          small.text-primary {{qgrs.id}} in {{mrna.accession}}
+        p {{mrna.definition}}
+
+      .info_table
+        p
+          label Organisim:
+          {{mrna.organism}}
+        p
+          label 5'UTR
+          {{mrna.utr_5.start}} - {{mrna.utr_5.end}} ({{mrna.utr_5.end-mrna.utr_5.start}})
+        p
+          label CDS
+          {{mrna.cds.start}} - {{mrna.cds.end}} ({{mrna.cds.end-mrna.cds.start}})
+        p
+          label 3'UTR
+          {{mrna.utr_3.start}} - {{mrna.utr_3.end}} ({{mrna.utr_3.end-mrna.utr_3.start}})
+
+      .info_table
+          legend QGRS Properties
+          p
+            label Sequence:
+            span.g4seq {{qgrs.sequence}}
+          p
+            label Tetrads:
+            span.g4tetrads {{qgrs.tetrads}}
+          p
+            label Loop Lengths:
+            span.g4loop{{qgrs.y1}} | {{qgrs.y2}} | {{qgrs.y3}}
+          p
+            label G-Score:
+            {{qgrs.gscore}}
+          p
+            label Region:
+            {{regionString}}
+
+      div(ng-show='qgrs.overlaps && qgrs.overlaps.length > 0')
+        legend.text-primary Overlapping motifs
+        p The following QGRS motifs overlap with this QGRS
+        table.table.table-striped.table-hover.table-bordered.table-condensed
+          thead
+            tr
+              th sequence
+              th tetrads
+              th loops
+              th gscore
+              th location
+          tbody
+            tr(ng-repeat="g4 in qgrs.overlaps")
+              td.g4seq {{g4.sequence}}
+              td.g4tetrads {{g4.tetrads}}
+              td.g4loop {{g4.y1}} | {{g4.y2}} | {{g4.y3}}
+              td {{g4.gscore}}
+              td {{g4.start}} - {{g4.start + g4.length}}
+
+
+block scripts
+  script(src='/scripts/qgrs.js')

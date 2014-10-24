@@ -66,9 +66,11 @@ block content
               th.centered_col 3'UTR
               th downstream
               th location
+              th range
           tbody
             tr(ng-repeat="g4 in mrna.g4s")
-              td {{g4.id}}
+              td
+                a(href='/gui/qgrs/{{g4.id}}') {{g4.id}}
               td.g4seq {{g4.sequence}}
               td.g4tetrads {{g4.tetrads}}
               td.g4loop {{g4.y1}} | {{g4.y2}} | {{g4.y3}}
@@ -82,6 +84,7 @@ block content
               td.centered_col
                 i.fa.fa-check-circle-o(ng-show='g4.isDownstream')
               td {{g4.start}} - {{g4.start + g4.length}}
+              td {{g4.range.start}} - {{g4.range.end}}
 
       div(ng-show='mrna.u_rich_downstream && mrna.u_rich_downstream.length > 0')
         legend.text-primary U-Rich Motifs

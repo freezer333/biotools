@@ -76,6 +76,8 @@ app.post('/qgrs', qgrs_routes.qgrs_find);
 app.get('/qgrs/:g4id', qgrs_routes.qgrs);
 app.get('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
 app.post('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
+app.get('/gui/qgrs/:g4id', qgrs_routes.record);
+
 
 app.get('/qgrs/mrna/:accession/map', qgrs_routes.qgrs_mrna)
 app.get('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)

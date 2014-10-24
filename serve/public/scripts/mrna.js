@@ -30,14 +30,15 @@ app.controller('mRNACtrl', function($scope, mRNAService) {
   $scope.listings = [];
   $scope.skip = 0;
   $scope.limit = 25;
-  $scope.annotations_only = true;
+  $scope.filter = {};
+  $scope.filter.annotations_only = true;
   mRNAService.getSpecies().then(function(result) {
     $scope.species = result.species;
   })
 
   $scope.search = function() {
     $scope.listings = [];
-    mRNAService.find($scope.accession, $scope.organism, $scope.ontology, $scope.annotations_only, $scope.skip, $scope.limit).then(function(result) {
+    mRNAService.find($scope.filter.accession, $scope.filter.organism, $scope.filter.ontology, $scope.filter.annotations_only, $scope.skip, $scope.limit).then(function(result) {
         $scope.listings = result;
 
 
