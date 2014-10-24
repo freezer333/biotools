@@ -11,10 +11,113 @@ var qgrsService = app.factory('qgrsService', function($http) {
       return $http.get('/mrna/' + accession, {}).then(function(result) {
         return result.data;
       })
+    },
+    run : function(filter) {
+      return $http({method:"GET", url: '/qgrs/mrna/density/analysis', params: filter
+      }).then(function(result) {
+          return result.data._id;
+      });
+    },
+    update : function(id) {
+      return $http.get('/jobs/' + id, {}).then (function (status) {
+        return status.data
+      },
+      function(data) {
+        return null;
+      });
+    },
+    getSpecies : function(accession, organism, ontology, skip, limit) {
+      return $http.get('/mrna/info/species', {})
+                      .then(function(result) {
+                          return result.data;
+                      });
     }
   }
+
 });
 
+
+app.controller('QGRSEnrichmentCtrl', function($scope, $interval, qgrsService) {
+  $scope.annotations_only = true;
+  $scope.organism = "Homo sapiens";
+
+  qgrsService.getSpecies().then(function(result) {
+    $scope.species = result.species;
+  });
+
+  $scope.run = function() {
+    $scope.in_progress = true;
+    $scope.complete = false;
+    $scope.progress = 0;
+    $scope.status = "Starting:   ";
+    qgrsService.run($scope.filter).then(function(result) {
+        task = $interval( function () {
+          var id = result;
+          qgrsService.update(id).then(function (status) {
+            if (status == null ) {
+              $scope.progress = "Analysis Failed";
+              $interval.cancel(task);
+            }
+            else {
+              $scope.progress = Math.floor(parseFloat(status.progress) * 100) ;
+              $scope.status = status.status;
+              if ( status.complete) {
+                $interval.cancel(task);
+                $scope.progress = 100;
+                $scope.in_progress = false;
+                $scope.complete = true;
+
+                $scope.results = status.result;
+                $('#container').highcharts({
+                  chart: {
+                    type: 'column'
+                  },
+                  title: {
+                    text: 'Analysis Results'
+                  },
+                  subtitle: {
+                    text: 'QGRS Enrichment - ' + status.result.mrna_count + ' mRNA'
+                  },
+                  xAxis: {
+                    categories: [
+                      'Entire mRNA',
+                      "5'UTR",
+                      'CDS',
+                      "3'UTR",
+                      'Downstream'
+                      ]
+                  },
+                  yAxis: {
+                    min: 0,
+                    title: {
+                      text: 'QGRS density'
+                    }
+                  },
+                  plotOptions: {
+                    column: {
+                      pointPadding: 0.2,
+                      borderWidth: 0
+                    }
+                  },
+                  series: [{
+                    name: 'Average QGRS Denstiy in Region',
+                    data: [
+                      parseFloat(status.result.avg_density.all) ,
+                      parseFloat(status.result.avg_density.utr5) ,
+                      parseFloat(status.result.avg_density.cds) ,
+                      parseFloat(status.result.avg_density.utr3) ,
+                      parseFloat(status.result.avg_density.downstream) ]
+                  }],
+                });
+              }
+            }
+
+            });
+        }, 2000);
+
+      });
+  }
+});
 
 
 app.controller('QGRSRecordCtrl', function($scope, qgrsService) {

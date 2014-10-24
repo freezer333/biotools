@@ -310,6 +310,7 @@ exports.qgrs_enrichment_analysis = function(req, res) {
     job.complete = true;
 
     job.result  = {
+      mrna_count : total_to_be_processed,
       avg_density : {
           all : all_den / all_count,
           utr5 : utr5_den / utr5_count,

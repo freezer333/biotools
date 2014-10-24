@@ -60,23 +60,29 @@ block content
             thead
               tr
                 th Region
-                th Average QGRS Density
+                th Total QGRS Found
+                th Avg QGRS Density
             tbody
               tr
                 td Entire Transcript
-                td {{results.all}}
+                td {{results.totals.all  | number}}
+                td {{results.avg_density.all  | number:4}}
               tr
                 td 5' UTR
-                td {{results.utr5}}
+                td {{results.totals.utr5  | number}}
+                td {{results.avg_density.utr5  | number:4}}
               tr
                 td CDS
-                td {{results.cds}}
+                td {{results.totals.cds  | number}}
+                td {{results.avg_density.cds  | number:4}}
               tr
                 td 3' UTR
-                td {{results.utr3}}
+                td {{results.totals.utr3  | number}}
+                td {{results.avg_density.utr3  | number:4}}
               tr
                 td Downstream of poly(A) site
-                td {{results.downstream}}
+                td {{results.totals.downstream  | number}}
+                td {{results.avg_density.downstream  | number:4}}
         .col-sm-6
           div#container
 block scripts
