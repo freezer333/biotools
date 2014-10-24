@@ -41,13 +41,13 @@ mrna_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("acce
 
 def purge_organism(organism):
     spec = {
-        "organism" : organism, 
+        "organism" : organism,
         "build": organisms[organism]['build']
     }
     mrna_collect.remove(spec)
     gene_collect.remove(spec)
     print('\t- Removed existing records for ', organism, ' build # ', organisms[organism]['build'], ' in gene and mrna collections....')
-    
+
 
 def process_file(file, organism):
     num_genes = 0;
@@ -61,7 +61,7 @@ def process_file(file, organism):
         line = data.decode('utf-8')
         if not line.startswith("##") :
             fields = line.split('\t')
-                
+
             if len(fields) > 2 and fields[2] == 'gene' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
                 info = fields[8];
                 info_fields = info.split(';');
@@ -84,17 +84,17 @@ def process_file(file, organism):
                # print ("\tInserting gene", chrome, " -> ", gene_id, '(', name, ') from ' , fields[3], ' to ', fields[4])
 
                 record = {
-                    "chrom" : chrome, 
+                    "chrom" : chrome,
                     "start" : fields[3],
-                    "end" : fields[4], 
-                    "gene_id" : gene_id, 
-                    "gene_name" : name, 
-                    "orientation" : fields[6], 
-                    "organism" : organism, 
+                    "end" : fields[4],
+                    "gene_id" : gene_id,
+                    "gene_name" : name,
+                    "orientation" : fields[6],
+                    "organism" : organism,
                     "build" : organisms[organism]['build']
                 }
                 spec  = {
-                    "organism" : organism, 
+                    "organism" : organism,
                     "build" : organisms[organism]['build'],
                     "gene_id" : gene_id
                 }
@@ -107,8 +107,11 @@ def process_file(file, organism):
                     if len(current_mrna['exons']) < 1 :
                         print ("Failure - can't save an mRNA without exons!")
 
+                    length = 0;
+                    for exon in exons :
+
                     spec  = {
-                        "organism" : organism, 
+                        "organism" : organism,
                         "build" : organisms[organism]['build'],
                         "accession" : current_mrna['accession']
                     }
@@ -135,20 +138,20 @@ def process_file(file, organism):
                 # name (accession), gene id, chromosome, start, end
 
                 chrome = fields[0].split('.')[0]
-                    
+
                 current_mrna = {
-                    "chrom" : chrome, 
+                    "chrom" : chrome,
                     "start" : fields[3],
-                    "end" : fields[4], 
-                    "gene_id" : gene_id, 
+                    "end" : fields[4],
+                    "gene_id" : gene_id,
                     "accession" : accession_num,
                     "orientation" : fields[6],
-                    "exons" : list(), 
-                    "organism" : organism, 
+                    "exons" : list(),
+                    "organism" : organism,
                     "build" : organisms[organism]['build']
                 }
 
-                    
+
             if len(fields) > 2 and fields[2] == 'exon' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
                 info = fields[8];
                 info_fields = info.split(';');
@@ -168,7 +171,7 @@ def process_file(file, organism):
                 if current_mrna and current_mrna['accession'] == accession:
                     # print ("Exon for ", accession, " found -> ", fields[3], " - ", fields[4])
                     current_mrna['exons'].append({"start" : fields[3], "end" : fields[4]})
-                    
+
 
    # print ('\t+ Processed ', num_genes, ' genes')
    # print ('\t+ Processed ', num_mRNA, ' mRNA')
@@ -186,7 +189,7 @@ for organism in sorted(organisms) :
         print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
         with urllib.request.urlopen(organisms[organism]['url']) as response, open(local, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
-    
+
     purge_organism(organism)
     file = gzip.open(local, 'rb')
     process_file(file, organism)
