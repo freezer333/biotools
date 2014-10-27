@@ -49,7 +49,7 @@ def process_mrna(count, mrna):
             end = int(mrna['start']) - upstream
             url = seq_url + '/chrom/' + mrna['chrom'] + '/' + str(start) + '/' + str(end) + "?orientation=-";
 
-        print (url)
+        
         response = requests.get(url)
         if response.status_code == requests.codes.ok :
             data = response.json()
@@ -62,7 +62,7 @@ def process_mrna(count, mrna):
                 ret = collect.update({'_id':mrna['_id']}, {'$set': {'u_rich_downstream': us}})
 
                 #collect.find_and_modify({'accession' : mrna['accession']}, up)
-                print('Updated\t' , '{0: <15}'.format(mrna['accession']), " with ", len(us), ' u-rich motifs\t', ret)
+                print('Updated\t' , '{0: <15}'.format(mrna['accession']), " with ", len(us), ' u-rich motifs\t', mrna['organism'])
 
 def get_urich_motifs(seq):
     seq = seq.replace('T', 'U')

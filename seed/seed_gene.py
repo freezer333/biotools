@@ -107,8 +107,6 @@ def process_file(file, organism):
                     if len(current_mrna['exons']) < 1 :
                         print ("Failure - can't save an mRNA without exons!")
 
-                    length = 0;
-                    for exon in exons :
 
                     spec  = {
                         "organism" : organism,
