@@ -19,6 +19,8 @@ var qgrs_routes = require('./routes/qgrs');
 var urich_routes = require('./routes/urich');
 var mrna_routes = require('./routes/mrna');
 
+var chrom = require('./routes/chrom').routes;
+
 var port = process.env.PORT || 3000;
 
 if (app.get('env') === 'development') {
@@ -42,8 +44,8 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(session({ secret: 'qgrs-rcnj-1986'}))
 
+
 app.get('/', routes.home)
-app.get('/chrom/:accession/:start/:end', routes.chrom);
 app.get('/gene/:id', routes.gene)
 app.get('/gene/:skip/:limit', routes.gene_list)
 
@@ -93,4 +95,5 @@ app.get('/jobs', job_routes.list)
 app.get('/jobs/:jobid', job_routes.analysis_status);
 
 
-http.createServer(app).listen(port);
+app.use('/', chrom);
+app.listen(port);

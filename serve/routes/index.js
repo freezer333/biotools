@@ -2,35 +2,12 @@
 var db = require("../db");
 var fs = require('fs');
 var _ = require('underscore');
+var seq_utils = require('../utils/seq')
 
 exports.home = function(req, res) {
     res.render("home", {});
 }
 
-exports.chrom = function(req, res) {
-    var accession = req.params.accession;
-    var start = req.params.start;
-    var end = req.params.end;
-    var orientation = req.query.orientation || "+";
-
-    if ( !accession || !start || !end ) {
-        res.status(404).end('Sequence range was not specified or was invalid');
-        return ;
-    }
-
-    db.getSequence(accession, start, end, function(err, result) {
-        if ( err ) {
-            res.status(404).end('Sequence range on chromosome ' + accession + ' could not be found');
-        }
-        else {
-            res.setHeader('Content-Type', 'application/json');
-            if ( orientation == '-') {
-                result.seq = reverse_compliment(result.seq);
-            }
-            res.end(JSON.stringify(result));
-        }
-    });
-}
 
 
 
@@ -82,17 +59,7 @@ function serve_mrna(req, res, callback) {
     })
 }
 
-function reverse_compliment(sequence){
-    rev = sequence.split("").reverse();
-    sequence = rev.map(function (c){
-                if ( c == 'A' ) return 'T';
-                if ( c == 'T' ) return 'A';
-                if ( c == 'C' ) return 'G';
-                if ( c == 'G' ) return 'C';
-                return c;
-            }).join("");
-    return sequence;
-}
+
 
 
 exports.build_mrna_sequence = function (accession, downstream, error, success) {
@@ -131,7 +98,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                         sequence+= result.seq.substring(s, e);
                     }
                     if ( mrna.orientation == '-') {
-                        sequence = reverse_compliment(sequence);
+                        sequence = seq_utils.reverse_complement(sequence);
                     }
 
                     // now pull the downstream sequence data, if it was specified...
@@ -153,7 +120,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                             else {
                                 var ds = result.seq;
                                 if ( mrna.orientation == '-') {
-                                    ds =  reverse_compliment(ds);
+                                    ds =  seq_utils.reverse_complement(ds);
                                 }
                                 sequence += ds;
                                 success(mrna, sequence);
@@ -286,7 +253,7 @@ exports.mrna_list = function(req, res) {
     var skip = req.params.skip || 0;
     var limit = req.params.limit || 100;
     var query = exports.build_mrna_query(req);
-
+    console.log(query);
     db.mrna.find(query, {gene_id : 1, accession : 1, gene_name : 1, organism:1, definition:1}, { skip: skip, limit: limit }, function(err, result){
         if ( err ) {
             res.status(404).end('Gene could not found');
