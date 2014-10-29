@@ -6,7 +6,14 @@ exports.routes = express.Router();
 
 exports.routes.get('/chrom',
   function (req, res) {
-    res.end("not done");
+    var seq_col = db.seq.collection;
+    seq_col.aggregate( [
+      {'$group' : { '_id' : {'accession' : '$accession', 'organism' : '$organism', 'build' : '$build'}}},
+      {'$project': {'_id' : 0, 'accession': '$_id.accession', 'organism' : '$_id.organism', 'build' : '$_id.build'}},
+      {'$sort': { 'organism' : 1, 'build': 1, 'accession':1 } }
+      ], function (err, result) {
+        res.end(JSON.stringify(result));
+      });
   });
 
 
