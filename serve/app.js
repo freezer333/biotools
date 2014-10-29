@@ -8,6 +8,7 @@ var session         = require('express-session');
 var http            = require('http');
 var fs              = require('fs');
 
+console.log("Starting node web services (pid= " + process.pid + ")")
 
 var app = exports.app = express();
 var routes = require('./routes');
