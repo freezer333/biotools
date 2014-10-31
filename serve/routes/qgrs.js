@@ -389,7 +389,7 @@ function calc_density(parent_mrna, filter, downstream, g4s) {
           if ( inDown(g4)) in_downstream = true;
       }
       if (in_any) merge_range_set(any, {start: g4.start, end: g4.start+g4.length});
-      if (in_5utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length}, {start : 0, end : parent_mrna.cds_start});
+      if (in_5utr) merge_range_set(u5, {start: g4.start, end: g4.start+g4.length}, {start : 0, end : cds_start});
       if (in_3utr) merge_range_set(u3, {start: g4.start, end: g4.start+g4.length}, {start : cds_end, end : transcript_end});
       if (in_cds) merge_range_set(cds, {start: g4.start, end: g4.start+g4.length}, {start : cds_start, end : cds_end})
       if (in_downstream) merge_range_set(down, {start: g4.start, end: g4.start+g4.length}, {start : transcript_end})
@@ -403,7 +403,6 @@ function calc_density(parent_mrna, filter, downstream, g4s) {
           process_motif(g4);
       }
   }
-
   var total = computeTotal(any);
   var total_5utr = computeTotal(u5);
   var total_cds = computeTotal(cds);
