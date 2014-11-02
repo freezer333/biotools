@@ -1,0 +1,32 @@
+{ "organism" : "Homo sapiens",
+  "build" : "38",
+  "taxon_id" : "9606",
+  "url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/Primary_Assembly/assembled_chromosomes/FASTA/",
+  "chromosomes" :
+    [
+      {"common_id" : "1", "url_suffix" : "chr1.fa.gz", "accession" : "NC_000001"},
+      {"common_id" : "2", "url_suffix" : "chr2.fa.gz", "accession" : "NC_000002"},
+      {"common_id" : "3", "url_suffix" : "chr3.fa.gz", "accession" : "NC_000003"},
+      {"common_id" : "4", "url_suffix" : "chr4.fa.gz", "accession" : "NC_000004"},
+      {"common_id" : "5", "url_suffix" : "chr5.fa.gz", "accession" : "NC_000005"},
+      {"common_id" : "6", "url_suffix" : "chr6.fa.gz", "accession" : "NC_000006"},
+      {"common_id" : "7", "url_suffix" : "chr7.fa.gz", "accession" : "NC_000007"},
+      {"common_id" : "8", "url_suffix" : "chr8.fa.gz", "accession" : "NC_000008"},
+      {"common_id" : "9", "url_suffix" : "chr9.fa.gz", "accession" : "NC_000009"},
+      {"common_id" : "10", "url_suffix" : "chr10.fa.gz", "accession" : "NC_000010"},
+      {"common_id" : "11", "url_suffix" : "chr11.fa.gz", "accession" : "NC_000011"},
+      {"common_id" : "12", "url_suffix" : "chr12.fa.gz", "accession" : "NC_000012"},
+      {"common_id" : "13", "url_suffix" : "chr13.fa.gz", "accession" : "NC_000013"},
+      {"common_id" : "14", "url_suffix" : "chr14.fa.gz", "accession" : "NC_000014"},
+      {"common_id" : "15", "url_suffix" : "chr15.fa.gz", "accession" : "NC_000015"},
+      {"common_id" : "16", "url_suffix" : "chr16.fa.gz", "accession" : "NC_000016"},
+      {"common_id" : "17", "url_suffix" : "chr17.fa.gz", "accession" : "NC_000017"},
+      {"common_id" : "18", "url_suffix" : "chr18.fa.gz", "accession" : "NC_000018"},
+      {"common_id" : "19", "url_suffix" : "chr19.fa.gz", "accession" : "NC_000019"},
+      {"common_id" : "20", "url_suffix" : "chr20.fa.gz", "accession" : "NC_000020"},
+      {"common_id" : "21", "url_suffix" : "chr21.fa.gz", "accession" : "NC_000021"},
+      {"common_id" : "22", "url_suffix" : "chr22.fa.gz", "accession" : "NC_000022"},
+      {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "NC_000023"},
+      {"common_id" : "Y", "url_suffix" : "chrY.fa.gz", "accession" : "NC_000024"}
+    ]
+}

@@ -1,0 +1,32 @@
+{ "organism" : "Gorilla gorilla",
+  "build" : "3.1",
+  "taxon_id" : "9593",
+  "url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Gorilla_gorilla/gorGor3.1/Primary_Assembly/assembled_chromosomes/FASTA/",
+  "chromosomes" :
+    [
+      {"common_id" : "1", "url_suffix" : "chr1.fa.gz", "accession" : "FR853080"},
+      {"common_id" : "2a", "url_suffix" : "chr2A.fa.gz", "accession" : "FR853094"},
+      {"common_id" : "2b", "url_suffix" : "chr2B.fa.gz", "accession" : "FR853095"},
+      {"common_id" : "3", "url_suffix" : "chr3.fa.gz", "accession" : "FR853096"},
+      {"common_id" : "4", "url_suffix" : "chr4.fa.gz", "accession" : "FR853097"},
+      {"common_id" : "5", "url_suffix" : "chr5.fa.gz", "accession" : "FR853098"},
+      {"common_id" : "6", "url_suffix" : "chr6.fa.gz", "accession" : "FR853099"},
+      {"common_id" : "7", "url_suffix" : "chr7.fa.gz", "accession" : "FR853100"},
+      {"common_id" : "8", "url_suffix" : "chr8.fa.gz", "accession" : "FR853101"},
+      {"common_id" : "9", "url_suffix" : "chr9.fa.gz", "accession" : "FR853102"},
+      {"common_id" : "10", "url_suffix" : "chr10.fa.gz", "accession" : "FR853081"},
+      {"common_id" : "11", "url_suffix" : "chr11.fa.gz", "accession" : "FR853082"},
+      {"common_id" : "12", "url_suffix" : "chr12.fa.gz", "accession" : "FR853083"},
+      {"common_id" : "13", "url_suffix" : "chr13.fa.gz", "accession" : "FR853084"},
+      {"common_id" : "14", "url_suffix" : "chr14.fa.gz", "accession" : "FR853085"},
+      {"common_id" : "15", "url_suffix" : "chr15.fa.gz", "accession" : "FR853086"},
+      {"common_id" : "16", "url_suffix" : "chr16.fa.gz", "accession" : "FR853087"},
+      {"common_id" : "17", "url_suffix" : "chr17.fa.gz", "accession" : "FR853088"},
+      {"common_id" : "18", "url_suffix" : "chr18.fa.gz", "accession" : "FR853089"},
+      {"common_id" : "19", "url_suffix" : "chr19.fa.gz", "accession" : "FR853090"},
+      {"common_id" : "20", "url_suffix" : "chr20.fa.gz", "accession" : "FR853091"},
+      {"common_id" : "21", "url_suffix" : "chr21.fa.gz", "accession" : "FR853092"},
+      {"common_id" : "22", "url_suffix" : "chr22.fa.gz", "accession" : "FR853093"},
+      {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "FR853103"}
+    ]
+}

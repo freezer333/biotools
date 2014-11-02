@@ -1,0 +1,14 @@
+{ "organism" : "Caenorhabditis elegans",
+  "build" : "WBcel235",
+  "taxon_id" : "6239",
+  "url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/invertebrates/Caenorhabditis_elegans/WBcel235/Primary_Assembly/assembled_chromosomes/FASTA/",
+  "chromosomes" :
+    [
+      {"common_id" : "1", "url_suffix" : "chrI.fa.gz", "accession" : "BX284601"},
+      {"common_id" : "2", "url_suffix" : "chrII.fa.gz", "accession" : "BX284602"},
+      {"common_id" : "3", "url_suffix" : "chrIII.fa.gz", "accession" : "BX284603"},
+      {"common_id" : "4", "url_suffix" : "chrIV.fa.gz", "accession" : "BX284604"},
+      {"common_id" : "5", "url_suffix" : "chrV.fa.gz", "accession" : "BX284605"},
+      {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "BX284606"}
+    ]
+}

@@ -1,0 +1,15 @@
+{ "organism" : "Drosophila melanogaster",
+  "build" : "6",
+  "taxon_id" : "7227",
+  "url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/invertebrates/Drosophila_melanogaster/Release_6_plus_ISO1_MT/Primary_Assembly/assembled_chromosomes/FASTA/",
+  "chromosomes" :
+    [
+      {"common_id" : "2L", "url_suffix" : "chr2L.fa.gz", "accession" : "AE014134"},
+      {"common_id" : "2R", "url_suffix" : "chr2R.fa.gz", "accession" : "AE013599"},
+      {"common_id" : "3L", "url_suffix" : "chr3L.fa.gz", "accession" : "AE014296"},
+      {"common_id" : "3R", "url_suffix" : "chr3R.fa.gz", "accession" : "AE014297"},
+      {"common_id" : "4", "url_suffix" : "chr4.fa.gz", "accession" : "AE014135"},
+      {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "AE014298"},
+      {"common_id" : "Y", "url_suffix" : "chrY.fa.gz", "accession" : "CP007106"}
+    ]
+}

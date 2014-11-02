@@ -104,10 +104,41 @@ Note, we'll be adding more data sources and seeding scripts continually, so keep
 This script builds the sequence database from the FASTA files downloaded in step 6a.  
 
 ```
-$ python3 seed_chrome.py
+$ python3 seed_chrome.py [taxon 1] [taxon 2] ... [taxon n]
 ```
 
-Please note, this step will take quite some time to complete.  Follow all directions provided by the interactive script.
+The taxon arguments correspond to the taxon id's of organisms.  Any number of taxons can be specified, and will be built in succession.  Note that the organisms **must** be represented by json seed files in the `chromosome/seeds` directory.  
+
+For example, the following command will build the genomes of *Homo sapiens* and *Mus musculus*:  
+
+```
+$ python3 seed_chrome.py 9606 10090
+```
+
+Successfully built chromosomes are recorded in a Mongo collection called `seedlog`.  If the chromosome has been fully built, it will always be skipped - give a record of the completion is in `seedlog`.  Here is an example of the record in `seedlog` corresponding to chromosome 1 for *Homo sapiens*.
+
+```
+{
+	"_id" : ObjectId("54569241edc3ca1ea34f0be1"),
+	"accession" : "NC_000001",
+	"entry_type" : "chromosome seed completion",
+	"organism" : "Homo sapiens",
+	"build" : "38"
+}
+```
+
+If you want to rebuilt the organism, remove all records like the one above for a given organism.  The next time the seed script is run it will automatically purge the existing records before rebuilding the organism's genome.  You may also remove individual chromosomes and re-run the script.
+
+Please note, this step will take quite some time to complete - especially for the higher organisms.
+
+Currently supported organisms (although its easy to create your own seed file...)
+
+* *Homo sapiens* (9606)
+* *Pan troglodytes* (9598)
+* *Gorilla gorilla* (9593)
+* *Mus musculus* (10090)
+* *Drosophila melanogaster* (7227)
+* *Caenorhabditis elegans* (6239)
 
 ## 6b - Basic mRNA and Gene Data
 This script will build the gene and mrna data collections from the file download in step 6b.  
