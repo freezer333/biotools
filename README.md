@@ -101,7 +101,7 @@ Note, we'll be adding more data sources and seeding scripts continually, so keep
 
 ***To execute these scripts, you must navigate to the `biotools/seed` directory.***
 ## 6a - Chromosome Sequence Data
-This script builds the sequence database from the FASTA files downloaded in step 6a.  
+This script builds the sequence database from the FASTA files automatically downloaded from NCBI  
 
 ```
 $ python3 seed_chrome.py [taxon 1] [taxon 2] ... [taxon n]
@@ -354,7 +354,17 @@ You can create indexes on any commonly searched attributes to support your proje
 
 
 # Step 9:  Serving your data
-While you will also be able to access this data directly through MongoDB, some of the datasets (especially sequence data) is easier to access through web services.   In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
+
+The easiest way to start all the services/tools is to simply type 
+
+```
+$ ./biotools start
+```
+As long as you have Mongodb (mongod), supervisor, and python3 installed and on your path, this script will start up the services for you.  Note - prior to running this scrip, MongoDB shouldn't be running...
+
+If you do not have supervisor installed, type `$sudo npm install -g supervisor` before running the biotools startup script.
+
+If that script does not work for you, the services can be started manually.  You'll need to start up MongoDB (type mongod at the command line). In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
 
 The following URL's can be used to access data:
 

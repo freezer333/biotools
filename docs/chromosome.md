@@ -1,21 +1,4 @@
-# apex web documentation
-This document explains the core modules of the apex system, their API urls and options,
-and GUI support.
-# apex core API Routes
-
-* jobs
-* user management
-* package management
-
-# apex core GUI Routes
-
-* jobs
-* user management
-* package management
-
-# apex packages
-
-## chromosome
+# chromosome package
 The chromosome package provides reference chromosome sequence data to the rest
 of the platform's packages.  The package is seeded with `seed_chrome.py` and creates
 a collection within the database called `seq`.  
@@ -71,7 +54,82 @@ function reverse_complement(sequence){
 Use of the web api is still strongly encouraged over the lower level database method
 and manual reverse complement procedure.
 
-### api routes
+## seeding
+The seeding script builds the sequence database from FASTA files downloaded from NCBI.
+
+```
+$ python3 seed_chrome.py [taxon 1] [taxon 2] ... [taxon n]
+```
+
+The taxon arguments correspond to the taxon id's of organisms.  Any number of taxons can be specified, and will be built in succession.  Note that the organisms **must** be represented by json seed files in the `chromosome/seeds` directory.  
+
+For example, the following command will build the genomes of *Homo sapiens* and *Mus musculus*:  
+
+```
+$ python3 seed_chrome.py 9606 10090
+```
+
+Successfully built chromosomes are recorded in a Mongo collection called `seedlog`.  If the chromosome has been fully built, it will always be skipped - give a record of the completion is in `seedlog`.  Here is an example of the record in `seedlog` corresponding to chromosome 1 for *Homo sapiens*.
+
+```
+{
+	"_id" : ObjectId("54569241edc3ca1ea34f0be1"),
+	"accession" : "NC_000001",
+	"entry_type" : "chromosome seed completion",
+	"organism" : "Homo sapiens",
+	"build" : "38"
+}
+```
+
+If you want to rebuilt the organism, remove all records like the one above for a given organism.  The next time the seed script is run it will automatically purge the existing records before rebuilding the organism's genome.  You may also remove individual chromosomes and re-run the script.
+
+Please note, this step will take quite some time to complete - especially for the higher organisms.
+
+Currently supported organisms (although its easy to create your own seed file...)
+
+* *Homo sapiens* (9606)
+* *Pan troglodytes* (9598)
+* *Gorilla gorilla* (9593)
+* *Mus musculus* (10090)
+* *Drosophila melanogaster* (7227)
+* *Caenorhabditis elegans* (6239)
+
+### creating new seed documents
+
+Any organism whose genome is provided in FASTA format, with each chromosome in a separate
+file, can be added to the system easily.  Simply create a new .json file in the `chromosome_seeds` folder
+with the taxon id as the filename (i.e. 9606.json).
+
+The seed file contains the organism name, build identifier (for versioning), and other attributes
+defining the data set.  It also holds a base URL to the folder on NCBI's ftp site were all the FASTA
+assembled chromosome files can be found.
+
+The .json file must contain an array listing each chromosome in the organism, along with its common name, its
+accession, and its actual filename.
+
+If the .json file is created correctly, the seeding script will download all chromosomes and build the genome of your new organism.
+
+Below is an example of the seed file for the common fruit fly:
+
+```
+{ "organism" : "Drosophila melanogaster",
+	"build" : "6",
+	"taxon_id" : "7227",
+	"url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/invertebrates/Drosophila_melanogaster/Release_6_plus_ISO1_MT/Primary_Assembly/assembled_chromosomes/FASTA/",
+	"chromosomes" :
+		[
+			{"common_id" : "2L", "url_suffix" : "chr2L.fa.gz", "accession" : "AE014134"},
+			{"common_id" : "2R", "url_suffix" : "chr2R.fa.gz", "accession" : "AE013599"},
+			{"common_id" : "3L", "url_suffix" : "chr3L.fa.gz", "accession" : "AE014296"},
+			{"common_id" : "3R", "url_suffix" : "chr3R.fa.gz", "accession" : "AE014297"},
+			{"common_id" : "4", "url_suffix" : "chr4.fa.gz", "accession" : "AE014135"},
+			{"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "AE014298"},
+			{"common_id" : "Y", "url_suffix" : "chrY.fa.gz", "accession" : "CP007106"}
+		]
+}
+```
+
+## api routes
 
 `/chrom`
 
@@ -132,65 +190,4 @@ The resulting JSON includes the parameters specified, along with the sequence.
 Requests for sequence data at any supported sequence
 
 
-### gui routes
-
-## mrna
-## gene
-## qgrs
-## urich
-## needle
-## taxon
-## homologene
-## gene ontology
-
-
-<!--
-app.get('/chrom/:accession/:start/:end', routes.chrom);
-app.get('/gene/:id', routes.gene)
-app.get('/gene/:skip/:limit', routes.gene_list)
-
-app.get('/mrna/info/species', routes.mrna_species);
-app.get('/mrna/info/ontology', routes.mrna_ontology);
-app.get('/mrna/:accession', routes.mrna_api)
-app.get('/mrna/:accession/sequence', routes.mrna_sequence)
-app.get('/mrna/:accession/sequence/:start/:end', routes.mrna_sequence)
-app.get('/mrna/:accession/sequence/:start', routes.mrna_sequence)
-app.get('/mrna/:skip/:limit', routes.mrna_list)
-app.get('/mrna/', routes.mrna_list)
-app.get('/mrna', routes.mrna_list)
-
-app.get('/gui/mrna', mrna_routes.index)
-app.get('/gui/mrna/:accession', mrna_routes.record)
-
-
-app.post('/alignment', alignment_routes.index)
-app.get('/alignment', alignment_routes.input)
-app.get('/alignment/not_configured', alignment_routes.not_configured)
-app.get('/alignment/interactive', alignment_routes.input)
-
-app.get('/homologene/gene/:id', homologene_routes.search_by_gene)
-app.get('/homologene/mrna/:accession', homologene_routes.search_by_mrna)
-app.get('/homologene/list/:skip/:limit', homologene_routes.index)
-app.get('/homologene/list', homologene_routes.index)
-app.get('/homologene/species', homologene_routes.species)
-
-app.get('/qgrs/input', qgrs_routes.input)
-app.post('/qgrs', qgrs_routes.qgrs_find);
-app.get('/qgrs/:g4id', qgrs_routes.qgrs);
-app.get('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
-app.post('/qgrs/:g4id/overlaps', qgrs_routes.qgrs_overlaps)
-app.get('/gui/qgrs/:g4id', qgrs_routes.record);
-
-
-app.get('/qgrs/mrna/:accession/map', qgrs_routes.qgrs_mrna)
-app.get('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
-app.post('/qgrs/mrna/:accession/density', qgrs_routes.qgrs_density)
-app.get('/qgrs/mrna/density', qgrs_routes.qgrs_enrichment)
-app.get('/qgrs/mrna/density/analysis', qgrs_routes.qgrs_enrichment_analysis)
-
-app.get('/ugcorrelate',urich_routes.index);
-app.get('/ugcorrelate/analysis', urich_routes.uganalysis)
-
-app.get('/jobs', job_routes.list)
-app.get('/jobs/:jobid', job_routes.analysis_status);
--->
+## gui routes
