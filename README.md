@@ -355,7 +355,7 @@ You can create indexes on any commonly searched attributes to support your proje
 
 # Step 9:  Serving your data
 
-The easiest way to start all the services/tools is to simply type 
+The easiest way to start all the services/tools is to simply type
 
 ```
 $ ./biotools start
@@ -401,7 +401,7 @@ http://localhost:3000/gene/:skip/:limit
 A similar URL strategy is used for genes as well.
 
 ## Serving specific mRNA or Genes by id/accession number
-For mrna and genes, you can specifiy precisely which record you want to retreive by specifying the accession number for mrna, or the gene id for genes
+For mrna and genes, you can specify precisely which record you want to retreive by specifying the accession number for mrna, or the gene id for genes
 
 ```
 http://localhost:3000/mrna/:accession
@@ -409,6 +409,13 @@ http://localhost:3000/gene/:geneid
 ```  
 
 For example, request to `http://localhost:3000/gene/64109` will return a JSON representation of the CRLF2 human gene.  Requests to `http://localhost:3000/api/mrna/NM_000345.3` will return a JSON representation of the human SNCA mRNA.  
+
+## Serving Gene products
+A list of all mRNA that are produced by a particular gene can be found at the following URL:
+
+```
+http://localhost:3000/gene/:geneid/products
+```  
 
 ## Serving mRNA sequences
 For mRNA, you can easily retrieve the full sequence using the following URL:

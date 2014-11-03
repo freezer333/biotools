@@ -10,39 +10,6 @@ exports.home = function(req, res) {
 
 
 
-
-exports.gene = function(req, res) {
-    var id = req.params.id;
-    if ( !id) {
-        res.status(404).end('Gene id was not specified or was invalid');
-        return ;
-    }
-    db.gene.findOne({ '$or' : [{gene_id : id}, {gene_name : id}]}, function(err, result){
-        if ( err ) {
-            res.status(404).end('Gene could not found');
-        }
-        else {
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));
-        }
-    })
-}
-
-exports.gene_list = function(req, res) {
-    var skip = req.params.skip;
-    var limit = req.params.limit;
-
-    db.gene.find({}, {gene_id : 1, gene_name : 1}, { skip: skip, limit: limit }, function(err, result){
-        if ( err ) {
-            res.status(404).end('Gene could not found');
-        }
-        else {
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));
-        }
-    })
-}
-
 function serve_mrna(req, res, callback) {
     var accession = req.params.accession;
     if ( !accession) {
