@@ -1,4 +1,22 @@
-exports.index = function(req, res) {
+var express = require('express');
+exports.routes = express.Router();
+
+
+
+var input = function(req, res) {
+    res.render("alignment/input", {});
+}
+
+
+exports.routes.get('/alignment', input)
+exports.routes.get('/alignment/interactive', input)
+
+exports.routes.get('/alignment/not_configured', function(req, res) {
+    res.render("alignment/not_configured", {});
+})
+
+
+exports.routes.post('/alignment', function(req, res) {
     var seqa = req.body.seqa;
     var seqb = req.body.seqb;
 
@@ -21,13 +39,4 @@ exports.index = function(req, res) {
             res.render("alignment/not_configured", err);
         }
     )
-}
-
-
-
-exports.not_configured = function(req, res) {
-    res.render("alignment/not_configured", {});
-}
-exports.input = function(req, res) {
-    res.render("alignment/input", {});
-}
+});

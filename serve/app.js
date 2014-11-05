@@ -21,6 +21,7 @@ var mrna_routes = require('./routes/mrna');
 
 var chrom = require('./routes/chrom').routes;
 var gene = require('./routes/gene').routes;
+var alignment = require('./routes/alignment').routes;
 
 var port = process.env.PORT || 3000;
 
@@ -62,10 +63,7 @@ app.get('/gui/mrna', mrna_routes.index)
 app.get('/gui/mrna/:accession', mrna_routes.record)
 
 
-app.post('/alignment', alignment_routes.index)
-app.get('/alignment', alignment_routes.input)
-app.get('/alignment/not_configured', alignment_routes.not_configured)
-app.get('/alignment/interactive', alignment_routes.input)
+
 
 app.get('/homologene/gene/:id', homologene_routes.search_by_gene)
 app.get('/homologene/mrna/:accession', homologene_routes.search_by_mrna)
@@ -96,4 +94,5 @@ app.get('/jobs/:jobid', job_routes.analysis_status);
 
 app.use('/', chrom);
 app.use('/', gene)
+app.use('/', alignment);
 app.listen(port);
