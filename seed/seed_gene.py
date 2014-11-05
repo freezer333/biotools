@@ -92,7 +92,7 @@ def process_file(file, organism, build):
                 if not current_mrna is None:
                    # print ("\tInserting mRNA", current_mrna['accession'] , " with " , len(current_mrna['exons']) , " exons")
                     if len(current_mrna['exons']) < 1 :
-                        print ("Failure - can't save an mRNA without exons!")
+                        print ("Failure - can't save", current_mrna['accession'], "without exons!")
 
 
                     spec  = {

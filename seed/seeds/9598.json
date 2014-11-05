@@ -32,7 +32,7 @@
     ],
     "genes" :
       {
-        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/Pan_troglodytes/GFF/ref_Pan_troglodytes-2.1.4_top_level.gff3.gz",
+        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Pan_troglodytes/latest_assembly_versions/GCF_000001515.6_Pan_troglodytes-2.1.4/GCF_000001515.6_Pan_troglodytes-2.1.4_genomic.gff.gz",
         "build" : "2.1.4"
       }
 }

@@ -10,5 +10,12 @@
       {"common_id" : "4", "url_suffix" : "chrIV.fa.gz", "accession" : "BX284604"},
       {"common_id" : "5", "url_suffix" : "chrV.fa.gz", "accession" : "BX284605"},
       {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "BX284606"}
-    ]
+    ],
+    "genes" :
+      {
+        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/invertebrate/Caenorhabditis_elegans/latest_assembly_versions/GCF_000002985.6_WBcel235/GCF_000002985.6_WBcel235_genomic.gff.gz",
+        "build" : "WBcel235"
+      }
+
+
 }
