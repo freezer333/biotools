@@ -5,6 +5,8 @@ import os
 import urllib.request
 import shutil
 import gzip
+import json
+
 
 from pymongo import ASCENDING, DESCENDING
 
@@ -19,37 +21,22 @@ mrna_collect = db.mrna
 #--------------------
 
 
-organisms = dict()
-
-organisms['Homo sapiens'] = dict()
-organisms['Homo sapiens']['url'] = 'ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/GFF/ref_GRCh38_top_level.gff3.gz'
-organisms['Homo sapiens']['build'] = 38
-
-
-organisms['Mus musculus'] = dict()
-organisms['Mus musculus']['url'] = 'ftp://ftp.ncbi.nlm.nih.gov/genomes/Mus_musculus/GFF/ref_GRCm38.p2_top_level.gff3.gz'
-organisms['Mus musculus']['build'] = 38
-
-
 base_dir = os.getcwd() + '/external_data/top_level_annotations/'
 os.makedirs(base_dir, exist_ok=True)
 
 
-gene_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("gene_id", ASCENDING)])
-mrna_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("accession", ASCENDING)])
 
-
-def purge_organism(organism):
+def purge_organism(organism, build):
     spec = {
         "organism" : organism,
-        "build": organisms[organism]['build']
+        "build": build
     }
     mrna_collect.remove(spec)
     gene_collect.remove(spec)
-    print('\t- Removed existing records for ', organism, ' build # ', organisms[organism]['build'], ' in gene and mrna collections....')
+    print('\t- Removed existing records for ', organism, ' build # ', build, ' in gene and mrna collections....')
 
 
-def process_file(file, organism):
+def process_file(file, organism, build):
     num_genes = 0;
     num_mRNA = 0;
     current_mrna = None
@@ -91,11 +78,11 @@ def process_file(file, organism):
                     "gene_name" : name,
                     "orientation" : fields[6],
                     "organism" : organism,
-                    "build" : organisms[organism]['build']
+                    "build" : build
                 }
                 spec  = {
                     "organism" : organism,
-                    "build" : organisms[organism]['build'],
+                    "build" : build,
                     "gene_id" : gene_id
                 }
 
@@ -110,7 +97,7 @@ def process_file(file, organism):
 
                     spec  = {
                         "organism" : organism,
-                        "build" : organisms[organism]['build'],
+                        "build" : build,
                         "accession" : current_mrna['accession']
                     }
 
@@ -146,7 +133,7 @@ def process_file(file, organism):
                     "orientation" : fields[6],
                     "exons" : list(),
                     "organism" : organism,
-                    "build" : organisms[organism]['build']
+                    "build" : build
                 }
 
 
@@ -179,17 +166,38 @@ def process_file(file, organism):
 
 
 
-for organism in sorted(organisms) :
-    print("############################################################")
-    print('Processing top-level annotations for ', organism)
-    local = base_dir + organism
-    if not os.path.isfile(local):
-        print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
-        with urllib.request.urlopen(organisms[organism]['url']) as response, open(local, 'wb') as out_file:
-            shutil.copyfileobj(response, out_file)
 
-    purge_organism(organism)
-    file = gzip.open(local, 'rb')
-    process_file(file, organism)
-    file.close()
-    print("############################################################")
+if len(sys.argv) > 1 :
+  taxon_ids = sys.argv[1:]
+else :
+  print("You must specify taxon id's of the organism you want to build.")
+  print("For example:  '",sys.argv[0]," 9606' would install Homo sapiens")
+  print("        and:  '",sys.argv[0]," 9598 9593' would install chimps and gorillas")
+  sys.exit(0);
+
+
+
+for taxon_id in sorted(taxon_ids) :
+  try :
+    with open('seeds/' + taxon_id + ".json") as json_file:
+        seed = json.load(json_file)
+        organism = seed['organism']
+        build = seed['genes']['build']
+        print("############################################################")
+        print('Processing top-level annotations for ', organism)
+        local = base_dir + organism
+        if not os.path.isfile(local):
+            print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
+            with urllib.request.urlopen(seed['genes']['url']) as response, open(local, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+
+        purge_organism(organism, build)
+        file = gzip.open(local, 'rb')
+        process_file(file, organism, build)
+        file.close()
+        print("############################################################")
+  except KeyError:
+    print("Genes for", organism, "not supported by the seed file");
+
+gene_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("gene_id", ASCENDING)])
+mrna_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("accession", ASCENDING)])

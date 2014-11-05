@@ -29,5 +29,10 @@
       {"common_id" : "22", "url_suffix" : "chr22.fa.gz", "accession" : "FR853093"},
       {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "FR853103"},
       {"common_id" : "Y", "url_suffix" : "chrX.fa.gz", "accession" : "FR853103"}
-    ]
+    ],
+    "genes" :
+      {
+        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/Pan_troglodytes/GFF/ref_Pan_troglodytes-2.1.4_top_level.gff3.gz",
+        "build" : "2.1.4"
+      }
 }

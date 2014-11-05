@@ -28,5 +28,10 @@
       {"common_id" : "22", "url_suffix" : "chr22.fa.gz", "accession" : "NC_000022"},
       {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "NC_000023"},
       {"common_id" : "Y", "url_suffix" : "chrY.fa.gz", "accession" : "NC_000024"}
-    ]
+    ],
+  "genes" :
+    {
+      "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/GFF/ref_GRCh38_top_level.gff3.gz",
+      "build" : "38"
+    }
 }

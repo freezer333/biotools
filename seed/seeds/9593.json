@@ -28,5 +28,12 @@
       {"common_id" : "21", "url_suffix" : "chr21.fa.gz", "accession" : "FR853092"},
       {"common_id" : "22", "url_suffix" : "chr22.fa.gz", "accession" : "FR853093"},
       {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "FR853103"}
-    ]
+    ],
+    "genes" :
+      {
+        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/Gorilla_gorilla/GFF/ref_gorGor3.1_top_level.gff3.gz",
+        "build" : "3.1"
+      }
+
+
 }
