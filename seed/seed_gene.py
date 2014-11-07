@@ -7,7 +7,6 @@ import shutil
 import gzip
 import json
 
-
 from pymongo import ASCENDING, DESCENDING
 
 
@@ -19,6 +18,9 @@ db = client.chrome
 gene_collect = db.gene
 mrna_collect = db.mrna
 #--------------------
+
+from seed_utils import parse_info
+
 
 
 base_dir = os.getcwd() + '/external_data/top_level_annotations/'
@@ -51,24 +53,20 @@ def process_file(file, organism, build):
 
             if len(fields) > 2 and fields[2] == 'gene' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
                 info = fields[8];
-                info_fields = info.split(';');
-                num_genes += 1
-                genes.add(info_fields[0])
+                mapped_info = parse_info(info);
 
-                index = info.find('GeneID:')
-                index2 = info.find(',', index)
-                index3 = info.find(';', index)
-                index_end = index3
-                if index2 < index3 :
-                    index_end = index2
-                gene_id = info[index+7:index_end]
-                if gene_id.find(';') >= 0:
-                    gene_id = gene_id.split(';')[0]
-                # record name, gene id, chromosome, start, end
+
+                if 'Dbxref' in mapped_info and 'GeneID' in mapped_info['Dbxref']:
+                  gene_id = mapped_info['Dbxref']['GeneID'];
+                else :
+                  gene_id = mapped_info['Name'];
+                num_genes += 1
+                genes.add(gene_id)
 
                 chrome = fields[0].split('.')[0]
-                name = info_fields[1].split('=')[1]
-               # print ("\tInserting gene", chrome, " -> ", gene_id, '(', name, ') from ' , fields[3], ' to ', fields[4])
+                name = mapped_info['Name']
+
+                print ("\tInserting gene", chrome, " -> ", gene_id, '(', name, ') from ' , fields[3], ' to ', fields[4])
 
                 record = {
                     "chrom" : chrome,
@@ -80,6 +78,7 @@ def process_file(file, organism, build):
                     "organism" : organism,
                     "build" : build
                 }
+              #  print(record)
                 spec  = {
                     "organism" : organism,
                     "build" : build,
@@ -90,10 +89,13 @@ def process_file(file, organism, build):
 
             if len(fields) > 2 and fields[2] == 'mRNA' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
                 if not current_mrna is None:
-                   # print ("\tInserting mRNA", current_mrna['accession'] , " with " , len(current_mrna['exons']) , " exons")
+                    print ("\tInserting mRNA", current_mrna['accession'] , " with " , len(current_mrna['exons']) , " exons")
+                  #  print(current_mrna)
                     if len(current_mrna['exons']) < 1 :
                         print ("Failure - can't save", current_mrna['accession'], "without exons!")
-
+                        print(current_mrna['accession'] )
+                        print (line)
+                        sys.exit(1);
 
                     spec  = {
                         "organism" : organism,
@@ -105,57 +107,46 @@ def process_file(file, organism, build):
                     current_mrna = None
 
                 info = fields[8];
-                info_fields = info.split(';');
-                num_mRNA += 1
-                mRNA.add(info_fields[1].split('=')[1])
+                mapped_info = parse_info(info);
 
-                accession_num = info_fields[1].split('=')[1]
-                #Dbxref=GeneID:79501,Genbank:NM_001005484.1,HGNC:14825,HPRD:14974
-                index = info.find('GeneID:')
-                index2 = info.find(',', index)
-                index3 = info.find(';', index)
-                index_end = index3
-                if index2 < index3 :
-                    index_end = index2
-                gene_id = info[index+7:index_end]
-                if gene_id.find(';') >= 0:
-                    gene_id = gene_id.split(';')[0]
-                # name (accession), gene id, chromosome, start, end
+                if 'gene' in mapped_info and 'Name' in mapped_info:
+                  accession_num = mapped_info['Name'];
 
-                chrome = fields[0].split('.')[0]
+                  if 'Dbxref' in mapped_info and 'GeneID' in mapped_info['Dbxref']:
+                    gene_id = mapped_info['Dbxref']['GeneID'];
+                  else :
+                    gene_id = mapped_info['gene'];
 
-                current_mrna = {
-                    "chrom" : chrome,
-                    "start" : fields[3],
-                    "end" : fields[4],
-                    "gene_id" : gene_id,
-                    "accession" : accession_num,
-                    "orientation" : fields[6],
-                    "exons" : list(),
-                    "organism" : organism,
-                    "build" : build
-                }
+                  chrome = fields[0].split('.')[0]
+
+                  current_mrna = {
+                      "chrom" : chrome,
+                      "start" : fields[3],
+                      "end" : fields[4],
+                      "gene_id" : gene_id,
+                      "accession" : accession_num,
+                      "orientation" : fields[6],
+                      "exons" : list(),
+                      "organism" : organism,
+                      "build" : build
+                  }
+                  mRNA.add(accession_num)
+                else :
+                  # we aren't going to store the mRNA since it doesn't have a proper name or accession
+                  current_mrna = None
 
 
             if len(fields) > 2 and fields[2] == 'exon' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
                 info = fields[8];
-                info_fields = info.split(';');
-                #Dbxref=GeneID:79501,Genbank:NM_001005484.1,HGNC:14825,HPRD:14974
-                index = info.find('Genbank:')
-                index2 = info.find(',', index)
-                index3 = info.find(';', index)
-                index_end = index3
-                if index2 < index3 :
-                    index_end = index2
-                accession = info[index+8:index_end]
-                if accession.find(';') >= 0:
-                    accession = accession.split(';')[0]
-                # name (accession), gene id, chromosome, start, end
 
-                chrome = fields[0].split('.')[0]
-                if current_mrna and current_mrna['accession'] == accession:
-                    # print ("Exon for ", accession, " found -> ", fields[3], " - ", fields[4])
-                    current_mrna['exons'].append({"start" : fields[3], "end" : fields[4]})
+                mapped_info = parse_info(info);
+                if 'transcript_id' in mapped_info :
+                  accession = mapped_info['transcript_id'];
+                  chrome = fields[0].split('.')[0]
+                  if current_mrna and current_mrna['accession'] == accession:
+                      # print ("Exon for ", accession, " found -> ", fields[3], " - ", fields[4])
+                      current_mrna['exons'].append({"start" : fields[3], "end" : fields[4]})
+
 
 
    # print ('\t+ Processed ', num_genes, ' genes')
@@ -178,26 +169,25 @@ else :
 
 
 for taxon_id in sorted(taxon_ids) :
-  try :
-    with open('seeds/' + taxon_id + ".json") as json_file:
-        seed = json.load(json_file)
-        organism = seed['organism']
-        build = seed['genes']['build']
-        print("############################################################")
-        print('Processing top-level annotations for ', organism)
-        local = base_dir + organism
-        if not os.path.isfile(local):
-            print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
-            with urllib.request.urlopen(seed['genes']['url']) as response, open(local, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
-
-        purge_organism(organism, build)
-        file = gzip.open(local, 'rb')
-        process_file(file, organism, build)
-        file.close()
-        print("############################################################")
-  except KeyError:
-    print("Genes for", organism, "not supported by the seed file");
+  #try :
+  with open('seeds/' + taxon_id + ".json") as json_file:
+      seed = json.load(json_file)
+      organism = seed['organism']
+      build = seed['genes']['build']
+      print("############################################################")
+      print('Processing top-level annotations for ', organism)
+      local = base_dir + organism
+      if not os.path.isfile(local):
+          print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
+          with urllib.request.urlopen(seed['genes']['url']) as response, open(local, 'wb') as out_file:
+              shutil.copyfileobj(response, out_file)
+      purge_organism(organism, build)
+      file = gzip.open(local, 'rb')
+      process_file(file, organism, build)
+      file.close()
+      print("############################################################")
+#  except KeyError:
+#  print("Genes for", organism, "not supported by the seed file");
 
 gene_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("gene_id", ASCENDING)])
 mrna_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("accession", ASCENDING)])

@@ -31,7 +31,7 @@
     ],
     "genes" :
       {
-        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/Gorilla_gorilla/GFF/ref_gorGor3.1_top_level.gff3.gz",
+        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Gorilla_gorilla/latest_assembly_versions/GCF_000151905.1_gorGor3.1/GCF_000151905.1_gorGor3.1_genomic.gff.gz",
         "build" : "3.1"
       }
 

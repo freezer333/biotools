@@ -11,5 +11,10 @@
       {"common_id" : "4", "url_suffix" : "chr4.fa.gz", "accession" : "AE014135"},
       {"common_id" : "X", "url_suffix" : "chrX.fa.gz", "accession" : "AE014298"},
       {"common_id" : "Y", "url_suffix" : "chrY.fa.gz", "accession" : "CP007106"}
-    ]
+    ],
+    "genes" :
+      {
+        "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/invertebrate/Drosophila_melanogaster/latest_assembly_versions/GCF_000001215.4_Release_6_plus_ISO1_MT/GCF_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz",
+        "build" : "WBcel235"
+      }
 }
