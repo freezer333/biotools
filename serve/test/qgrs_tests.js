@@ -7,13 +7,13 @@ var gapped = "-AA---A--AAA-----AAAA----AAAA-----AAAA--AAAAAA--AAAAAA--A"
 
 var motifs  = [
   {
-    start : 0, tetrad1 : 2, tetrad2 : 4, tetrad3: 5, tetrad4 : 7
+    start : 0, tetrad1 : 2, tetrad2 : 4, tetrad3: 5, tetrad4 : 7, length : 10
   },
   {
-    start : 4, tetrad1 : 7, tetrad2 : 9, tetrad3: 10, tetrad4 : 13
+    start : 4, tetrad1 : 7, tetrad2 : 9, tetrad3: 10, tetrad4 : 13, length : 10
   },
   {
-    start : 10, tetrad1 :13, tetrad2 : 15, tetrad3: 16, tetrad4 : 18
+    start : 10, tetrad1 :13, tetrad2 : 15, tetrad3: 16, tetrad4 : 18, length : 10
   }
 ]
 
@@ -36,6 +36,15 @@ describe ('Test qgrs javascript functions ', function() {
         assert(motifs[2].start_gapped == 25);
         done();
       })
+
+      it('should modify length', function(done){
+        conserve.map_gaps(gapped, motifs);
+        assert(motifs[0].length_gapped == 25);
+
+        done();
+      })
     });
+
+
 
 });

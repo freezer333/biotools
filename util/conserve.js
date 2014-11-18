@@ -1,5 +1,28 @@
 
 
+//percent difference is the difference between both lengths divided by the length of the maximum strand
+function percentDifference(valueA, valueB){
+  if (valueA == 0 && valueB == 0){
+    return 0;
+  }
+  return ( (Math.abs(valueA - valueB))/Math.max(valueA, valueB));
+}
+
+//assigns a score from 0-1 by taking percent difference into account and the highest percentage desired to be incorporated
+function score(min, max, percentDifference){
+  return Math.max(0,(1- (percentDifference)/(max - min)));
+}
+
+function length(start, end){
+  return end - start + 1;
+}
+
+
+exports.cscore = function (p, c) {
+
+
+
+}
 
 /*----------------------------------------------
 Input:  gapped_sequence:  the source sequence which
@@ -34,9 +57,14 @@ exports.map_gaps = function (gapped_sequence, g4s) {
 }
 
 function apply_gap(g4, gapmap){
-  g4.start_gapped = g4.start + gapmap[g4.start];
-  g4.tetrad1_gapped = g4.tetrad1 + gapmap[g4.tetrad1];
-  g4.tetrad2_gapped = g4.tetrad2 + gapmap[g4.tetrad2];
-  g4.tetrad3_gapped = g4.tetrad3 + gapmap[g4.tetrad3];
-  g4.tetrad4_gapped = g4.tetrad4 + gapmap[g4.tetrad4];
+  g4.start_gapped = map(g4.start, gapmap);
+  g4.tetrad1_gapped = map(g4.tetrad1, gapmap);
+  g4.tetrad2_gapped = map(g4.tetrad2, gapmap);
+  g4.tetrad3_gapped = map(g4.tetrad3, gapmap);
+  g4.tetrad4_gapped = map(g4.tetrad4, gapmap);
+  g4.length_gapped = length(g4.start_gapped, map(g4.start + g4.length, gapmap));
+}
+
+function map(nt, gapmap) {
+  return nt + gapmap[nt];
 }
