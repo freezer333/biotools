@@ -9,16 +9,15 @@ var fs = require('fs');
 var seq_test_3_expected = fs.readFileSync('test/seq_test_3.txt', 'utf-8');
 seq_test_3_expected = seq_test_3_expected.replace(/(\r\n|\n|\r)/gm,"");
 
+
+
 describe ('Test chromosome sequence queries ', function() {
     before(function (done) {
-        mongoose.connect(url, { auto_reconnect: true }, function (err, res) {
-            if (err) {
-                console.log ('ERROR connecting to: ' + url + '. ' + err);
-            } else {
-                db.init(mongoose);
-                done();
-              }
-            });
+      this.timeout(10000);
+      setTimeout(function () {
+          done();
+      }, 3000);
+
     });
     describe('Human chromosome 9 - CM000671.2', function(){
       this.timeout(10000);
@@ -50,7 +49,7 @@ describe ('Test chromosome sequence queries ', function() {
             done();
         });
       })
-      
+
       it('Nucleotides 19950 - 30030 should match test data - 3 page test, large sequence sequence', function(done){
         db.getSequence('NC_000009', 19950, 30030, function(err, result) {
             assert(result.seq == seq_test_3_expected);
@@ -90,12 +89,6 @@ describe ('Test chromosome sequence queries ', function() {
       })
 
 
-      it('Invalid sequence throws error', function(done){
-        db.getSequence('Nonsense.2', 0, 1, function(err, sequence) {
-            assert(err);
-            done();
-        });
-      })
 
 
     });
