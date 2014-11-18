@@ -66,7 +66,7 @@ def process_file(file, organism, build):
                 chrome = fields[0].split('.')[0]
                 name = mapped_info['Name']
 
-                print ("\tInserting gene", chrome, " -> ", gene_id, '(', name, ') from ' , fields[3], ' to ', fields[4])
+                #print ("\tInserting gene", chrome, " -> ", gene_id, '(', name, ') from ' , fields[3], ' to ', fields[4])
 
                 record = {
                     "chrom" : chrome,
@@ -89,7 +89,7 @@ def process_file(file, organism, build):
 
             if len(fields) > 2 and fields[2] == 'mRNA' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
                 if not current_mrna is None:
-                    print ("\tInserting mRNA", current_mrna['accession'] , " with " , len(current_mrna['exons']) , " exons")
+                  #  print ("\tInserting mRNA", current_mrna['accession'] , " with " , len(current_mrna['exons']) , " exons")
                   #  print(current_mrna)
                     if len(current_mrna['exons']) < 1 :
                         print ("Failure - can't save", current_mrna['accession'], "without exons!")
