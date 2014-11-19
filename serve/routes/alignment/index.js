@@ -29,7 +29,7 @@ exports.routes.post('/alignment', function(req, res) {
         return;
     }
 
-    var aligner = require('../tools/align')
+    var aligner = require('../../tools/align')
     var result = aligner.run(seqa, seqb, { gapopen : 10, gapextend : 0.5},
         function(result) {
             res.setHeader('Content-Type', 'application/json');
