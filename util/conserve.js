@@ -13,16 +13,60 @@ function score(min, max, percentDifference){
   return Math.max(0,(1- (percentDifference)/(max - min)));
 }
 
+
+function overlapScore(float min, float max, float percentOverlap) {
+  return Math.min(1, (percentOverlap)/(max - min));
+}
+
 function length(start, end){
   return end - start + 1;
 }
 
-
-exports.cscore = function (p, c) {
-
-
-
+function compute_overlap(s1, s2, e1, e2){
+  if (s1<=s2 && e1>=e2 && e1>s2) {
+    return length(s2,e2);}
+  if (s1<=s2 && e1<e2 && e1>s2) {
+    return length(s2,e1);}
+  if (s1>s2 && e1>=e2 && e2>s1) {
+    return length(s1,e2);}
+  if (s1>s2 && e1<e2) {
+    return length(s1,e1);}
+  if (e2<=s1 || s2>=e1) {return 0;}
+  return -1;
 }
+
+function build_padding_boundries(p, c, p_seq_length, c_seq_length) {
+  padding = p.length_gapped <= c.length_gapped
+            ? p.length_gapped / 2
+            : c.length_gapped / 2
+
+  padded = {
+      padding : padding,
+      p : {
+        start : p.start_gapped - padding,
+        end : p.start_gapped + p.length_gapped + padding
+      },
+      c : {
+        start : c.start_gapped - padding,
+        end : c.start_gapped + c.length_gapped + padding
+      }
+  }
+  if ( padded.p.start < 0 ) padded.p.start = 0;
+  if ( padded.c.start < 0 ) padded.c.start = 0;
+  if ( padded.p.end > p_seq_length) padded.p.end = p_seq_length;
+  if ( padded.c.end > c_seq_length) padded.c.end = c_seq_length;
+  return padded;
+}
+
+
+function calculateOverlapComponent (p, c, p_seq_length, c_seq_length) {
+  padded = build_padding_boundries(p, c, p_seq_length, c_seq_length);
+  overlap = compute_overlap(padded.p.start, padded.c.start, padded.p.end, padded.c.end)
+  overlap_score = overlapScore(0. 0.85, overlap);
+  if (overlap_score < 0.2) return undefined;
+}
+
+exports.calcOverlapComponent = calculateOverlapComponent;
 
 /*----------------------------------------------
 Input:  gapped_sequence:  the source sequence which

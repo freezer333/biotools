@@ -26,7 +26,7 @@ exports.routes.get('/chrom/:accession/:start/:end',
     var orientation = req.query.orientation || "+";
 
     if ( !accession || !start || !end ) {
-        res.status(404).end('Sequence range was not specified or was invalid');
+        res.status(404).end('Sequence range was not specified, or was invalid');
         return ;
     }
 
