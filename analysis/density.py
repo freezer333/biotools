@@ -40,4 +40,4 @@ for record in mcursor:
     if j == 27000:
         break
 
-book.save("fixeddensitylength6.xls")
+book.save("fixeddensitylength.xls")
