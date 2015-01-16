@@ -30,6 +30,7 @@ class SequencePageBuilder:
         }
 
         self.seq_collect.insert(record)
+        print('.', end="")
 
     def purge(self, accession) :
         spec = {
@@ -80,7 +81,7 @@ class SequencePageBuilder:
               compressed = zlib.compress(bytes(buffer, 'ascii'))
               self.insertPage(start, start+len(buffer), acc, compressed)
               page_count += 1
-
+          print ("  +  Inserted ", page_count, " pages into sequence collection for chromosome", acc)
           return True
         except EOFError:
           print ("  x  An error occurred while processing this chromosome file - please verify that the file was downloaded entirely (or simply manually delete it)")
