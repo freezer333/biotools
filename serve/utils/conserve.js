@@ -19,8 +19,11 @@ function overlapScore(min, max, percentOverlap) {
 }
 
 function length(start, end){
-  return end - start + 1;
+  var r = end - start + 1;
+  return r;
 }
+
+exports._length = length;
 
 function compute_overlap(s1, s2, e1, e2){
   if (s1<=s2 && e1>=e2 && e1>s2) {
@@ -39,16 +42,15 @@ function build_padding_boundries(p, c, p_seq_length, c_seq_length) {
   padding = p.length_gapped <= c.length_gapped
             ? p.length_gapped / 2
             : c.length_gapped / 2
-
   padded = {
       padding : padding,
       p : {
         start : p.start_gapped - padding,
-        end : p.start_gapped + p.length_gapped + padding
+        end : p.start_gapped + p.length_gapped + padding - 1
       },
       c : {
         start : c.start_gapped - padding,
-        end : c.start_gapped + c.length_gapped + padding
+        end : c.start_gapped + c.length_gapped + padding - 1
       }
   }
   if ( padded.p.start < 0 ) padded.p.start = 0;
@@ -60,13 +62,63 @@ function build_padding_boundries(p, c, p_seq_length, c_seq_length) {
 
 
 function calculateOverlapComponent (p, c, p_seq_length, c_seq_length) {
-  padded = build_padding_boundries(p, c, p_seq_length, c_seq_length);
-  overlap = compute_overlap(padded.p.start, padded.c.start, padded.p.end, padded.c.end)
-  overlap_score = overlapScore(0, 0.85, overlap);
-  if (overlap_score < 0.2) return undefined;
+  var padded = build_padding_boundries(p, c, p_seq_length, c_seq_length);
+  var overlap = compute_overlap(padded.p.start, padded.c.start, padded.p.end, padded.c.end)
+  var region = length(Math.min(padded.p.start, padded.c.start),
+                      Math.max(padded.p.end, padded.c.end));
+
+  var overlap_percentage= overlap / region;
+  return Math.min(1, overlap_percentage/.85);
+  if ( overlap_percentage > 0.85 ) return 1
+  return overlapScore(0, .85, overlap_percentage);//overlapScore(0, 0.85, overlap);
+
 }
 
-exports.calcOverlapComponent = calculateOverlapComponent;
+exports.overlapScore = calculateOverlapComponent;
+
+exports.tetradScore = function (p, c) {
+  var pdiff = percentDifference(p.tetrads, c.tetrads);
+  if ( pdiff >= 0.5 ) return 0;
+  var t = score(0, 1, pdiff);
+  return t;
+}
+
+exports.lengthScore = function (p, c) {
+  var dif = Math.abs(p.length - c.length);
+  var r = 1 - dif / ((p.length + c.length)/2)
+  if ( r < .6 ) return 0;
+  return r;
+}
+
+/*----------------------------------------------
+Input:  principal and comparison- arrays of motifs.
+        the arrays contain motiffs with the gapped
+        indexes already in them.
+
+      [  This algorithm should probably moved to C++...  ]
+
+        Each g4 in the arrays are now considered "families".
+
+        For each family, pair with each family in the comparison.
+          For each family pair -
+            For each G4 (including overlaps) in principal, compare with every comparison (include overlaps)
+              find the best fit conservation pair (highest score).
+                Assign a best_conserved_overall record with the following data:
+                  conservation score
+                  principal motif
+                  comparison accession, organism, taxon
+                  comparison motif
+
+            Compare the representative in principal with each compariron (include overlaps)
+              find the best fit conservation pair (highest score)
+                Assign a best_conserved_rep record
+                  conservation score
+                  comparison accession, organism, taxon
+                  comparison motif
+*/
+exports.crunch = function(p, c) {
+
+}
 
 /*----------------------------------------------
 Input:  gapped_sequence:  the source sequence which
@@ -78,7 +130,6 @@ Input:  gapped_sequence:  the source sequence which
         to be cloned and transformed to start_gapped, end_gapped, etc.
 
         The mapping is applied to all overlapping g4's as well
-
 -----------------------------------------------*/
 
 exports.map_gaps = function (gapped_sequence, g4s) {
@@ -107,7 +158,7 @@ function apply_gap(g4, gapmap){
   g4.tetrad2_gapped = map(g4.tetrad2, gapmap);
   g4.tetrad3_gapped = map(g4.tetrad3, gapmap);
   g4.tetrad4_gapped = map(g4.tetrad4, gapmap);
-  g4.length_gapped = length(g4.start_gapped, map(g4.start + g4.length, gapmap));
+  g4.length_gapped = length(g4.start_gapped, map(g4.start + g4.length-1, gapmap));
 }
 
 function map(nt, gapmap) {

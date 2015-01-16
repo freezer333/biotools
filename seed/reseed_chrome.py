@@ -84,7 +84,7 @@ for record in rcursor:
         c_cursor = seq_collect.find(spec=spec, snapshot=True, timeout=False)
         if ( c_cursor.count() == 0) :
             start = time.time()
-            print ('Missing',  '{0: <15}'.format(record['gene_name']), '{0: <15}'.format(record['organism']),'{0: <15}'.format(record['chrom']))
+            print ('Missing',  '{0: <15}'.format(record['accession']), '{0: <15}'.format(record['organism']),'{0: <15}'.format(record['chrom']))
             mis_count+= 1
             reseed_chrom(record['organism'], record['chrom'])
             end = time.time()

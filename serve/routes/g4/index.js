@@ -23,16 +23,12 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
   var principal = {
     time : new Date(),
     qgrs_map_version : qgrs_version,
-    accession : p,
-    sequence: "",
-    result : ""
+    accession : p
   }
   var comparison = {
     time : new Date(),
     qgrs_map_version : qgrs_version,
-    accession : c,
-    sequence: "",
-    result : ""
+    accession : c
   }
 
   async.parallel([
@@ -42,7 +38,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
               callback('Principal mRNA [' + p + '] not found');
             },
             function(mrna, sequence) {
-              callback(null, sequence);
+              callback(null, {mrna:mrna, sequence : sequence});
             });
       },
       function (callback) {
@@ -51,7 +47,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
               callback('Comparison mRNA [' + c + '] not found');
             },
             function(mrna, sequence) {
-              callback(null, sequence);
+              callback(null, {mrna:mrna, sequence :sequence});
             });
       }
     ],
@@ -60,11 +56,15 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
         res.status(404).end(err);
         return;
       }
-      principal.sequence = results[0];
-      principal.result = JSON.parse(qgrs_module.find(principal.sequence));
+      principal.organism = results[0].mrna.organism;
+      principal.taxon = results[0].mrna.taxon;
+      principal.sequence = results[0].sequence;
+      principal.g4s = JSON.parse(qgrs_module.find(principal.sequence)).results;
 
-      comparison.sequence = results[1];
-      comparison.result = JSON.parse(qgrs_module.find(comparison.sequence));
+      comparison.organism = results[1].mrna.organism;
+      comparison.taxon = results[1].mrna.taxon;
+      comparison.sequence = results[1].sequence;
+      comparison.g4s = JSON.parse(qgrs_module.find(comparison.sequence)).results;
 
       var aligner = require('../../tools/align')
       var result = aligner.run(principal.sequence, comparison.sequence, { gapopen : 10, gapextend : 0.5},
@@ -74,8 +74,17 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
                 comparison : comparison,
                 alignment : alignment
               };
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify(result));
+
+
+              process_aligned_sequences(result, function(err, result){
+                if ( err) {
+                  res.status(404).end(err);
+                }
+                else {
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify(result));
+                }
+              })
           },
           function(err) {
               res.status(404).end("Could not perform needle alignment");
@@ -85,3 +94,18 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
 
     });
 });
+
+
+function process_aligned_sequences(input, callback) {
+
+  var conserve = require('../../utils/conserve.js')
+
+  conserve.map_gaps(input.alignment.a, input.principal.g4s);
+  conserve.map_gaps(input.alignment.b, input.comparison.g4s);
+
+  conserve.crunch(input.principal);
+  conserve.crunch(input.comparison);
+  callback(null, input);
+
+
+}
