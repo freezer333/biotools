@@ -95,8 +95,8 @@ exports.map_gaps = function (gapped_sequence, g4s) {
 
   for ( g4 in g4s ) {
     apply_gap(g4s[g4], gap);
-    for ( o in g4.overlaps) {
-      apply_gap(g4.overlaps[o]);
+    for ( o in g4s[g4].overlaps) {
+      apply_gap(g4s[g4].overlaps[o], gap);
     }
   }
 }

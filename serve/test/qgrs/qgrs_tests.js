@@ -7,7 +7,11 @@ var gapped = "-AA---A--AAA-----AAAA----AAAA-----AAAA--AAAAAA--AAAAAA--A"
 
 var motifs  = [
   {
-    start : 0, tetrad1 : 2, tetrad2 : 4, tetrad3: 5, tetrad4 : 7, length : 10
+    start : 0, tetrad1 : 2, tetrad2 : 4, tetrad3: 5, tetrad4 : 7, length : 10,
+      overlaps : [
+                  {start : 0, tetrad1 : 2, tetrad2 : 4, tetrad3: 5, tetrad4 : 7, length : 10},
+                  {start : 4, tetrad1 : 7, tetrad2 : 9, tetrad3: 10, tetrad4 : 13, length : 10}
+                 ]
   },
   {
     start : 4, tetrad1 : 7, tetrad2 : 9, tetrad3: 10, tetrad4 : 13, length : 10
@@ -33,6 +37,12 @@ describe ('Test qgrs conservation', function() {
         assert(motifs[0].start_gapped == 1);
         assert(motifs[1].start_gapped == 10);
         assert(motifs[2].start_gapped == 25);
+        done();
+      })
+      it('should modify starts of overlaps', function(done){
+        conserve.map_gaps(gapped, motifs);
+        assert(motifs[0].overlaps[0].start_gapped == 1);
+        assert(motifs[0].overlaps[1].start_gapped == 10);
         done();
       })
 
