@@ -23,7 +23,8 @@
     "mime": "*",
     "temp": "*",
     "qgrs": "0.2.4",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "http-post": "~0.1.1"
   },
   "devDependencies": {
     "chai": "~1.9.1"

@@ -21,8 +21,6 @@ var perform_alignment = function(a, b, gapopen, gapextend, oncomplete, onerror) 
     b_filename = path.join(dirPath, 'seqb.fasta');
     out_filename = path.join(dirPath, 'out.needle');
 
-    console.log(a_filename);
-    
     async.parallel([
       function(callback) {
         fs.writeFile(a_filename, '> sequence a\n'+a, function(err) {
@@ -40,16 +38,16 @@ var perform_alignment = function(a, b, gapopen, gapextend, oncomplete, onerror) 
 
         open_jobs++;
 
-        
+
         var spawn = require('child_process').spawn,
-            needle  = spawn('needle', 
+            needle  = spawn('needle',
                 ['-asequence', a_filename, '-bsequence', b_filename, '-outfile', out_filename, '-gapopen', gapopen, '-gapextend', gapextend, '-aformat', 'fasta']);
-        
+
         needle.on('error', function (err) {
           console.log("Alignment failed - " + JSON.stringify(err));
           onerror(err);
-        })    
-        
+        })
+
         needle.on('close', function (code, signal) {
           var seqA = "";
           var seqB = "";
@@ -78,7 +76,7 @@ var perform_alignment = function(a, b, gapopen, gapextend, oncomplete, onerror) 
 
   });
 
-  
 
-  
+
+
 }

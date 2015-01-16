@@ -3,6 +3,8 @@ var qgrs_module = require('qgrs');
 var qgrs_version = require('qgrs/package.json').version;
 var core_routes = require('../index');
 var async = require('async');
+var http = require('http');
+http.post = require('http-post');
 
 
 exports.routes = express.Router();
@@ -64,11 +66,22 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
       comparison.sequence = results[1];
       comparison.result = JSON.parse(qgrs_module.find(comparison.sequence));
 
-      var result = {
-        principal : principal,
-        comparison : comparison
-      };
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(result));
+      var aligner = require('../../tools/align')
+      var result = aligner.run(principal.sequence, comparison.sequence, { gapopen : 10, gapextend : 0.5},
+          function(alignment) {
+              var result = {
+                principal : principal,
+                comparison : comparison,
+                alignment : alignment
+              };
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(result));
+          },
+          function(err) {
+              res.status(404).end("Could not perform needle alignment");
+              return;
+          }
+      );
+
     });
 });
