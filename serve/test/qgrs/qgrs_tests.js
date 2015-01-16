@@ -198,5 +198,16 @@ describe('Test qgrs conservation score calculation', function() {
       done();
     });
 
+
+  })
+  describe ('Test mixing', function() {
+    it ('should be .865 for given parts', function(done) {
+      var parts = {
+        overlap : 0.9, tetrads : 0.8, loop : 0.85, len : 0.7
+      }
+      var overall = conserve.mix_conservation(parts);
+      overall.should.be.approximately(.865, 0.005);
+      done();
+    });
   })
 });

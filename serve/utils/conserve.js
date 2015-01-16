@@ -1,6 +1,6 @@
 
 
-//percent difference is the difference between both lengths divided by the length of the maximum strand
+//percent difference is the difference between both values divided by the average value
 function percentDifference(valueA, valueB){
   if (valueA == 0 && valueB == 0){
     return 0;
@@ -11,12 +11,6 @@ function percentDifference(valueA, valueB){
   var r =  1 - (dif/avg);
   return r;
 }
-
-//assigns a score from 0-1 by taking percent difference into account and the highest percentage desired to be incorporated
-function score(min, max, percentDifference){
-  return Math.max(0,(1- (percentDifference)/(max - min)));
-}
-
 
 function overlapScore(min, max, percentOverlap) {
   return Math.min(1, (percentOverlap)/(max - min));
@@ -98,6 +92,24 @@ exports.loopScore = function(p, c) {
   var d3 = percentDifference(p.y3, c.y3)
   var avg = (d1+d2+d3)/3;
   return avg;
+}
+
+exports.mix_conservation = function(parts) {
+  return parts.overlap * 0.65 +
+         parts.tetrads * 0.20 +
+         parts.loop * 0.10 +
+         parts.len * 0.05;
+}
+
+exports.conservationScore = function (p, c, p_length, c_length) {
+  var conservation = {
+    overlap : exports.overlapScore(p, c, p_length, c_length),
+    tetrads : exports.tetradScore(p, c),
+    loop : exports.loopScore(p, c),
+    len : exports.lengthScore(p, c)
+  }
+  conservation.overall = exports.mix_conservation(conservation);
+  return conservation;
 }
 /*----------------------------------------------
 Input:  principal and comparison- arrays of motifs.
