@@ -1,6 +1,6 @@
 var should = require('should');
 var assert = require('assert');
-var conserve = require('../../util/conserve.js')
+var conserve = require('../../utils/conserve.js')
 
 var ungapped = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 var gapped = "-AA---A--AAA-----AAAA----AAAA-----AAAA--AAAAAA--AAAAAA--A"
@@ -17,8 +17,7 @@ var motifs  = [
   }
 ]
 
-describe ('Test qgrs javascript functions ', function() {
-
+describe ('Test qgrs conservation', function() {
     describe('None-gapped motifs', function(){
       it('should not change motifs if there are no gaps', function(done){
         conserve.map_gaps(ungapped, motifs);
@@ -40,7 +39,6 @@ describe ('Test qgrs javascript functions ', function() {
       it('should modify length', function(done){
         conserve.map_gaps(gapped, motifs);
         assert(motifs[0].length_gapped == 25);
-
         done();
       })
     });

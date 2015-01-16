@@ -1,6 +1,5 @@
 var db = require("../db");
 var async = require('async');
-var spawn = require('child_process').spawn;
 var core_routes = require('./index');
 var _ = require('underscore');
 
@@ -113,7 +112,6 @@ exports.qgrs_overlaps = function(req, res){
             callback(null, JSON.parse(result).results);
         },
         function(g4s, callback){
-            console.log(g4s);
             var g = g4s[0];
             g.overlaps = g.overlaps.filter(filter.apply);
             callback(null, g);

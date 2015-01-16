@@ -32,7 +32,6 @@ function serve_mrna(req, res, callback) {
 exports.build_mrna_sequence = function (accession, downstream, error, success) {
     db.mrna.findOne({ accession : accession}, function(err, mrna){
         if ( err || mrna == null ) {
-
             error('the mRNA could not be found in the database.');
             return;
         }
@@ -52,6 +51,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
 
             db.getSequence(mrna.chrom, mrna.start-1, mrna.end, function(err, result) {
                 if ( err ) {
+                  console.log("Primary sequence range was not found - " + accession);
                     error('Sequence range on chromosome ' + mrna.chrom + ' could not found');
                     return;
                 }
@@ -81,6 +81,7 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                         }
                         db.getSequence(mrna.chrom, r.start, r.end, function(err, result) {
                             if ( err ) {
+                                console.log("Downstream sequence range was not found");
                                 error('Sequence range on chromosome ' + mrna.chrom + ' could not found');
                                 return;
                             }

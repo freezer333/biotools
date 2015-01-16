@@ -40,6 +40,16 @@ function compare_ranges(a,b) {
 }
 
 exports.getSequence = function(accession, start, end, final_callback) {
+
+  // QUICK HACK - RESOLVE ACCESSION SYNONYM
+
+    var synonyms = {
+      NT_187005: 'NC_000083'
+    }
+    if ( synonyms[accession] ) {
+      accession = synonyms[accession];
+    }
+
     var init_start = start;
     var init_end = end;
     if ( start < 0 || end < start) {
@@ -73,6 +83,7 @@ exports.getSequence = function(accession, start, end, final_callback) {
         }
     } while ( start_page != end_page)
 
+    var error = false; // flag so we don't call the error callback multiple times
     async.each(ranges,
         function(range, callback) {
             getSequenceFromPage(accession, range.start, range.end, function( err, page_seq) {
@@ -85,11 +96,19 @@ exports.getSequence = function(accession, start, end, final_callback) {
             });
         }, function (err) {
             if ( err ) {
+              if ( !error) {
+                error = true;
                 final_callback(err);
+              }
+
             }
 
             if ( processed_ranges.length == 0 ) {
-                final_callback('No sequence data found');
+                if ( !error) {
+                  error = true;
+                  final_callback('No sequence data found');
+                }
+
                 return;
             }
 
@@ -99,7 +118,11 @@ exports.getSequence = function(accession, start, end, final_callback) {
                 if ( processed_ranges[i].seq )
                     retval += processed_ranges[i].seq;
                 else {
-                    final_callback("Range was invalid", null);
+                    if ( !error) {
+                      error = true;
+                      final_callback("Range was invalid", null);
+                    }
+
                 }
             }
             final_callback(null,

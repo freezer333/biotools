@@ -14,7 +14,7 @@ function score(min, max, percentDifference){
 }
 
 
-function overlapScore(float min, float max, float percentOverlap) {
+function overlapScore(min, max, percentOverlap) {
   return Math.min(1, (percentOverlap)/(max - min));
 }
 
@@ -62,7 +62,7 @@ function build_padding_boundries(p, c, p_seq_length, c_seq_length) {
 function calculateOverlapComponent (p, c, p_seq_length, c_seq_length) {
   padded = build_padding_boundries(p, c, p_seq_length, c_seq_length);
   overlap = compute_overlap(padded.p.start, padded.c.start, padded.p.end, padded.c.end)
-  overlap_score = overlapScore(0. 0.85, overlap);
+  overlap_score = overlapScore(0, 0.85, overlap);
   if (overlap_score < 0.2) return undefined;
 }
 
@@ -80,6 +80,7 @@ Input:  gapped_sequence:  the source sequence which
         The mapping is applied to all overlapping g4's as well
 
 -----------------------------------------------*/
+
 exports.map_gaps = function (gapped_sequence, g4s) {
   gap = [];
   gaps = 0;

@@ -22,6 +22,7 @@ var mrna_routes = require('./routes/mrna');
 var chrom = require('./routes/chrom').routes;
 var gene = require('./routes/gene').routes;
 var alignment = require('./routes/alignment').routes;
+var g4 = require('./routes/g4').routes;
 
 var port = process.env.PORT || 3000;
 
@@ -95,4 +96,5 @@ app.get('/jobs/:jobid', job_routes.analysis_status);
 app.use('/', chrom);
 app.use('/', gene)
 app.use('/', alignment);
+app.use('/g4/', g4);
 app.listen(port);
