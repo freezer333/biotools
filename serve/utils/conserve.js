@@ -5,7 +5,11 @@ function percentDifference(valueA, valueB){
   if (valueA == 0 && valueB == 0){
     return 0;
   }
-  return ( (Math.abs(valueA - valueB))/Math.max(valueA, valueB));
+  var dif = Math.abs(valueA - valueB);
+  var avg = (valueA + valueB) / 2
+
+  var r =  1 - (dif/avg);
+  return r;
 }
 
 //assigns a score from 0-1 by taking percent difference into account and the highest percentage desired to be incorporated
@@ -78,22 +82,20 @@ exports.overlapScore = calculateOverlapComponent;
 
 exports.tetradScore = function (p, c) {
   var pdiff = percentDifference(p.tetrads, c.tetrads);
-  if ( pdiff >= 0.5 ) return 0;
-  var t = score(0, 1, pdiff);
-  return t;
+  if ( pdiff< 0.5 ) return 0;
+  return pdiff;
 }
 
 exports.lengthScore = function (p, c) {
-  var dif = Math.abs(p.length - c.length);
-  var r = 1 - dif / ((p.length + c.length)/2)
+  var r = percentDifference(p.length, c.length)
   if ( r < .6 ) return 0;
   return r;
 }
 
 exports.loopScore = function(p, c) {
-  var d1 = Math.min(p.y1, c.y1)/Math.max(p.y1, c.y1);
-  var d2 = Math.min(p.y2, c.y2)/Math.max(p.y2, c.y2);
-  var d3 = Math.min(p.y3, c.y3)/Math.max(p.y3, c.y3);
+  var d1 = percentDifference(p.y1, c.y1)
+  var d2 = percentDifference(p.y2, c.y2)
+  var d3 = percentDifference(p.y3, c.y3)
   var avg = (d1+d2+d3)/3;
   return avg;
 }

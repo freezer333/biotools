@@ -114,14 +114,14 @@ describe('Test qgrs conservation score calculation', function() {
       assert(conserve.tetradScore(principal3, comparison3) == 1);
       done();
     });
-    it ('should be 2/3 if the tetrad numbers are 3 and 2', function(done) {
+    it ('should be 1 - 2/2.5 if the tetrad numbers are 3 and 2', function(done) {
       var tetradScore = conserve.tetradScore(principal2, comparison2);
-      tetradScore.should.be.approximately(0.67, 0.005);
+      tetradScore.should.be.approximately(1 - 1/2.5, 0.005);
       done();
     });
-    it ('should be 3/4 if the tetrad numbers are 3 and 4', function(done) {
+    it ('should be 1-  1/3.5 if the tetrad numbers are 3 and 4', function(done) {
       var tetradScore = conserve.tetradScore({tetrads:3}, {tetrads:4});
-      tetradScore.should.be.approximately(0.75, 0.005);
+      tetradScore.should.be.approximately(1 - 1/3.5, 0.005);
       done();
     });
     it ('should be 0 if the tetrad numbers are 2 and 4', function(done) {
@@ -189,12 +189,12 @@ describe('Test qgrs conservation score calculation', function() {
     });
   })
   describe ('Test loop score', function() {
-    it ('should be .783333 for given loop lengths', function(done) {
+    it ('should be .756 for given loop lengths', function(done) {
       var loop = conserve.loopScore(
         {y1: 4, y2: 3, y3: 8},
         {y1: 5, y2: 4, y3: 10}
       );
-      loop.should.be.approximately(.78333, 0.005);
+      loop.should.be.approximately(.756, 0.005);
       done();
     });
 
