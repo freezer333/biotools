@@ -188,4 +188,15 @@ describe('Test qgrs conservation score calculation', function() {
       done();
     });
   })
+  describe ('Test loop score', function() {
+    it ('should be .783333 for given loop lengths', function(done) {
+      var loop = conserve.loopScore(
+        {y1: 4, y2: 3, y3: 8},
+        {y1: 5, y2: 4, y3: 10}
+      );
+      loop.should.be.approximately(.78333, 0.005);
+      done();
+    });
+
+  })
 });

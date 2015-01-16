@@ -70,7 +70,7 @@ function calculateOverlapComponent (p, c, p_seq_length, c_seq_length) {
   var overlap_percentage= overlap / region;
   return Math.min(1, overlap_percentage/.85);
   if ( overlap_percentage > 0.85 ) return 1
-  return overlapScore(0, .85, overlap_percentage);//overlapScore(0, 0.85, overlap);
+  return overlapScore(0, .85, overlap_percentage);
 
 }
 
@@ -90,6 +90,13 @@ exports.lengthScore = function (p, c) {
   return r;
 }
 
+exports.loopScore = function(p, c) {
+  var d1 = Math.min(p.y1, c.y1)/Math.max(p.y1, c.y1);
+  var d2 = Math.min(p.y2, c.y2)/Math.max(p.y2, c.y2);
+  var d3 = Math.min(p.y3, c.y3)/Math.max(p.y3, c.y3);
+  var avg = (d1+d2+d3)/3;
+  return avg;
+}
 /*----------------------------------------------
 Input:  principal and comparison- arrays of motifs.
         the arrays contain motiffs with the gapped
