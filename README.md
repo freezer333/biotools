@@ -147,6 +147,15 @@ This script will build the gene and mrna data collections from the file download
 $ python3 seed_gene.py
 ```
 
+Note About 1 out of every 500 or so genes and mRNA are linking back to chromosome accession numbers not found in the organism’s primary assembly.  To get these missing chromosomes use the following script:
+
+```
+$ python3 reseed_chrome.py
+```
+
+This script will scan all genes and mRNA and download missing chromosomes using entrez url.  Its a good
+idea to do this whenever you add a new set of genes/mrna.
+
 ## 6c - mRNA Sequence Features
 This script will attach sequence feature data to many of the mRNA built from step 7b.  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
 

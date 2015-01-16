@@ -64,6 +64,14 @@ def record_complete(organism, accession, seed) :
   spec = make_log(organism, accession, seed)
   seedlog_collect.insert(spec);
 
+
+#def processURL(organism, accession, seed, url) :
+    #this is similar to processing a file, but we are downloading the
+    #FASTA based on the access instead.  This is because lots of genes
+    #seem to link back to chromosomes that are not "NC".
+
+    #http://www.ncbi.nlm.nih.gov/nuccore/NT_187005.1?report=fasta&log$=seqview&format=text
+
 def processFile(organism, accession, seed, file):
     line_num = 0
     start = 0

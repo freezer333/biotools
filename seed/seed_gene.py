@@ -26,7 +26,7 @@ from seed_utils import parse_info
 base_dir = os.getcwd() + '/external_data/top_level_annotations/'
 os.makedirs(base_dir, exist_ok=True)
 
-
+#http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=253510044&rettype=fasta&retmode=text
 
 def purge_organism(organism, build):
     spec = {
