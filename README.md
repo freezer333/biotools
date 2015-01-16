@@ -1,5 +1,7 @@
 # Instructions for setting up bioinformatics data sources
 
+These instructions are for undergraduate bioinformatics students, the first few steps cover some basic setup and dependency installation.  This suite of tools uses Node.js, Python3, MongoDB, and is distributed with git.  If all of this is familiar to - please just proceed to Step 6.
+
 # Step 1:  Install Node.js
 The data sources run locally as a web service on your machine.  The web services are served from a Node.js application, which is very easy to run.  Later in this document you will see how to initialize the services, in this step you should simply ensure that Node.js is installed and running.
 
