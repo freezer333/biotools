@@ -83,9 +83,12 @@ for record in rcursor:
     if record['chrom'] not in processed:
         c_cursor = seq_collect.find(spec=spec, snapshot=True, timeout=False)
         if ( c_cursor.count() == 0) :
-            print ('Missing',  '{0: <15}'.format(record['accession']), '{0: <15}'.format(record['organism']),'{0: <15}'.format(record['chrom']))
+            start = time.time()
+            print ('Missing',  '{0: <15}'.format(record['gene_name']), '{0: <15}'.format(record['organism']),'{0: <15}'.format(record['chrom']))
             mis_count+= 1
             reseed_chrom(record['organism'], record['chrom'])
+            end = time.time()
+            print('\tMissing chromosome ', mis_count, '/', count,  'processeds in', '{0:.4f}'.format(end-start), 'seconds')
     count += 1
     processed.add(record['chrom'])
 mcursor.close()

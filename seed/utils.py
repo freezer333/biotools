@@ -30,8 +30,7 @@ class SequencePageBuilder:
         }
 
         self.seq_collect.insert(record)
-        print('.', end="")
-
+        
     def purge(self, accession) :
         spec = {
             "accession" : accession,
