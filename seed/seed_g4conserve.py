@@ -70,7 +70,7 @@ def process_mrna(count, mrna):
 
     if len(data) > 0 :
         comparisons = [ h['mrna_accession_ver'] for h in data[0]['homologs'] if h['tax_name']==c_organism]
-        if  len(comparisons) > 0 :
+        if  len(comparisons) > 0 and 'g4s' in mrna:
             pa = mrna['accession'];
             ca = comparisons[0];
             url = seq_url + '/g4/mrna/' + pa + '/' + ca + '/cmap?downstream=200'
@@ -82,8 +82,9 @@ def process_mrna(count, mrna):
                 u_count = 0
                 for g4 in data['principal']['g4s']:
                     g_count += 1
-                    if 'best_conserved_rep' in g4 :
+                    if 'best_conserved_rep' in g4:
                         c_count += 1
+
                         dbg4 = next((g for g in mrna['g4s'] if g['id'] == g4['id']), None)
                         if dbg4 is not None:
                             u_count+= 1
@@ -111,13 +112,13 @@ def process_mrna(count, mrna):
 
                 if u_count > 0:
                     collect.update({'accession':mrna['accession']}, {'$set': {'g4s': mrna['g4s']}})
-                    print( '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]), ' mapped ', c_count , 'conserved motifs of ', g_count)
+                    print('{0: <10}'.format(count),  '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]), ' mapped ', c_count , 'conserved motifs of ', g_count)
 
 mcursor = collect.find(spec={'organism':p_organism},snapshot=True, timeout=False)
 count = 1
 for record in mcursor:
-    if process_mrna(count, record):
-        count += 1
+    process_mrna(count, record)
+    count += 1
 mcursor.close()
 
 print ('Processed ', count, " mRNA ->  G4 Conservation Seeding Complete")
