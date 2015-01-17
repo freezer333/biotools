@@ -14,7 +14,28 @@ exports.routes.get('/', function(req, res) {
 });
 
 
+function annotate_g4s(mrna, sequence, g4s) {
+  var prefix = mrna.accession + ".";
+  g4s.forEach(function (g4, index) {
+    g4.id = prefix + (index+1);
 
+    cds_start = mrna.cds ? mrna.cds.start : undefined
+    cds_end = mrna.cds ? mrna.cds.end : undefined
+    end = sequence.length
+    if ( cds_start && cds_end ) {
+      g4_start = g4.start
+      g4_end = g4_start + g4.length
+      g4.is5Prime = g4_start <= cds_start
+      g4.isCDS = g4_start >= cds_start && g4_start <= cds_end || g4_end >= cds_start && g4_end <= cds_end
+      g4.is3Prime = g4_start >= cds_end && g4_start <= end || g4_end >= cds_end && g4_end <= end
+      g4.isDownstream = g4_end >= end
+    }
+
+    g4.overlaps.forEach(function (overlap, index) {
+      overlap.id = g4.id + "." + (index+1);
+    })
+  })
+}
 exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
   var p = req.params.principal;
   var c = req.params.comparison;
@@ -66,6 +87,8 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
       comparison.sequence = results[1].sequence;
       comparison.g4s = JSON.parse(qgrs_module.find(comparison.sequence)).results;
 
+      annotate_g4s(results[0].mrna, principal.sequence, principal.g4s);
+      annotate_g4s(results[1].mrna, comparison.sequence, comparison.g4s);
       var aligner = require('../../tools/align')
       var result = aligner.run(principal.sequence, comparison.sequence, { gapopen : 10, gapextend : 0.5},
           function(alignment) {
@@ -103,8 +126,7 @@ function process_aligned_sequences(input, callback) {
   conserve.map_gaps(input.alignment.a, input.principal.g4s);
   conserve.map_gaps(input.alignment.b, input.comparison.g4s);
 
-  conserve.crunch(input.principal);
-  conserve.crunch(input.comparison);
+  conserve.compute_conservation(input.principal, input.comparison);
   callback(null, input);
 
 

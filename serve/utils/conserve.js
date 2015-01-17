@@ -109,6 +109,7 @@ exports.conservationScore = function (p, c, p_length, c_length) {
     len : exports.lengthScore(p, c)
   }
   conservation.overall = exports.mix_conservation(conservation);
+  if ( conservation.overall < 0.5) return undefined;
   return conservation;
 }
 /*----------------------------------------------
@@ -137,9 +138,71 @@ Input:  principal and comparison- arrays of motifs.
                   comparison accession, organism, taxon
                   comparison motif
 */
-exports.crunch = function(p, c) {
+exports.compute_conservation = function(p, c) {
+  p.g4s.forEach(function (g4) {
+      // compare with all comparison families
+      g4.best_conserved_rep = getBestComparison(g4, p, c);
+      var overall_best = g4.best_conserved_rep;
+      if (overall_best) {
+        // we won't do this if the primary didn't match with anything - too weak.
+        // now check if any of the overlaps in principal are better
+        g4.overlaps.forEach(function(overlap) {
+          var cons = getBestComparison(overlap, p, c);
+          //console.log(cons.score.overall + " < " + overall_best.score.overall);
+          if ( cons && cons.score.overall > overall_best.score.overall) {
+            overall_best = cons;
+            console.log("YES");
+          }
+        });
+      }
+      g4.best_conserved_overall = overall_best;
+  });
+
+
 
 }
+
+function getBestComparison(g4, p, c) {
+  var best = undefined;
+  c.g4s.forEach(function(comparison_g4) {
+    var cons = process(g4, comparison_g4, p.sequence.length, c.sequence.length, c);
+    if ( cons && (!best || best.score.overall < cons.score.overall)) {
+        best = cons;
+    }
+  });
+  return best;
+}
+
+function process(p_g4, c_g4, p_len, c_len,comparison_mrna_data ) {
+  // we need to find the best match, and associate it with the p_g4
+  var cscore = exports.conservationScore(p_g4, c_g4, p_len, c_len);
+  c_g4.overlaps.forEach(function (cover) {
+    var s = exports.conservationScore(p_g4, cover, p_len, c_len);
+    if ( s && ( !cscore || cscore.overall < s.overall)) {
+      cscore = s;
+    }
+  })
+
+
+  if ( cscore ) {
+    var comp_mrna = JSON.parse(JSON.stringify(comparison_mrna_data));
+    delete comp_mrna.sequence;
+    delete comp_mrna.g4s;
+    var comp_g4 = JSON.parse(JSON.stringify(c_g4));
+    delete comp_g4.overlaps;
+      return {
+        comparison_mrna : comp_mrna,
+        comparison_g4 : comp_g4,
+        score : cscore
+      }
+  }
+  else {
+    return undefined;
+  }
+}
+
+
+
 
 /*----------------------------------------------
 Input:  gapped_sequence:  the source sequence which
