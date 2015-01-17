@@ -121,6 +121,8 @@ exports.compute_conservation = function(p, c) {
   p.g4s.forEach(function (g4) {
       // compare with all comparison families
       g4.best_conserved_rep = getBestComparison(g4, p, c);
+      /*
+      This is too much of a load - need to move to C++
       var overall_best = g4.best_conserved_rep;
       if (overall_best) {
         // we won't do this if the primary didn't match with anything - too weak.
@@ -134,16 +136,21 @@ exports.compute_conservation = function(p, c) {
         });
       }
       g4.best_conserved_overall = overall_best;
+      */
   });
 }
 
 function getBestComparison(g4, p, c) {
   var best = undefined;
   c.g4s.forEach(function(comparison_g4) {
-    var cons = process(g4, comparison_g4, p.sequence.length, c.sequence.length, c);
-    if ( cons && (!best || best.score.overall < cons.score.overall)) {
-        best = cons;
+    if (Math.abs(g4.start_gapped - comparison_g4.start_gapped) < 200 ) {
+      // conservatively - there is no way these are matches if starting off by more than 200
+      var cons = process(g4, comparison_g4, p.sequence.length, c.sequence.length, c);
+      if ( cons && (!best || best.score.overall < cons.score.overall)) {
+          best = cons;
+      }
     }
+
   });
   return best;
 }
