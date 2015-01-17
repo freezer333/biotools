@@ -62,7 +62,7 @@ c_organism = record['scientific name'];
 
 print("Computing conservation between ", p_organism , "and", c_organism)
 
-def process_mrna(count, mrna, start_time):
+def process_mrna(count, mrna):
     url = seq_url + '/homologene/mrna/' + mrna['accession']
     response = requests.get(url)
     if response.status_code == requests.codes.ok :
@@ -79,21 +79,44 @@ def process_mrna(count, mrna, start_time):
                 data = response.json()
                 c_count = 0
                 g_count = 0
+                u_count = 0
                 for g4 in data['principal']['g4s']:
                     g_count += 1
                     if 'best_conserved_rep' in g4 :
                         c_count += 1
+                        dbg4 = next((g for g in mrna['g4s'] if g['id'] == g4['id']), None)
+                        if dbg4 is not None:
+                            u_count+= 1
 
-                        #  Next step, plug the best_conserved_ref (without comparison gap)
-                        #  into a conservation array in the g4 in the DB and save!
+                            if 'conserved' not in dbg4 :
+                                dbg4['conserved'] = list()
+                            else:
+                                # get rid of the element from associated with this organism
+                                i = 0
+                                fi = -1
+                                for con in dbg4['conserved'] :
+                                    if con['comparison_mrna']['organism'] == c_organism :
+                                        fi = i
+                                    i+= 1
+                                if fi >= 0 :
+                                    del dbg4['conserved'][fi]
 
-                print( '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]), ' mapped ', c_count , 'conserved motifs of ', g_count)
+                            del g4['best_conserved_rep']['comparison_g4']['start_gapped']
+                            del g4['best_conserved_rep']['comparison_g4']['tetrad1_gapped']
+                            del g4['best_conserved_rep']['comparison_g4']['tetrad2_gapped']
+                            del g4['best_conserved_rep']['comparison_g4']['tetrad3_gapped']
+                            del g4['best_conserved_rep']['comparison_g4']['tetrad4_gapped']
+                            del g4['best_conserved_rep']['comparison_g4']['length_gapped']
+                            dbg4['conserved'].append(g4['best_conserved_rep']);
 
-start = time.time()
+                if u_count > 0:
+                    collect.update({'accession':mrna['accession']}, {'$set': {'g4s': mrna['g4s']}})
+                    print( '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]), ' mapped ', c_count , 'conserved motifs of ', g_count)
+
 mcursor = collect.find(spec={'organism':p_organism},snapshot=True, timeout=False)
 count = 1
 for record in mcursor:
-    if process_mrna(count, record, start):
+    if process_mrna(count, record):
         count += 1
 mcursor.close()
 
