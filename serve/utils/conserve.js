@@ -112,32 +112,11 @@ exports.conservationScore = function (p, c, p_length, c_length) {
   if ( conservation.overall < 0.5) return undefined;
   return conservation;
 }
-/*----------------------------------------------
-Input:  principal and comparison- arrays of motifs.
-        the arrays contain motiffs with the gapped
-        indexes already in them.
 
-      [  This algorithm should probably moved to C++...  ]
 
-        Each g4 in the arrays are now considered "families".
 
-        For each family, pair with each family in the comparison.
-          For each family pair -
-            For each G4 (including overlaps) in principal, compare with every comparison (include overlaps)
-              find the best fit conservation pair (highest score).
-                Assign a best_conserved_overall record with the following data:
-                  conservation score
-                  principal motif
-                  comparison accession, organism, taxon
-                  comparison motif
-
-            Compare the representative in principal with each compariron (include overlaps)
-              find the best fit conservation pair (highest score)
-                Assign a best_conserved_rep record
-                  conservation score
-                  comparison accession, organism, taxon
-                  comparison motif
-*/
+/// This probably needs to be optimized in C++ - it can
+/// be extremely compute-intensive with the right gene.
 exports.compute_conservation = function(p, c) {
   p.g4s.forEach(function (g4) {
       // compare with all comparison families
@@ -151,15 +130,11 @@ exports.compute_conservation = function(p, c) {
           //console.log(cons.score.overall + " < " + overall_best.score.overall);
           if ( cons && cons.score.overall > overall_best.score.overall) {
             overall_best = cons;
-            console.log("YES");
           }
         });
       }
       g4.best_conserved_overall = overall_best;
   });
-
-
-
 }
 
 function getBestComparison(g4, p, c) {

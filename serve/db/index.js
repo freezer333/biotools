@@ -40,16 +40,6 @@ function compare_ranges(a,b) {
 }
 
 exports.getSequence = function(accession, start, end, final_callback) {
-
-  // QUICK HACK - RESOLVE ACCESSION SYNONYM
-
-    var synonyms = {
-      NT_187005: 'NC_000083'
-    }
-    if ( synonyms[accession] ) {
-      accession = synonyms[accession];
-    }
-
     var init_start = start;
     var init_end = end;
     if ( start < 0 || end < start) {
