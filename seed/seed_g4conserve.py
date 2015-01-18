@@ -11,7 +11,7 @@ import time
 sys.path.append("../util")
 import g
 
-skip_existing = False
+skip_existing = True
 
 
 config = configparser.ConfigParser()
@@ -63,6 +63,16 @@ c_organism = record['scientific name'];
 print("Computing conservation between ", p_organism , "and", c_organism)
 
 def process_mrna(count, mrna):
+
+    if 'g4s' in mrna:
+        for g4 in mrna['g4s'] :
+            if 'conserved' in g4:
+                comps = [ comp for comp in g4['conserved'] if comp['comparison_mrna']['organism'] == c_organism]
+                if len(comps) > 0 and skip_existing :
+                    print('{0: <10}'.format(count),  '{0: <15}'.format(mrna['accession']), "SKIPPED - already has comparisong G4 for ", c_organism)
+                    return
+
+
     url = seq_url + '/homologene/mrna/' + mrna['accession']
     response = requests.get(url)
     if response.status_code == requests.codes.ok :
