@@ -115,14 +115,17 @@ exports.getSequence = function(accession, start, end, final_callback) {
 
                 }
             }
-            final_callback(null,
-                {
-                    accession : accession,
-                    start : init_start,
-                    end : init_end,
-                    description : processed_ranges[0].description,
-                    seq : retval
-                });
+            if ( !error ) {
+                final_callback(null,
+                    {
+                        accession : accession,
+                        start : init_start,
+                        end : init_end,
+                        description : processed_ranges[0].description,
+                        seq : retval
+                    });
+            }
+
         }
     );
 }

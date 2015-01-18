@@ -71,6 +71,8 @@ def process_mrna(count, mrna):
     if len(data) > 0 :
         comparisons = [ h['mrna_accession_ver'] for h in data[0]['homologs'] if h['tax_name']==c_organism]
         if  len(comparisons) > 0 and 'g4s' in mrna:
+            print('{0: <10}'.format(count),  '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]))
+
             pa = mrna['accession'];
             ca = comparisons[0];
             url = seq_url + '/g4/mrna/' + pa + '/' + ca + '/cmap?downstream=200'
