@@ -43,34 +43,53 @@ var perform_alignment = function(a, b, gapopen, gapextend, oncomplete, onerror) 
             needle  = spawn('needle',
                 ['-asequence', a_filename, '-bsequence', b_filename, '-outfile', out_filename, '-gapopen', gapopen, '-gapextend', gapextend, '-aformat', 'fasta']);
 
+        var killed = false;
+        // if this goes on for more than 30 seconds, we need to kill it
+        setTimeout(function() {
+          if ( !killed ) {
+            killed = true;
+            console.log("Killing Needle child program - runtime too long")
+
+            needle.kill();
+            onerror("Could not perform sequence alignment - sequences too large");
+          }
+        }, 30*1000)
+
         needle.on('error', function (err) {
-          console.log("Alignment failed - " + JSON.stringify(err));
-          onerror(err);
+          if ( !killed ){
+            killed =true
+              console.log("Alignment failed - " + JSON.stringify(err));
+              onerror(err);
+          }
         })
 
         needle.on('close', function (code, signal) {
-          var seqA = "";
-          var seqB = "";
-          var text = fs.readFileSync(out_filename,'utf8')
-          var firstMark = text.indexOf(">");
-          var secondMark = text.indexOf(">", firstMark+1);
+          if ( !killed ){
+            killed = true;
+            var seqA = "";
+            var seqB = "";
+            var text = fs.readFileSync(out_filename,'utf8')
+            var firstMark = text.indexOf(">");
+            var secondMark = text.indexOf(">", firstMark+1);
 
-          var firstSeq = text.indexOf("\n", firstMark+1);
-          var secondSeq = text.indexOf("\n", secondMark + 1);
+            var firstSeq = text.indexOf("\n", firstMark+1);
+            var secondSeq = text.indexOf("\n", secondMark + 1);
 
-          var seqA = text.substring(firstSeq+1, secondMark);
-          var seqB = text.substring(secondSeq+1);
+            var seqA = text.substring(firstSeq+1, secondMark);
+            var seqB = text.substring(secondSeq+1);
 
-          seqA = seqA.replace(/(\r\n|\n|\r)/gm,"");
-          seqB = seqB.replace(/(\r\n|\n|\r)/gm,"");
+            seqA = seqA.replace(/(\r\n|\n|\r)/gm,"");
+            seqB = seqB.replace(/(\r\n|\n|\r)/gm,"");
 
-          open_jobs--;
-          if ( open_jobs < 1 ) {
-            temp.cleanup(function(err, stats) {
-              //console.log(stats)
-            });
+            open_jobs--;
+            if ( open_jobs < 1 ) {
+              temp.cleanup(function(err, stats) {
+                //console.log(stats)
+              });
+            }
+            oncomplete({a : seqA, b : seqB});
+
           }
-          oncomplete({a : seqA, b : seqB});
         });
     });
 
