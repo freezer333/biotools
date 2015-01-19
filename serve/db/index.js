@@ -15,14 +15,13 @@ mongoose.connect(url, { auto_reconnect: true }, function (err, res) {
   }
 });
 
-
-
 var init = function init(mongoose) {
     createSeqSchema(mongoose);
     createGeneSchema(mongoose);
     createMrnaSchema(mongoose);
     createHomologeneSchema(mongoose);
     createJobsSchema(mongoose);
+    createAlignmentSchema(mongoose);
 };
 
 var seq;
@@ -37,6 +36,95 @@ function compare_ranges(a,b) {
   if (a.start > b.start)
     return 1;
   return 0;
+}
+
+
+function createAlignmentSchema(mongoose) {
+    var schem = new mongoose.Schema({
+            principal_id : { type: String, index: true },
+            comparison_id : { type: String, index: true },
+            principal_seq: Buffer,
+            comparison_seq: Buffer,
+            alignment_type : String,
+            date : Date
+        });
+
+    exports.alignments = mongoose.model('Alignment', schem);
+    alignments = exports.alignments;
+}
+
+function inflateAlignment(callback, compressed) {
+  zlib.inflate(compressed, function(err, result) {
+      if ( err ) {
+          callback(err);
+      }
+      else {
+        var retval = result.toString('ascii');
+        callback(null, retval);
+      }
+  })
+}
+
+
+exports.getAlignment = function (principal, comparison, callback) {
+  alignments.findOne({principal_id:principal, comparison_id : comparison}, function(err, record) {
+      if ( err ) {
+          callback(err);
+          return;
+      }
+      if ( record ) {
+        async.parallel([
+            function (pcall) {
+              inflateAlignment(pcall, record.principal_seq);
+            },
+            function (pcall) {
+              inflateAlignment(pcall, record.comparison_seq);
+            }
+          ],
+          function (err, results) {
+            callback(err, {
+              principal_id : principal,
+              comparison_id : comparison,
+              principal_seq : results[0],
+              comparison_seq : results[1],
+              date : record.date
+            });
+          });
+      }
+      else {
+          callback(null, null);
+      }
+  });
+}
+
+exports.saveAlignment = function (alignment, callback ) {
+  async.parallel (
+    [
+      function (pcall) {
+        zlib.deflate(alignment.principal_seq, function(err, result) {
+            pcall(err, result);
+        })
+      },
+      function (pcall) {
+        zlib.deflate(alignment.comparison_seq, function(err, result) {
+            pcall(err, result);
+        })
+      }
+    ],
+    function (err, results) {
+      if ( !err ) {
+        alignment.principal_seq = results[0];
+        alignment.comparison_seq = results[1];
+        alignments.update(
+          { principal_id: alignment.principal_id, comparison_id:alignment.comparison_id },
+          alignment, { multi: true, upsert:true }, function (err, numberAffected, raw) {
+            if ( callback) {
+              callback(err, "Alignment Saved");
+            }
+        });
+      }
+    }
+  )
 }
 
 exports.getSequence = function(accession, start, end, final_callback) {
@@ -171,11 +259,11 @@ function createSeqSchema(mongoose) {
             description : String
         }, {collection:'seq'});
 
-
-
     exports.seq = mongoose.model('Seq', schem);
     seq = exports.seq;
 }
+
+
 
 function createJobsSchema(mongoose) {
 
@@ -191,8 +279,6 @@ function createJobsSchema(mongoose) {
             query : mongoose.Schema.Types.Mixed,
             result : mongoose.Schema.Types.Mixed
         }, {collection:'jobs'});
-
-
 
     exports.jobs = mongoose.model('Jobs', schem);
     jobs = exports.jobs;

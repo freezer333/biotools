@@ -156,7 +156,6 @@ function getBestComparison(g4, p, c) {
           best = cons;
       }
     }
-
   });
   return best;
 }

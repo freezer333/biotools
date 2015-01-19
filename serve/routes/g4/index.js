@@ -4,6 +4,8 @@ var qgrs_version = require('qgrs/package.json').version;
 var core_routes = require('../index');
 var async = require('async');
 var http = require('http');
+
+
 http.post = require('http-post');
 
 
@@ -97,35 +99,40 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
 
       annotate_g4s(results[0].mrna, principal.sequence, principal.g4s);
       annotate_g4s(results[1].mrna, comparison.sequence, comparison.g4s);
-      var aligner = require('../../tools/align')
 
-      var result = aligner.run(principal.sequence, comparison.sequence, { gapopen : 10, gapextend : 0.5},
-          function(alignment) {
-              var result = {
-                principal : principal,
-                comparison : comparison,
-                alignment : alignment
-              };
-              var elapsed_align = (new Date()) - start;
-              start = new Date()
-              process_aligned_sequences(result, function(err, result){
-                if ( err) {
-                  res.status(404).end(err);
-                }
-                else {
-                  elapsed_conserve = new Date() - start;
-                  debug("p_gmap = " + elapsed_p_map/1000 + "s, p_cmap = " + elapsed_c_map/1000 + ",s align=" + elapsed_align/1000  +
-                        "s, conserve=" + elapsed_conserve/1000 + "s");
-                  res.setHeader('Content-Type', 'application/json');
-                  res.end(JSON.stringify(result));
-                }
-              })
-          },
-          function(err) {
-              res.status(404).end("Could not perform needle alignment");
-              return;
+      var rest = require('restler');
+      var httputils = require('../../utils/httputils');
+      var jsonData = { a : {id:principal.accession, seq:principal.sequence},
+                       b : {id:comparison.accession, seq:comparison.sequence}};
+      var url =httputils.local_endpoint(req) + "/alignment/cacheable";
+
+      rest.postJson(url, jsonData).on('complete', function(alignment, response) {
+        if ( response.statusCode != 200) {
+          res.status(404).end("Could not perform needle alignment");
+          return;
+        }
+
+        var result = {
+          principal : principal,
+          comparison : comparison,
+          alignment : alignment
+        };
+        var elapsed_align = (new Date()) - start;
+        start = new Date()
+        process_aligned_sequences(result, function(err, result){
+          if ( err) {
+            res.status(404).end(err);
           }
-      );
+          else {
+            elapsed_conserve = new Date() - start;
+            debug("p_gmap = " + elapsed_p_map/1000 + "s, p_cmap = " + elapsed_c_map/1000 + ",s align=" + elapsed_align/1000  +
+                  "s, conserve=" + elapsed_conserve/1000 + "s");
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(result));
+          }
+        })
+      });
 
     });
 });
