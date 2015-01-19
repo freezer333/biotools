@@ -4,6 +4,14 @@ var fs = require('fs');
 
 var mongoose = exports.mongoose = require ("mongoose");
 
+
+var MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect(url, function(err, db) {
+  exports.native = db
+});
+
+
 mongoose.connect(url, { auto_reconnect: true }, function (err, res) {
   if (err) {
     console.log ('ERROR connecting to: ' + url + '. ' + err);

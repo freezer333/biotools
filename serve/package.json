@@ -26,7 +26,10 @@
     "underscore": "~1.7.0",
     "http-post": "~0.1.1",
     "debug": "~2.1.1",
-    "restler": "~3.2.2"
+    "restler": "~3.2.2",
+    "mongodb": "~1.4.28",
+    "json-stream": "~1.0.0",
+    "JSONStream": "~0.10.0"
   },
   "devDependencies": {
     "chai": "~1.9.1"
