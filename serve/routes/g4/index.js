@@ -4,9 +4,8 @@ var qgrs_version = require('qgrs/package.json').version;
 var core_routes = require('../index');
 var async = require('async');
 var http = require('http');
-
-
-http.post = require('http-post');
+var rest = require('restler');
+var httputils = require('../../utils/httputils');
 
 
 exports.routes = express.Router();
@@ -100,8 +99,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
       annotate_g4s(results[0].mrna, principal.sequence, principal.g4s);
       annotate_g4s(results[1].mrna, comparison.sequence, comparison.g4s);
 
-      var rest = require('restler');
-      var httputils = require('../../utils/httputils');
+
       var jsonData = { a : {id:principal.accession, seq:principal.sequence},
                        b : {id:comparison.accession, seq:comparison.sequence}};
       var url =httputils.local_endpoint(req) + "/alignment/cacheable";
