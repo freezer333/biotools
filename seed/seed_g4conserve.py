@@ -40,6 +40,7 @@ client = MongoClient()
 db = client[config['db']['name']]
 collect = db.mrna
 tax_collect = db.taxon
+gconserve_progress = db.g4conserve_progress
 #------------------------------------------------------------
 
 
@@ -126,10 +127,14 @@ def process_mrna(count, mrna):
                     collect.update({'accession':mrna['accession']}, {'$set': {'g4s': mrna['g4s']}})
                     print('{0: <10}'.format(count),  '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]), ' mapped ', c_count , 'conserved motifs of ', g_count)
 
-mcursor = collect.find(spec={'organism':p_organism},snapshot=True, timeout=False)
+mcursor = collect.find(spec={'organism':p_organism},timeout=False).sort("accession", 1)
 count = 1
 for record in mcursor:
-    process_mrna(count, record)
+    if gconserve_progress.find(spec={'accession':record['accession']},snapshot=True, timeout=False).count() < 1:
+        process_mrna(count, record)
+        gconserve_progress.insert({'accession' : record['accession']});
+    else:
+        print ("... ", record['accession'], " ...");
     count += 1
 mcursor.close()
 
