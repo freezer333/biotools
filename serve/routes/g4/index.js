@@ -52,6 +52,11 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
     accession : c
   }
 
+  var debug = require('debug')('cmap');
+  var elapsed_c_map;
+  var elapsed_p_map;
+  var start = new Date();
+
   async.parallel([
       function (callback) {
         core_routes.build_mrna_sequence(p, downstream,
@@ -60,6 +65,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
             },
             function(mrna, sequence) {
               callback(null, {mrna:mrna, sequence : sequence});
+              elapsed_p_map = (new Date())-start;
             });
       },
       function (callback) {
@@ -69,6 +75,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
             },
             function(mrna, sequence) {
               callback(null, {mrna:mrna, sequence :sequence});
+              elapsed_c_map = (new Date())-start;
             });
       }
     ],
@@ -77,6 +84,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
         res.status(404).end(err);
         return;
       }
+      start = new Date();
       principal.organism = results[0].mrna.organism;
       principal.taxon = results[0].mrna.taxon;
       principal.sequence = results[0].sequence;
@@ -90,6 +98,7 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
       annotate_g4s(results[0].mrna, principal.sequence, principal.g4s);
       annotate_g4s(results[1].mrna, comparison.sequence, comparison.g4s);
       var aligner = require('../../tools/align')
+
       var result = aligner.run(principal.sequence, comparison.sequence, { gapopen : 10, gapextend : 0.5},
           function(alignment) {
               var result = {
@@ -97,13 +106,16 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
                 comparison : comparison,
                 alignment : alignment
               };
-
-
+              var elapsed_align = (new Date()) - start;
+              start = new Date()
               process_aligned_sequences(result, function(err, result){
                 if ( err) {
                   res.status(404).end(err);
                 }
                 else {
+                  elapsed_conserve = new Date() - start;
+                  debug("p_gmap = " + elapsed_p_map/1000 + "s, p_cmap = " + elapsed_c_map/1000 + ",s align=" + elapsed_align/1000  +
+                        "s, conserve=" + elapsed_conserve/1000 + "s");
                   res.setHeader('Content-Type', 'application/json');
                   res.end(JSON.stringify(result));
                 }
@@ -122,10 +134,8 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
 function process_aligned_sequences(input, callback) {
 
   var conserve = require('../../utils/conserve.js')
-
   conserve.map_gaps(input.alignment.a, input.principal.g4s);
   conserve.map_gaps(input.alignment.b, input.comparison.g4s);
-
   conserve.compute_conservation(input.principal, input.comparison);
   callback(null, input);
 

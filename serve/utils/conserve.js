@@ -115,29 +115,35 @@ exports.conservationScore = function (p, c, p_length, c_length) {
 
 
 
-/// This probably needs to be optimized in C++ - it can
-/// be extremely compute-intensive with the right gene.
+
 exports.compute_conservation = function(p, c) {
-  p.g4s.forEach(function (g4) {
+    p.g4s.forEach(function (g4) {
       // compare with all comparison families
       g4.best_conserved_rep = getBestComparison(g4, p, c);
-      /*
-      This is too much of a load - need to move to C++
-      var overall_best = g4.best_conserved_rep;
-      if (overall_best) {
-        // we won't do this if the primary didn't match with anything - too weak.
-        // now check if any of the overlaps in principal are better
-        g4.overlaps.forEach(function(overlap) {
-          var cons = getBestComparison(overlap, p, c);
-          //console.log(cons.score.overall + " < " + overall_best.score.overall);
-          if ( cons && cons.score.overall > overall_best.score.overall) {
-            overall_best = cons;
-          }
-        });
-      }
-      g4.best_conserved_overall = overall_best;
-      */
+
+      /////////////////////////////////////////////////////////////////////////
+      // Skipping the overall comparison - for many seqeunces this
+      // ends up being 100x times slower because of all the overlaps
+      // in principal.  Anectodatally, it doesn't seem to be very different
+      // than best_rep - it may not be worth it.
+      //
+      //g4.best_conserved_overall = getBestOverallConserved(g4.best_conserved_rep);
   });
+}
+
+function getBestOverallConserved(best_rep) {
+  var overall_best = best_rep;
+  if (overall_best) {
+    // we won't do this if the primary didn't match with anything - too weak.
+    // now check if any of the overlaps in principal are better
+    g4.overlaps.forEach(function(overlap) {
+      var cons = getBestComparison(overlap, p, c);
+      if ( cons && cons.score.overall > overall_best.score.overall) {
+        overall_best = cons;
+      }
+    });
+    return overall_best;
+  }
 }
 
 function getBestComparison(g4, p, c) {
