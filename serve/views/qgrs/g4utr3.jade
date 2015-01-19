@@ -1,0 +1,21 @@
+extends ../layout
+block title
+  title Conserved G4 in the 3' UTR
+
+block content
+    .container(ng-controller='UTR3DatasetCtrl')
+      .page-header
+        h1
+          | Conserved G4&nbsp;
+          small.text-primary in the 3' UTR
+      
+      .info_table
+        legend Dataset Properties
+        p
+          label Organisim:
+        p
+          label Conservation Organisim:
+          
+        
+block scripts
+  script(src='/scripts/qgrs.js')

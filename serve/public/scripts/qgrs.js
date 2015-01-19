@@ -1,5 +1,6 @@
 
 var app = angular.module('app', []);
+
 var qgrsService = app.factory('qgrsService', function($http) {
   return {
     getRecord : function(id) {
@@ -9,6 +10,11 @@ var qgrsService = app.factory('qgrsService', function($http) {
     },
     getMRNARecord : function(accession) {
       return $http.get('/mrna/' + accession, {}).then(function(result) {
+        return result.data;
+      })
+    },
+    getUtr3Records : function() {
+      return $http.get('/g4/datasets/g4utr3/listings', {}).then(function(result) {
         return result.data;
       })
     },
@@ -35,6 +41,7 @@ var qgrsService = app.factory('qgrsService', function($http) {
   }
 
 });
+
 
 
 app.controller('QGRSEnrichmentCtrl', function($scope, $interval, qgrsService) {
@@ -151,4 +158,21 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
       return words[0];
   }
 
+});
+
+
+
+
+
+
+app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
+  console.log("here");
+  $scope.fetchSet = function() {
+    qgrsService.getUtr3Records().then(function(result) {
+        $scope.listings = result;
+        console.log(result);
+      });
+  }
+
+  $scope.fetchSet();
 });

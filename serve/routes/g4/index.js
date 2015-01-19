@@ -9,6 +9,9 @@ var httputils = require('../../utils/httputils');
 
 
 exports.routes = express.Router();
+var utr3 = require('./utr3');
+
+exports.routes.get('/datasets/g4utr3', utr3.main )
 
 exports.routes.get('/', function(req, res) {
   res.end("G4 module loaded");
