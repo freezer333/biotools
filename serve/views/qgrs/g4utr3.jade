@@ -18,6 +18,10 @@ block content
           | Human mRNA without mouse homologs in homologene were not included in this set.  A conservation
           | score of 0.95 was used as the screen for this set.
       .well
+        span.pull-right.text-primary &nbsp;
+          span(ng-show='search_done'){{listings.length}} results
+          span(ng-show='!search_done')
+              i.fa.fa-refresh.fa-spin
         p You may refine your search by filtering by tetrads, conservation, and by ontology terms for mRNA.
         form.form-horizntal
           fieldset
@@ -25,18 +29,18 @@ block content
               .col.col-sm-6
                 .form-group
                   label.control-label(for='filter.minTetrad') Minimum tetrads in motif
-                  input.form-control(type='number', min='3', step='1', ng-model='filter.minTetrad')
+                  input.form-control(type='number', min='3', max='8', step='1', ng-model='filter.minTetrad' ng-change='fetchSet()')
               .col.col-sm-6
                 .form-group
                   label.control-label(for='filter.minConservation') Minimum Conservation Score
-                  input.form-control(type='number', min='0.95', max='1.00', step='.01', ng-model='filter.minConservation')
+                  input.form-control(type='number', min='0.95', max='1.00', step='.01', ng-model='filter.minConservation', ng-change='fetchSet()')
             .row
               .col.col-sm-4
                 label.contol-label(for='filter.functions') mRNA has following Functions:
                 br
                 .badge_label_wrap(ng-repeat='v in filter.functions') 
                   | {{v}}
-                  button.btn.btn-danger.btn-xs
+                  button.btn.btn-danger.btn-xs(ng-click='remove_function(v)')
                     i.fa.fa-times
                 .alert.alert-info(ng-show="filter.functions.length == 0") None selected
               .col.col-sm-4
@@ -52,7 +56,7 @@ block content
                 br
                 .badge_label_wrap(ng-repeat='v in filter.processes') 
                   | {{v}}
-                  button.btn.btn-danger.btn-xs
+                  button.btn.btn-danger.btn-xs(ng-click='remove_process(v)')
                     i.fa.fa-times
                 .alert.alert-info(ng-show="filter.processes.length == 0") None selected
             .row

@@ -15,7 +15,7 @@ var qgrsService = app.factory('qgrsService', function($http) {
     },
 
     getUtr3Records : function(filter) {
-      return $http.get('/g4/datasets/g4utr3/listings', filter).then(function(result) {
+      return $http({method:"GET", url: '/g4/datasets/g4utr3/listings', params: filter}).then(function(result) {
         return result.data;
       })
     },
@@ -184,10 +184,13 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
 
 app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
   $scope.fetchSet = function() {
+    $scope.search_done = false;
     qgrsService.getUtr3Records($scope.filter).then(function(result) {
         $scope.listings = result;
+        $scope.search_done = true;
       });
   }
+  $scope.search_done = false;
   $scope.filter = {}
   $scope.filter.minTetrad = 3
   $scope.filter.minConservation = 0.95;
@@ -219,6 +222,12 @@ app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
   $scope.add_function = function(value) {
     $scope.filter.functions.push(value)
     $scope.apply_function_filter()
+    $scope.fetchSet();
+  }
+  $scope.remove_function = function(value) {
+    remove_from($scope.filter.functions, value);
+    $scope.apply_function_filter()
+    $scope.fetchSet();
   }
   $scope.apply_function_filter = function() {
     $scope.filtered_functions = $scope.functions.filter(function (item) {
@@ -230,10 +239,12 @@ app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
   $scope.add_component = function(value) {
     $scope.filter.components.push(value)
     $scope.apply_component_filter()
+    $scope.fetchSet();
   }
   $scope.remove_component = function(value) {
     remove_from($scope.filter.components, value);
     $scope.apply_component_filter()
+    $scope.fetchSet();
   }
   $scope.apply_component_filter = function() {
     $scope.filtered_components = $scope.listed_components.filter(function (item) {
@@ -246,6 +257,12 @@ app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
   $scope.add_process = function(value) {
     $scope.filter.processes.push(value)
     $scope.apply_process_filter()
+    $scope.fetchSet();
+  }
+  $scope.remove_process = function(value) {
+    remove_from($scope.filter.processes, value);
+    $scope.apply_process_filter()
+    $scope.fetchSet();
   }
   $scope.apply_process_filter = function() {
     $scope.filtered_processes = $scope.processes.filter(function (item) {

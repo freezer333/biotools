@@ -28,6 +28,11 @@ exports.processes = function (req, res) {
   })
 }
 exports.listings = function(req, res) {
+  var tetrads = req.query.minTetrad
+  var conservation = req.query.minTetrad
+  var functions = req.query.functions
+
+  console.log(functions);
   var unwind = {'$unwind':'$g4s'};
   var sort = {'$sort': {'gene_name':1}}
   var pipeline = []
