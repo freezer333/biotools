@@ -28,9 +28,8 @@ class SequencePageBuilder:
             "taxon_id" : self.taxon,
             "build": self.build
         }
-
         self.seq_collect.insert(record)
-        
+
     def purge(self, accession) :
         spec = {
             "accession" : accession,
@@ -52,6 +51,7 @@ class SequencePageBuilder:
                   line = data.decode('utf-8')
               else:
                   line = data
+                  line_num = 1
               if line_num > 0:
                   seq = line.strip()
                   cur_len = len(seq)

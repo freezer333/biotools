@@ -44,7 +44,6 @@ def reseed_chrom(organism, accession) :
 
 
 
-
 start = time.time()
 mcursor = gene_collect.find(spec={},snapshot=True, timeout=False)
 rcursor = mrna_collect.find(spec={},snapshot=True, timeout=False)
