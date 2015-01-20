@@ -112,6 +112,8 @@ block content
                 br
                 | (genomic)
               th QGRS Sequence
+              th Tetrads
+              th Conservation
           tbody
             tr(ng-repeat="mrna in listings")
               td
@@ -126,5 +128,7 @@ block content
               td.centered_col
                 i.fa.fa-check-circle-o(ng-show='mrna.g4s.isDownstream')
               td {{mrna.g4s.sequence}}
+              td {{mrna.g4s.tetrads}}
+              td {{mrna.g4s.conserved.score.overall | number:2 }}
 block scripts
   script(src='/scripts/qgrs.js')
