@@ -13,8 +13,26 @@ var qgrsService = app.factory('qgrsService', function($http) {
         return result.data;
       })
     },
-    getUtr3Records : function() {
-      return $http.get('/g4/datasets/g4utr3/listings', {}).then(function(result) {
+
+    getUtr3Records : function(filter) {
+      return $http.get('/g4/datasets/g4utr3/listings', filter).then(function(result) {
+        return result.data;
+      })
+    },
+    getUtr3Functions : function() {
+      return $http.get('/g4/datasets/g4utr3/functions', {}).then(function(result) {
+        return result.data;
+      })
+    },
+    getUtr3Components : function() {
+      return $http.get('/g4/datasets/g4utr3/components', {}).then(function(result) {
+        console.log(result)
+
+        return result.data;
+      })
+    },
+    getUtr3Processes : function() {
+      return $http.get('/g4/datasets/g4utr3/processes', {}).then(function(result) {
         return result.data;
       })
     },
@@ -166,12 +184,74 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
 
 app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
   $scope.fetchSet = function() {
-    qgrsService.getUtr3Records().then(function(result) {
+    qgrsService.getUtr3Records($scope.filter).then(function(result) {
         $scope.listings = result;
       });
   }
   $scope.filter = {}
   $scope.filter.minTetrad = 3
   $scope.filter.minConservation = 0.95;
+  $scope.filter.functions = [];
+  $scope.filter.components = [];
+  $scope.filter.processes = [];
+  qgrsService.getUtr3Functions().then(function(result) {
+      $scope.functions = result;
+      $scope.filtered_functions = result;
+    });
+  qgrsService.getUtr3Components().then(function(result) {
+      $scope.listed_components = result;
+      $scope.filtered_components = result;
+    });
+  qgrsService.getUtr3Processes().then(function(result) {
+      $scope.processes = result;
+      $scope.filtered_processes = result;
+    });
+
+
+  function remove_from(a, value) {
+    for (var i=a.length-1; i>=0; i--) {
+      if (a[i] === value) {
+          a.splice(i, 1);
+      }
+    }
+  }
+
+  $scope.add_function = function(value) {
+    $scope.filter.functions.push(value)
+    $scope.apply_function_filter()
+  }
+  $scope.apply_function_filter = function() {
+    $scope.filtered_functions = $scope.functions.filter(function (item) {
+      var search = RegExp( $scope.function_search, "i");
+      return item.match(search) && $scope.filter.functions.indexOf(item) == -1;
+    });
+
+  }
+  $scope.add_component = function(value) {
+    $scope.filter.components.push(value)
+    $scope.apply_component_filter()
+  }
+  $scope.remove_component = function(value) {
+    remove_from($scope.filter.components, value);
+    $scope.apply_component_filter()
+  }
+  $scope.apply_component_filter = function() {
+    $scope.filtered_components = $scope.listed_components.filter(function (item) {
+      var search = RegExp( $scope.component_search, "i");
+      return item.match(search) && $scope.filter.components.indexOf(item) == -1;
+    });
+  }
+
+
+  $scope.add_process = function(value) {
+    $scope.filter.processes.push(value)
+    $scope.apply_process_filter()
+  }
+  $scope.apply_process_filter = function() {
+    $scope.filtered_processes = $scope.processes.filter(function (item) {
+      var search = RegExp( $scope.process_search, "i");
+      return item.match(search) && $scope.filter.processes.indexOf(item) == -1;
+    });
+  }
   $scope.fetchSet();
 });

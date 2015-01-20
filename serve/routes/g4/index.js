@@ -13,7 +13,9 @@ var utr3 = require('./utr3');
 
 exports.routes.get('/datasets/g4utr3', utr3.main )
 exports.routes.get('/datasets/g4utr3/listings', utr3.listings )
-exports.routes.get('/datasets/g4utr3/ontology', utr3.ontology )
+exports.routes.get('/datasets/g4utr3/functions', utr3.functions )
+exports.routes.get('/datasets/g4utr3/components', utr3.listed_components )
+exports.routes.get('/datasets/g4utr3/processes', utr3.processes )
 
 exports.routes.get('/', function(req, res) {
   res.end("G4 module loaded");

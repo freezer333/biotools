@@ -31,9 +31,58 @@ block content
                   label.control-label(for='filter.minConservation') Minimum Conservation Score
                   input.form-control(type='number', min='0.95', max='1.00', step='.01', ng-model='filter.minConservation')
             .row
+              .col.col-sm-4
+                label.contol-label(for='filter.functions') mRNA has following Functions:
+                br
+                .badge_label_wrap(ng-repeat='v in filter.functions') 
+                  | {{v}}
+                  button.btn.btn-danger.btn-xs
+                    i.fa.fa-times
+                .alert.alert-info(ng-show="filter.functions.length == 0") None selected
+              .col.col-sm-4
+                label.contol-label(for='filter.components') mRNA has following Components:
+                br
+                .badge_label_wrap(ng-repeat='v in filter.components') 
+                  | {{v}}
+                  button.btn.btn-danger.btn-xs(ng-click='remove_component(v)')
+                    i.fa.fa-times
+                .alert.alert-info(ng-show="filter.components.length == 0") None selected
+              .col.col-sm-4
+                label.contol-label(for='filter.processes') mRNA has following Processes:
+                br
+                .badge_label_wrap(ng-repeat='v in filter.processes') 
+                  | {{v}}
+                  button.btn.btn-danger.btn-xs
+                    i.fa.fa-times
+                .alert.alert-info(ng-show="filter.processes.length == 0") None selected
+            .row
               .col.col-sm-12
-                span(ng-repeat="o in ontology")
-                  {{o}}
+                .btn.btn-primary.btn.sm(ng-click="show_ontology_listings = !show_ontology_listings") 
+                  span(ng-show='show_ontology_listings') Hide ontology listings
+                  span(ng-show='!show_ontology_listings') Show ontology listings
+                  
+            .row(ng-show='show_ontology_listings')
+              .col.col-sm-4
+                .form-group
+                  label.control-label(for='function_search') Find Functions to add to filter
+                  input.form-control(type='search', ng-model='function_search', ng-change='apply_function_filter()')
+                div(ng-repeat= 'v in filtered_functions') 
+                  span.btn.btn-success.btn-xs.pull-left(style='margin-right:10px', ng-click="add_function(v)") add
+                  p {{v}}
+              .col.col-sm-4
+                .form-group
+                  label.control-label(for='component_search') Find Components to add to filter
+                  input.form-control(type='search', ng-model='component_search', ng-change='apply_component_filter()')
+                div(ng-repeat= 'v in filtered_components') 
+                  span.btn.btn-success.btn-xs.pull-left(style='margin-right:10px', ng-click="add_component(v)") add
+                  p {{v}}
+              .col.col-sm-4
+                .form-group
+                  label.control-label(for='process_search') Find Processes to add to filter
+                  input.form-control(type='search', ng-model='process_search', ng-change='apply_process_filter()')
+                div(ng-repeat= 'v in filtered_processes') 
+                  span.btn.btn-success.btn-xs.pull-left(style='margin-right:10px', ng-click="add_process(v)") add
+                  p {{v}}
                 
       div(ng-show='listings.length > 0')
         h1 

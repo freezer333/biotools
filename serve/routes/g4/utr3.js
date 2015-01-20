@@ -9,8 +9,23 @@ exports.main = function(req, res) {
   res.render("qgrs/g4utr3", page);
 }
 
-exports.ontology = function (req, res) {
-  
+exports.functions = function (req, res) {
+  db.native.collection('g4utr3.meta').find({'key':'functions'}).toArray(function(err, docs) {
+      res.set('Content-Type', 'application/json');
+      res.end(JSON.stringify(docs[0].value));
+  })
+}
+exports.listed_components = function (req, res) {
+  db.native.collection('g4utr3.meta').find({'key':'components'}).toArray(function(err, docs) {
+      res.set('Content-Type', 'application/json');
+      res.end(JSON.stringify(docs[0].value));
+  })
+}
+exports.processes = function (req, res) {
+  db.native.collection('g4utr3.meta').find({'key':'processes'}).toArray(function(err, docs) {
+      res.set('Content-Type', 'application/json');
+      res.end(JSON.stringify(docs[0].value));
+  })
 }
 exports.listings = function(req, res) {
   var unwind = {'$unwind':'$g4s'};
@@ -18,7 +33,6 @@ exports.listings = function(req, res) {
   var pipeline = []
   pipeline.push(sort);
   pipeline.push(unwind);
-
 
   var cursor = db.native.collection('g4utr3').aggregate(pipeline, {
                    allowDiskUsage: true, cursor: {batchSize: 1000}});
