@@ -18,6 +18,9 @@ principal = 'Homo sapiens'
 comparison = 'Mus musculus'
 out_collection = 'g4utr3'
 
+db[out_collection].drop()
+db[out_collection+'.meta'].drop()
+
 print("=================================================================")
 print("Generating g4utr3 collection\n- Hiighly conserved G4 in 3'UTR")
 print("=================================================================")
@@ -57,8 +60,11 @@ pipeline = [
               }},
       {'$out' : out_collection}
     ]
-#mrna.aggregate(pipeline)
+
+mrna.aggregate(pipeline)
 print("Aggregation complete.  Results saved to", out_collection)
+results = db[out_collection].count()
+print(results, "mRNA found with highly conserved qgrs in 3'UTR region among", principal)
 print("=================================================================")
 
 
@@ -69,15 +75,8 @@ pipeline = [
     {'$group' : {'_id':None, "functions": {"$addToSet": '$ontology.functions'}}},
 ]
 results = db[out_collection].aggregate(pipeline)
-
-print("=================================================================")
 functions = results['result'][0]['functions'];
 functions.sort()
-for function in functions:
-    print( function);
-
-
-
 
 pipeline = [
     {'$project' : {'_id':0, 'ontology.components':1}},
@@ -85,13 +84,8 @@ pipeline = [
     {'$group' : {'_id':None, "components": {"$addToSet": '$ontology.components'}}},
 ]
 results = db[out_collection].aggregate(pipeline)
-print("=================================================================")
 components = results['result'][0]['components'];
 components.sort()
-for component in components:
-    print( component);
-
-
 
 pipeline = [
     {'$project' : {'_id':0, 'ontology.processes':1}},
@@ -99,14 +93,9 @@ pipeline = [
     {'$group' : {'_id':None, "processes": {"$addToSet": '$ontology.processes'}}},
 ]
 results = db[out_collection].aggregate(pipeline)
-print("=================================================================")
 processes = results['result'][0]['processes'];
 processes.sort()
-for process in processes:
-    print( process);
 
-
-print("=================================================================")
 print(len(functions), " functions");
 print(len(components), " components");
 print(len(processes), " processes");
