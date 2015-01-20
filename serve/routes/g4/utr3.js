@@ -9,20 +9,31 @@ exports.main = function(req, res) {
   res.render("qgrs/g4utr3", page);
 }
 
-
-exports.listings = function(req, res) {
-  db.native.collection('g4utr3').find({}, {}, function(err, cursor){
-    res.set('Content-Type', 'application/json');
-    cursor.stream().pipe(JSONStream.stringify()).pipe(res);
-  });
+exports.ontology = function (req, res) {
+  
 }
-/*
-  db.mrna.find(query, {gene_id : 1, accession : 1, gene_name : 1, organism:1, definition:1}, { skip: skip, limit: limit }, function(err, result){
-      if ( err ) {
-          res.status(404).end('Gene could not found');
-      }
-      else {
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify(result));
-      }
-  })*/
+exports.listings = function(req, res) {
+  var unwind = {'$unwind':'$g4s'};
+  var sort = {'$sort': {'gene_name':1}}
+  var pipeline = []
+  pipeline.push(sort);
+  pipeline.push(unwind);
+
+
+  var cursor = db.native.collection('g4utr3').aggregate(pipeline, {
+                   allowDiskUsage: true, cursor: {batchSize: 1000}});
+  var results = [];
+  var ontology = [];
+  cursor.on('error', function (err) {
+    res.status(401).end("Analysis pipeline failed - " + err);
+  })
+  cursor.on('data', function(data) {
+    results.push(data);
+  });
+  cursor.on('end', function() {
+    res.set('Content-Type', 'application/json');
+    res.end(JSON.stringify(results));
+  });
+
+
+}

@@ -144,7 +144,6 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
   }
 
   var makeRegionString = function(utr5, cds, utr3, downstream) {
-    console.log("regionstring");
     var words = [];
     if ( utr5) words.push("5'UTR")
     if ( cds) words.push("CDS")
@@ -166,13 +165,13 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
 
 
 app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
-  console.log("here");
   $scope.fetchSet = function() {
     qgrsService.getUtr3Records().then(function(result) {
         $scope.listings = result;
-        console.log(result);
       });
   }
-
+  $scope.filter = {}
+  $scope.filter.minTetrad = 3
+  $scope.filter.minConservation = 0.95;
   $scope.fetchSet();
 });

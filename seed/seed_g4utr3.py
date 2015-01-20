@@ -51,11 +51,67 @@ pipeline = [
                'utr_3' : {'$first' : '$utr_3'},
                'utr_5' : {'$first' : '$utr_5'},
                'orientation' : {'$first' : '$orientation'},
+               'ontology' : {'$first' : '$ontology'},
                'exons' : {'$first' : '$exons'},
                'end' : {'$first': '$end'}
               }},
       {'$out' : out_collection}
     ]
-mrna.aggregate(pipeline)
+#mrna.aggregate(pipeline)
 print("Aggregation complete.  Results saved to", out_collection)
 print("=================================================================")
+
+
+
+pipeline = [
+    {'$project' : {'_id':0, 'ontology.functions':1}},
+    {'$unwind': '$ontology.functions'},
+    {'$group' : {'_id':None, "functions": {"$addToSet": '$ontology.functions'}}},
+]
+results = db[out_collection].aggregate(pipeline)
+
+print("=================================================================")
+functions = results['result'][0]['functions'];
+functions.sort()
+for function in functions:
+    print( function);
+
+
+
+
+pipeline = [
+    {'$project' : {'_id':0, 'ontology.components':1}},
+    {'$unwind': '$ontology.components'},
+    {'$group' : {'_id':None, "components": {"$addToSet": '$ontology.components'}}},
+]
+results = db[out_collection].aggregate(pipeline)
+print("=================================================================")
+components = results['result'][0]['components'];
+components.sort()
+for component in components:
+    print( component);
+
+
+
+pipeline = [
+    {'$project' : {'_id':0, 'ontology.processes':1}},
+    {'$unwind': '$ontology.processes'},
+    {'$group' : {'_id':None, "processes": {"$addToSet": '$ontology.processes'}}},
+]
+results = db[out_collection].aggregate(pipeline)
+print("=================================================================")
+processes = results['result'][0]['processes'];
+processes.sort()
+for process in processes:
+    print( process);
+
+
+print("=================================================================")
+print(len(functions), " functions");
+print(len(components), " components");
+print(len(processes), " processes");
+
+
+db[out_collection+'.meta'].insert({'key':'functions', 'value': functions})
+db[out_collection+'.meta'].insert({'key':'processes', 'value': processes})
+db[out_collection+'.meta'].insert({'key':'components',  'value': components})

@@ -10,27 +10,68 @@ block content
           small.text-primary in the 3' UTR
       
       .info_table
-        legend Dataset Properties
+        p 
+          | This dataset contains all QGRS/G4 motifs found in the 3'UTR (or within 200 bases downstream)
+          | of human mRNA.  The QGRS are limited to only motifs with 3+ tetrads, and only those that
+          | are conserved in the mouse homolog of the human mRNA.
         p
-          label Organisim:
-        p
-          label Conservation Organisim:
-          
+          | Human mRNA without mouse homologs in homologene were not included in this set.  A conservation
+          | score of 0.95 was used as the screen for this set.
+      .well
+        p You may refine your search by filtering by tetrads, conservation, and by ontology terms for mRNA.
+        form.form-horizntal
+          fieldset
+            .row
+              .col.col-sm-6
+                .form-group
+                  label.control-label(for='filter.minTetrad') Minimum tetrads in motif
+                  input.form-control(type='number', min='3', step='1', ng-model='filter.minTetrad')
+              .col.col-sm-6
+                .form-group
+                  label.control-label(for='filter.minConservation') Minimum Conservation Score
+                  input.form-control(type='number', min='0.95', max='1.00', step='.01', ng-model='filter.minConservation')
+            .row
+              .col.col-sm-12
+                span(ng-repeat="o in ontology")
+                  {{o}}
+                
       div(ng-show='listings.length > 0')
-        h1 Search Results
+        h1 
+          | Search Results   
+          small.text-primary &nbsp;({{listings.length}} found)
+          button.pull-right.btn.btn-primary() Export to Excel
         table.table.table-striped.table-hover.table-bordered.table-condensed
           thead
             tr
-              th gene name
               th accession
+              th gene name
               th gene id
-              th # QGRS in 3'UTR
+              th QGRS id
+              th 
+                | Position 
+                br
+                | (nt. from start 
+                br
+                | of mRNA)
+              th 3'UTR
+              th 
+                | Downstream
+                br
+                | (genomic)
+              th QGRS Sequence
           tbody
             tr(ng-repeat="mrna in listings")
-              td {{mrna.gene_name}}
               td
                 a(href='/gui/mrna/{{mrna.accession}}'){{mrna.accession}}
+              td {{mrna.gene_name}}
               td {{mrna.gene_id}}
-              td {{mrna.g4s.length}}
+              td 
+                a(href='/gui/qgrs/{{mrna.g4s.id}}') {{mrna.g4s.id}}
+              td {{mrna.g4s.start}} - {{mrna.g4s.start + mrna.g4s.length}}
+              td.centered_col
+                i.fa.fa-check-circle-o(ng-show='mrna.g4s.is3Prime')
+              td.centered_col
+                i.fa.fa-check-circle-o(ng-show='mrna.g4s.isDownstream')
+              td {{mrna.g4s.sequence}}
 block scripts
   script(src='/scripts/qgrs.js')
