@@ -26,8 +26,6 @@ var qgrsService = app.factory('qgrsService', function($http) {
     },
     getUtr3Components : function() {
       return $http.get('/g4/datasets/g4utr3/components', {}).then(function(result) {
-        console.log(result)
-
         return result.data;
       })
     },
