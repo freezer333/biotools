@@ -165,8 +165,11 @@ for taxon_id in sorted(taxon_ids) :
 print("Creating indexes on seq collection");
 print(" + accession/start")
 seq_collect.create_index([("accession", pymongo.DESCENDING),("start", pymongo.ASCENDING)])
+seq_collect.create_index([("accession", pymongo.ASCENDING),("start", pymongo.ASCENDING)])
+seq_collect.create_index([("accession", pymongo.DESCENDING)])
 print(" + organism")
 seq_collect.create_index([("organism", pymongo.DESCENDING)])
+seq_collect.create_index([("organism", pymongo.ASCENDING)])
 print(" + build")
 seq_collect.create_index([("build", pymongo.DESCENDING)])
 print(" + taxon_id")

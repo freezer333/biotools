@@ -127,7 +127,7 @@ def process_mrna(count, mrna):
                     collect.update({'accession':mrna['accession']}, {'$set': {'g4s': mrna['g4s']}})
                     print('{0: <10}'.format(count),  '{0: <15}'.format(mrna['accession']), " x ", '{0: <15}'.format(comparisons[0]), ' mapped ', c_count , 'conserved motifs of ', g_count)
 
-def compute_conservation:
+
 mcursor = collect.find(spec={'organism':p_organism},timeout=False).sort("accession", 1)
 count = 1
 for record in mcursor:

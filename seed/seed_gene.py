@@ -191,3 +191,7 @@ for taxon_id in sorted(taxon_ids) :
 
 gene_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("gene_id", ASCENDING)])
 mrna_collect.create_index([("organism", ASCENDING), ("build", ASCENDING), ("accession", ASCENDING)])
+mrna_collect.create_index([("accession", ASCENDING)])
+mrna_collect.create_index([("gene_id", ASCENDING)])
+mrna_collect.create_index([("organism", ASCENDING)])
+gene_collect.create_index([("organism", ASCENDING)])
