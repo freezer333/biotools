@@ -51,6 +51,7 @@ function createAlignmentSchema(mongoose) {
     var schem = new mongoose.Schema({
             principal_id : { type: String, index: true },
             comparison_id : { type: String, index: true },
+            downstream : {type : Number, index: true },
             principal_seq: Buffer,
             comparison_seq: Buffer,
             alignment_type : String,
@@ -74,8 +75,8 @@ function inflateAlignment(callback, compressed) {
 }
 
 
-exports.getAlignment = function (principal, comparison, callback) {
-  alignments.findOne({principal_id:principal, comparison_id : comparison}, function(err, record) {
+exports.getAlignment = function (principal, comparison, downstream, callback) {
+  alignments.findOne({principal_id:principal, comparison_id : comparison, downstream : downstream}, function(err, record) {
       if ( err ) {
           callback(err);
           return;
@@ -93,6 +94,7 @@ exports.getAlignment = function (principal, comparison, callback) {
             callback(err, {
               principal_id : principal,
               comparison_id : comparison,
+              downstream : downstream,
               principal_seq : results[0],
               comparison_seq : results[1],
               date : record.date

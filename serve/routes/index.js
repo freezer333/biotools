@@ -150,7 +150,7 @@ exports.mrna_ontology = function(req, res) {
 
 exports.mrna_sequence = function (req, res){
     var accession = req.params.accession;
-    var downstream = req.query.downstream | 0
+    var downstream = parseInt(req.query.downstream || 0)
     var start = req.params.start || 0;
     var end = req.params.end || -1;
     exports.build_mrna_sequence(accession, downstream,

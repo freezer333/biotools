@@ -36,7 +36,7 @@ function annotate_g4s(mrna, sequence, g4s) {
       g4.is5Prime = g4_start <= cds_start
       g4.isCDS = g4_start >= cds_start && g4_start <= cds_end || g4_end >= cds_start && g4_end <= cds_end
       g4.is3Prime = g4_start >= cds_end && g4_start <= end || g4_end >= cds_end && g4_end <= end
-      g4.isDownstream = g4_end >= end
+      g4.isDownstream = g4_end >= mrna.utr_3.end;
     }
 
     g4.overlaps.forEach(function (overlap, index) {
@@ -47,7 +47,7 @@ function annotate_g4s(mrna, sequence, g4s) {
 exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
   var p = req.params.principal;
   var c = req.params.comparison;
-  var downstream = req.query.downstream | 0;
+  var downstream = parseInt(req.query.downstream || 0);
 
   var principal = {
     time : new Date(),
@@ -108,7 +108,8 @@ exports.routes.get('/mrna/:principal/:comparison/cmap', function(req, res) {
 
 
       var jsonData = { a : {id:principal.accession, seq:principal.sequence},
-                       b : {id:comparison.accession, seq:comparison.sequence}};
+                       b : {id:comparison.accession, seq:comparison.sequence},
+                       downstream:downstream};
       var url =httputils.local_endpoint(req) + "/alignment/cacheable";
 
       rest.postJson(url, jsonData).on('complete', function(alignment, response) {
