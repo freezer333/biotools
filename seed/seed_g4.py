@@ -110,7 +110,7 @@ def process_mrna(count, mrna, start_time):
                 g4_list.append(g4)
                 id += 1;
 
-            #collect.update({'_id':mrna['_id']}, {'$set': {'g4s': g4_list}})
+            collect.update({'_id':mrna['_id']}, {'$set': {'g4s': g4_list}})
 
 
             after = time.time()

@@ -11,7 +11,7 @@ import time
 sys.path.append("../util")
 import g
 
-skip_existing = True
+skip_existing = False
 
 
 config = configparser.ConfigParser()
