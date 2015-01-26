@@ -203,7 +203,7 @@ exports.getSequence = function(accession, start, end, final_callback) {
                 if ( processed_ranges[i].seq )
                     retval += processed_ranges[i].seq;
                 else {
-                    if ( !error) {
+                    if ( !error && i != processed_ranges.length-1) {
                       error = true;
                       final_callback("Range was invalid", null);
                     }

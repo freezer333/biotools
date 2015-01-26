@@ -81,8 +81,8 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                         }
                         db.getSequence(mrna.chrom, r.start, r.end, function(err, result) {
                             if ( err ) {
-                                console.log("Downstream sequence range was not found");
-                                /*error('Sequence range on chromosome ' + mrna.chrom + ' could not found');*/
+                                console.log("Downstream sequence range was not found for " + mrna.accession);
+                                success(mrna, sequence, 0);
                                 return;
                             }
                             else {
@@ -91,12 +91,12 @@ exports.build_mrna_sequence = function (accession, downstream, error, success) {
                                     ds =  seq_utils.reverse_complement(ds);
                                 }
                                 sequence += ds;
-                                success(mrna, sequence);
+                                success(mrna, sequence, ds.length);
                             }
                         });
                     }
                     else {
-                        success(mrna, sequence);
+                        success(mrna, sequence, 0);
                     }
 
 

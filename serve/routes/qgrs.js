@@ -172,13 +172,14 @@ exports.qgrs_mrna = function(req, res) {
           res.status(404).end('mRNA sequence data could not be found');
           return;
       },
-      function(mrna, sequence) {
+      function(mrna, sequence, downstream_included) {
         if ( !error) {
           var output = {
             time : new Date(),
             qgrs_map_version : qgrs_version,
             accession : accession,
             sequence: sequence,
+            downstream:downstream_included,
             result : ""
           }
           var r = JSON.parse(qgrs_module.find(sequence));
