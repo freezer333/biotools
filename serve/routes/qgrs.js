@@ -75,6 +75,7 @@ exports.qgrs_overlaps = function(req, res){
     var g4id = req.params.g4id;
     var g4;
     var g4_record;
+    var g4_start;
 
 
     async.waterfall([
@@ -93,9 +94,15 @@ exports.qgrs_overlaps = function(req, res){
             });
         },
         function(mrna, callback){
+            if ( !mrna || !mrna.g4s) {
+              callback("The given mRNA does not have any G4 motifs", null);
+              return;
+            }
             g4 = mrna.g4s.filter(function (g4) {
                 return g4.id == g4id;
             })[0];
+
+            g4_start = g4.range.start;
 
             downstream = g4.isDownstream ? 200 : 0;
             g4_record = g4;
@@ -114,6 +121,14 @@ exports.qgrs_overlaps = function(req, res){
         function(g4s, callback){
             var g = g4s[0];
             g.overlaps = g.overlaps.filter(filter.apply);
+            g.overlaps.forEach(function (o) {
+              // overlaps are relative to the start position of the parent
+              o.start+= g4_start;
+              o.tetrad1 += g4_start;
+              o.tetrad2 += g4_start;
+              o.tetrad3 += g4_start;
+              o.tetrad4 += g4_start;
+            });
             callback(null, g);
         }
     ], function (err, g4) {
