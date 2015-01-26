@@ -1,6 +1,6 @@
 {
   "name" : "qgrs",
-  "version" : "v0.2.4"
+  "version" : "v0.2.6"
   , "scripts" : {
       "preinstall" : "node-gyp configure && node-gyp build"
       , "preuninstall" : "rm -rf build/*"

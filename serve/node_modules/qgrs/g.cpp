@@ -4,6 +4,7 @@
 #include <cmath>
 #include <sstream>
 #include <ctime>
+#include <algorithm>
 using namespace std;
 
 
@@ -286,9 +287,13 @@ public:
     vector<G4> overlaps;
 };
 
+bool operator< (const G4 &left, const G4 &right) {
+    return left.start < right.start;
+}
+
 
 string find(string sequence, short min_tetrads, short min_score) {
-    queue <G4> raw_g4s;
+    vector <G4> raw_g4s;
     queue <G4Candidate> cands;
 
     seedQ(cands, sequence, min_tetrads);
@@ -298,7 +303,7 @@ string find(string sequence, short min_tetrads, short min_score) {
         if ( cand.complete() ) {
             if ( cand.viable(min_score)) {
                 G4 g(cand);
-                raw_g4s.push(g);
+                raw_g4s.push_back(g);
             }
         }
         else {
@@ -310,10 +315,13 @@ string find(string sequence, short min_tetrads, short min_score) {
             }
         }
     }
+
+    std::sort(raw_g4s.begin(), raw_g4s.end());
+
     vector< vector<G4> > fams;
     while (!raw_g4s.empty() ) {
-        G4 g = raw_g4s.front();
-        raw_g4s.pop();
+        G4 g = raw_g4s[0];
+        raw_g4s.erase (raw_g4s.begin());
         bool newFam = true;
         for (std::vector< vector<G4> >::iterator it = fams.begin() ; it != fams.end(); ++it) {
             if ( belongsin(g, *it) ) {
@@ -332,7 +340,7 @@ string find(string sequence, short min_tetrads, short min_score) {
 
 
     for (vector< vector<G4> >::iterator fam_it = fams.begin() ; fam_it != fams.end(); ++fam_it) {
-         short highest = 0;
+        short highest = 0;
         G4 final;
         for (vector<G4>::iterator it = fam_it->begin() ; it != fam_it->end(); ++it) {
             if ( it->gscore > highest ) {
@@ -348,6 +356,9 @@ string find(string sequence, short min_tetrads, short min_score) {
         }
         g4s.push_back(final);
     }
+
+
+
 
     stringstream out;
     out << "{\"results\" : [";
