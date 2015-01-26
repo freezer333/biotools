@@ -58,7 +58,6 @@ app.controller('mRNARecordCtrl', function($scope, mRNAService) {
       });
   }
   $scope.renderg4 = function(g4) {
-    console.log(g4);
     return renderg4(g4);
   }
 });
