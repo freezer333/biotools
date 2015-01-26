@@ -71,7 +71,7 @@ block content
             tr(ng-repeat="g4 in mrna.g4s")
               td
                 a(href='/gui/qgrs/{{g4.id}}') {{g4.id}}
-              td.g4seq {{g4.sequence}}
+              td.g4seq(ng-bind-html="renderg4(g4)") 
               td.g4tetrads {{g4.tetrads}}
               td.g4loop {{g4.y1}} | {{g4.y2}} | {{g4.y3}}
               td {{g4.gscore}}

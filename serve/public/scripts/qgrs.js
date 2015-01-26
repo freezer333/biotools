@@ -1,5 +1,6 @@
 
-var app = angular.module('app', []);
+
+var app = angular.module('app', ['ngSanitize']);
 
 var qgrsService = app.factory('qgrsService', function($http) {
   return {
@@ -148,7 +149,6 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
   $scope.fetchRecord = function(id) {
     qgrsService.getRecord(id).then(function(result) {
         $scope.qgrs = result;
-        console.log(result);
         $scope.regionString = makeRegionString(result.is5Prime, result.isCDS, result.is3Prime, result.isDownstream);
         $scope.loaded = result != null;
       });
@@ -159,13 +159,18 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
       });
   }
 
+  $scope.renderg4 = function(g4) {
+    if ( g4)
+      return renderg4(g4);
+    return ""
+  }
+
   var makeRegionString = function(utr5, cds, utr3, downstream) {
     var words = [];
     if ( utr5) words.push("5'UTR")
     if ( cds) words.push("CDS")
     if ( utr3) words.push("3'UTR")
     if ( downstream) words.push("Downstream from poly(A) site")
-    console.log(words);
     if ( words.length > 1 ) {
       return words.join (' and ');
     }
@@ -180,7 +185,7 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
 
 
 
-app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
+app.controller('UTR3DatasetCtrl', function($scope, $sce, qgrsService) {
   $scope.fetchSet = function() {
     $scope.search_done = false;
     qgrsService.getUtr3Records($scope.filter).then(function(result) {
@@ -208,6 +213,11 @@ app.controller('UTR3DatasetCtrl', function($scope, qgrsService) {
       $scope.filtered_processes = result;
     });
 
+  $scope.renderg4 = function(g4) {
+     if ( g4)
+       return renderg4(g4);
+      return ""
+  }
 
   function remove_from(a, value) {
     for (var i=a.length-1; i>=0; i--) {

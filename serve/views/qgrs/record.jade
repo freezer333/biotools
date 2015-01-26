@@ -27,8 +27,11 @@ block content
       .info_table
           legend QGRS Properties
           p
+            label Location:
+            span {{qgrs.start}} - {{qgrs.start + qgrs.length}}
+          p
             label Sequence:
-            span.g4seq {{qgrs.sequence}}
+            span(ng-bind-html="renderg4(qgrs)")
           p
             label Tetrads:
             span.g4tetrads {{qgrs.tetrads}}
@@ -55,7 +58,7 @@ block content
               th location
           tbody
             tr(ng-repeat="g4 in qgrs.overlaps")
-              td.g4seq {{g4.sequence}}
+              td.g4seq(ng-bind-html="renderg4(g4)") 
               td.g4tetrads {{g4.tetrads}}
               td.g4loop {{g4.y1}} | {{g4.y2}} | {{g4.y3}}
               td {{g4.gscore}}

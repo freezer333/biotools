@@ -127,7 +127,7 @@ block content
                 i.fa.fa-check-circle-o(ng-show='mrna.g4s.is3Prime')
               td.centered_col
                 i.fa.fa-check-circle-o(ng-show='mrna.g4s.isDownstream')
-              td {{g4(mrna.g4s)}}
+              td.g4(ng-bind-html="renderg4(mrna.g4s)") 
               td {{mrna.g4s.tetrads}}
               td {{mrna.g4s.conserved.score.overall | number:2 }}
 block scripts
