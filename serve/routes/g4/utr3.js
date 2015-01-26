@@ -41,7 +41,6 @@ function contains_any(haystack, ns) {
   var i = needles.filter(function(n) {
             return haystack.indexOf(n) != -1
           });
-  console.log(i);
   return i.length > 0;
 }
 exports.listings = function(req, res) {
@@ -81,18 +80,15 @@ exports.listings = function(req, res) {
     res.status(404).end("Analysis pipeline failed - " + err);
   })
   cursor.on('data', function(data) {
-    /// This is a (pragramming) time saver because aggregation would make this a pain (more unwinds)
+    /// This is a (programming) time saver because aggregation would make this a pain (more unwinds)
     /// This data set is pretty small - not a big deal here.
     if ( functions.length > 0 && (!data.ontology || !contains_any(data.ontology.functions, functions))) {
-      console.log("FAILED FUNCTIONS");
       return;
     }
     if ( components.length > 0 && (!data.ontology || !contains_any(data.ontology.components, components))) {
-      console.log("FAILED components");
       return;
     }
     if ( processes.length > 0 && (!data.ontology || !contains_any(data.ontology.processes, processes))) {
-      console.log("FAILED processes");
       return;
     }
     results.push(data);
