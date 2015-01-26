@@ -164,7 +164,7 @@ exports.input = function(req, res) {
 
 exports.qgrs_mrna = function(req, res) {
   var accession = req.params.accession;
-  var downstream = req.query.downstream | 0;
+  var downstream = parseInt(req.query.downstream || 0);
   var error = false;
   core_routes.build_mrna_sequence(accession, downstream,
       function(err) {

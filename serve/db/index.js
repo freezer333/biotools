@@ -143,7 +143,6 @@ exports.getSequence = function(accession, start, end, final_callback) {
         return;
     }
     if ( start == end ) {
-
         final_callback(null,
         {
             accession : accession,
