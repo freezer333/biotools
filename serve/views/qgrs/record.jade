@@ -47,20 +47,24 @@ block content
 
       div(ng-show='qgrs.overlaps && qgrs.overlaps.length > 0')
         legend.text-primary Overlapping motifs
-        p The following QGRS motifs overlap with this QGRS
+        p The following QGRS motifs overlap with this QGRS ("this" QGRS is highlighted at the top of the table)
         table.table.table-striped.table-hover.table-bordered.table-condensed
           thead
             tr
               th sequence
               th tetrads
-              th loops
               th gscore
               th location
           tbody
+            tr(style="background-color:#e74c3c")
+              td.g4seq(ng-bind-html="render_overlapped_g4(qgrs, qgrs)") 
+              td.g4tetrads {{qgrs.tetrads}}
+              td {{qgrs.gscore}}
+              td {{qgrs.start}} - {{qgrs.start + qgrs.length}}
+              
             tr(ng-repeat="g4 in qgrs.overlaps")
-              td.g4seq(ng-bind-html="renderg4(g4)") 
+              td.g4seq(ng-bind-html="render_overlapped_g4(qgrs, g4)") 
               td.g4tetrads {{g4.tetrads}}
-              td.g4loop {{g4.y1}} | {{g4.y2}} | {{g4.y3}}
               td {{g4.gscore}}
               td {{g4.start}} - {{g4.start + g4.length}}
 

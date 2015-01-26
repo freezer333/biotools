@@ -165,6 +165,11 @@ app.controller('QGRSRecordCtrl', function($scope, qgrsService) {
     return ""
   }
 
+  $scope.render_overlapped_g4 = function(parent, overlapped) {
+    return render_overlapped_g4(parent, overlapped);
+
+  }
+
   var makeRegionString = function(utr5, cds, utr3, downstream) {
     var words = [];
     if ( utr5) words.push("5'UTR")
