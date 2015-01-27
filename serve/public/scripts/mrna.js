@@ -2,12 +2,14 @@
 var app = angular.module('app', ['ngSanitize']);
 var mRNAService = app.factory('mRNAService', function($http) {
   return {
-    find : function(accession, organism, ontology, annotations, skip, limit) {
+    find : function(filter, skip, limit) {
       return $http({method:"GET", url: '/mrna/' + skip + "/" + limit, params: {
-          accession : accession,
-          organism : organism,
-          ontology : ontology,
-          annotations : annotations
+          accession : filter.accession,
+          organism : filter.organism,
+          ontology : filter.ontology,
+          gene_name : filter.gene_name,
+          gene_id : filter.gene_id,
+          annotations : filter.annotations_only
       }}).then(function(result) {
           return result.data;
       });
@@ -38,7 +40,7 @@ app.controller('mRNACtrl', function($scope, mRNAService) {
 
   $scope.search = function() {
     $scope.listings = [];
-    mRNAService.find($scope.filter.accession, $scope.filter.organism, $scope.filter.ontology, $scope.filter.annotations_only, $scope.skip, $scope.limit).then(function(result) {
+    mRNAService.find($scope.filter, $scope.skip, $scope.limit).then(function(result) {
         $scope.listings = result;
     });
   }

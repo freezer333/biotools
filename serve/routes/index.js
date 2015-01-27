@@ -186,12 +186,17 @@ exports.mrna_api = function(req, res) {
 
 exports.build_mrna_query = function (req, additional) {
   var accession_list = req.query.accession || "";
+  var gene_list = req.query.gene_name || "";
+  var gene_id_list = req.query.gene_id || "";
   var ontology_list = req.query.ontology || "";
-  console.log("Building mrna query - accessions:  " + accession_list);
   var accessions = accession_list ? accession_list.split(';').map(function(str){ return str.trim()}) : null;
   var ontology_terms = ontology_list ? ontology_list.split(';').map(function(str) { return str.trim()}) : null;
+  var gene_names = gene_list ? gene_list.split(';').map(function(str) { return str.trim()}) : null;
+  var gene_ids = gene_id_list ? gene_id_list.split(';').map(function(str) { return str.trim()}) : null;
   var selections = [];
   if ( accessions )                       selections.push({accession: {'$in' : accessions} });
+  if ( gene_names )                       selections.push({gene_name: {'$in' : gene_names} });
+  if ( gene_ids )                         selections.push({gene_id: {'$in' : gene_ids} });
   if ( req.query.annotations == 'true')   selections.push({cds : {'$exists': true}});
   if ( req.query.organism)                selections.push({organism: req.query.organism});
   if ( ontology_terms)   {
@@ -215,6 +220,7 @@ exports.build_mrna_query = function (req, additional) {
   else if ( selections.length > 1) {
     query['$and'] = selections;
   }
+  console.log(query)
   return query;
 }
 

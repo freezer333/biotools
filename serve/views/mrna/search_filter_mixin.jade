@@ -11,6 +11,15 @@ mixin mrna_search_filter()
   .row
     .col-sm-8
       .form-group
+        label.control-label(for='filter.gene_name') Gene name (separate by spaces or semi-colons)
+        textarea.form-control(ng-model='filter.gene_name')
+    .col-sm-4
+      .form-group
+        label.control-label(for='filter.gene_id') Gene id (separate by spaces or semi-colons)
+        textarea.form-control(ng-model='filter.gene_id')
+  .row
+    .col-sm-8
+      .form-group
         label.control-label(for='filter.ontology') Ontology terms (separate by semi-colons)
         textarea.form-control(ng-model='filter.ontology', data-role="tagsinput")
     .col-sm-4
