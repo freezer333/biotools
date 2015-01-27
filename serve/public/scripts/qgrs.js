@@ -283,5 +283,21 @@ app.controller('UTR3DatasetCtrl', function($scope, $sce, qgrsService) {
       return item.match(search) && $scope.filter.processes.indexOf(item) == -1;
     });
   }
+
+  $scope.excel_url = function () {
+    var filter = "";
+    $scope.filter.functions.forEach(function (o) {
+      filter += "functions=" + o + "&";
+    })
+    $scope.filter.components.forEach(function (o) {
+      filter += "components=" + o + "&";
+    })
+    $scope.filter.processes.forEach(function (o) {
+      filter += "processes=" + o + "&";
+    })
+    filter += "minTetrad=" + $scope.filter.minTetrad + "&";
+    filter += "minConservation=" + $scope.filter.minConservation.toFixed(2);
+    return '/g4/datasets/g4utr3/listings?output=excel&' + filter;
+  }
   $scope.fetchSet();
 });

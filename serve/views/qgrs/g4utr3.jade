@@ -92,7 +92,7 @@ block content
         h1 
           | Search Results   
           small.text-primary &nbsp;({{listings.length}} found)
-          button.pull-right.btn.btn-primary() Export to Excel
+          a.pull-right.btn.btn-primary(ng-href="{{excel_url()}}") Export to Excel
         table.table.table-striped.table-hover.table-bordered.table-condensed
           thead
             tr
