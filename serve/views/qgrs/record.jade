@@ -48,16 +48,43 @@ block content
             label Region:
             {{regionString}}
 
+      div(ng-show='qgrs.conserved && qgrs.conserved.length > 0')
+        legend.text-primary Conserved motifs
+        p The following motifs were found in homologous genes in other organisms and exhibit very similar characteristics and locations
+        table.table.table-striped.table-hover.table-bordered.table-condensed
+          thead
+            tr
+              th organism
+              th accession
+              th id
+              th conservation score
+              th sequence
+              th tetrads
+              th gscore
+              th location
+          tbody
+            tbody
+              tr(ng-repeat="c in qgrs.conserved")
+                th {{c.comparison_mrna.organism}}
+                th 
+                  a(href='/gui/mrna/{{c.comparison_mrna.accession}}'){{c.comparison_mrna.accession}}
+                th 
+                  a(href='/gui/qgrs/{{c.comparison_g4.id}}'){{c.comparison_g4.id}}
+                th {{c.score.overall  | number:2 }}
+                td.g4seq(ng-bind-html="renderg4(c.comparison_g4)") 
+                td.g4tetrads {{c.comparison_g4.tetrads}}
+                td {{c.comparison_g4.gscore}}
+                td {{c.comparison_g4.start}} - {{c.comparison_g4.start + c.comparison_g4.length}}
       div(ng-show='qgrs.overlaps && qgrs.overlaps.length > 0')
         legend.text-primary Overlapping motifs
         p The following QGRS motifs overlap with this QGRS ("this" QGRS is highlighted at the top of the table)
         table.table.table-striped.table-hover.table-bordered.table-condensed
           thead
             tr
-              th sequence
-              th tetrads
-              th gscore
-              th location
+                th sequence
+                th tetrads
+                th gscore
+                th location
           tbody
             tr(style="background-color:#e74c3c")
               td.g4seq(ng-bind-html="render_overlapped_g4(qgrs, qgrs)") 
