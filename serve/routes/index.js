@@ -220,7 +220,6 @@ exports.build_mrna_query = function (req, additional) {
   else if ( selections.length > 1) {
     query['$and'] = selections;
   }
-  console.log(query)
   return query;
 }
 
@@ -229,7 +228,7 @@ exports.mrna_list = function(req, res) {
     var skip = req.params.skip || 0;
     var limit = req.params.limit || 100;
     var query = exports.build_mrna_query(req);
-    console.log(query);
+
     db.mrna.find(query, {gene_id : 1, accession : 1, gene_name : 1, organism:1, definition:1}, { skip: skip, limit: limit }, function(err, result){
         if ( err ) {
             res.status(404).end('Gene could not found');
