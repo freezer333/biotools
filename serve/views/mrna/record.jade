@@ -14,6 +14,9 @@ block content
         p
           label Organisim:
           {{mrna.organism}}
+        p 
+          label Gene
+          {{mrna.gene_name}}  {{mrna.gene_id}}
         p
           label Gene Locus:
           a(title='Click for full genomic sequence (includes introns)', href='/chrom/{{mrna.chrom}}/{{mrna.start}}/{{mrna.end}}?orientation={{mrna.orientation}}', target='_blank')
@@ -21,22 +24,24 @@ block content
             | {{mrna.start}} - {{mrna.end}} ( {{mrna.orientation}} )
         p
           label Exons
-          {{mrna.exons.length}} exons, {{mrna.length}} nt.
+          {{mrna.exons.length}} exons 
+          span(ng-show='mrna.length'), {{mrna.length}} nt.
 
-        p
+        p(ng-show='mrna.utr_5')
           label 5'UTR
           {{mrna.utr_5.start}} - {{mrna.utr_5.end}} ({{mrna.utr_5.end-mrna.utr_5.start}})
-        p
+        p(ng-show='mrna.cds')
           label CDS
           {{mrna.cds.start}} - {{mrna.cds.end}} ({{mrna.cds.end-mrna.cds.start}})
-        p
+        p(ng-show='mrna.utr_3')
           label 3'UTR
           {{mrna.utr_3.start}} - {{mrna.utr_3.end}} ({{mrna.utr_3.end-mrna.utr_3.start}})
 
         a(href='/mrna/{{mrna.accession}}/sequence', target='_blank', title='Click for transcript sequence (includes 5\' and 3\'UTR, and CDS of mRNA)') Full mRNA Sequence
 
-      legend.text-primary Ontology
-      .info_table
+      
+      legend.text-primary(ng-show='mrna.ontology') Ontology
+      .info_table(ng-show='mrna.ontology')
         p
           label Components
           br
