@@ -102,6 +102,10 @@ exports.qgrs_overlaps = function(req, res){
                 return g4.id == g4id;
             })[0];
 
+            if ( !g4 ) {
+              callback("The given mRNA (" + mrna.accession + ") does not have any G4 motifs with id = " + g4id, null);
+              return
+            }
             g4_start = g4.range.start;
 
             downstream = g4.isDownstream ? 200 : 0;
