@@ -1,6 +1,7 @@
 
 var db = require("../../db");
 var JSONStream = require('JSONStream')
+var xlsx = require('node-xlsx');
 
 exports.main = function(req, res) {
   var page = {}
@@ -51,6 +52,7 @@ exports.listings = function(req, res) {
   var processes = req.query.processes || []
   var unwind = {'$unwind':'$g4s'};
   var sort = {'$sort': {'gene_name':1}}
+  var output_type = req.query.output || "json";
   var pipeline = []
   pipeline.push(sort);
   pipeline.push(unwind);
@@ -94,8 +96,26 @@ exports.listings = function(req, res) {
     results.push(data);
   });
   cursor.on('end', function() {
-    res.set('Content-Type', 'application/json');
-    res.end(JSON.stringify(results));
+    if ( output_type == "json") {
+        res.set('Content-Type', 'application/json');
+        res.end(JSON.stringify(results));
+    }
+    else {
+      var rows = [];
+      rows.push ( ["accession", "gene name", "gene id", "qgrs id", "position", "3'UTR", "Downstream", "Sequence", "tetrads", "conservation"])
+      results.forEach(function (listing){
+        rows.push([listing.accession, listing.gene_name, listing.gene_id, listing.g4s.id, (listing.g4s.start + " - " + (listing.g4s.start + listing.g4s.length)),
+                  listing.g4s.is3Prime, listing.g4s.isDownstream, listing.g4s.sequence, listing.g4s.tetrads, listing.g4s.conserved.score.overall]);
+      });
+      var buffer = xlsx.build([{
+        name: "Conserved (Mus musculus) G4 in Homo sapien 3'UTR",
+        data: rows
+      }]);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+      res.setHeader("Content-Disposition", "attachment; filename=" + "g4utr3conserved.xlsx");
+      res.end(buffer);
+    }
+
   });
 
 
