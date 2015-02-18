@@ -1,0 +1,117 @@
+import urllib.request
+import shutil
+import os
+import numpy as np
+import re
+import requests
+
+from pymongo import MongoClient
+client = MongoClient()
+db = client.chrome
+collect = db.mrna
+
+
+mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)
+
+def convert(n):
+    try:
+        return int(n)
+    except ValueError:
+        return float(n + 0.5)
+
+
+
+def getLen(mrna):
+	length = 0 
+
+	if (mrna['accession'] == "NM_002052.3" or mrna['accession'] == "NM_005512.2"):
+		return 0
+
+	url = 'http://localhost:3000/qgrs/mrna/' + mrna['accession']+ '/density'
+	response = requests.get(url)
+	if response.status_code == requests.codes.ok :
+		data = response.json()
+		length = data['density']['utr3']['length']
+
+	
+	if (length is None):
+		print ("x")
+	else:
+		if (length <= 200):
+			print (length)
+	return length
+		
+ 
+
+def hasU (record, numU):
+	hasU = 0
+	if 'u_rich_downstream' in record:
+		u_Elements = record['u_rich_downstream']
+		for u in u_Elements:
+			order = convert (u['order'])
+			if order == numU:
+				hasU = 1
+	return hasU
+
+def getGroup (le):
+	leng = 0
+	if (le is None):
+		leng = -1
+	else:
+		leng = convert(le)
+		leng = float(leng/5)
+		leng = convert (leng)
+	return leng
+
+def hasG (record):
+	hasG = 0
+	if 'g4s' in record:
+		g4s = record['g4s']
+		for g in g4s:
+			if g ['isDownstream']:
+				return 1
+	return hasG
+
+
+
+
+l=0
+group = 0
+total = dict()
+URS = dict()
+URS_QGRS = dict()
+for record in mcursor:
+	l = getLen(record)
+	group = getGroup(l)
+
+	if (group != -1):
+		if group in total:
+			total[group] += 1
+		else:
+			total[group] = 1
+
+		if (hasU(record, 5) == 1):
+			if group in URS:
+				URS[group] += 1
+			else:
+				URS[group] = 1
+
+			if (hasG (record) == 1):
+				if group in URS_QGRS:
+					URS_QGRS[group] += 1
+				else:
+					URS_QGRS[group] = 1
+
+
+
+
+
+for keys,values in cars.items():
+    print(keys, values)
+print ("*****************************************")
+for keys,values in URS.items():
+    print(keys, values)
+print ("*****************************************")
+for keys,values in URS_QGRS.items():
+    print(keys, values)
+
