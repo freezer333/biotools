@@ -1,3 +1,4 @@
+# Relationship between U'Rich and QGRS motifs in the Polyadenylation Complex
 # Project goals
 
 1. Build a database of all human polyA sites along with QGRS and U'Rich motifs within 200 bases downstream of the site.  PolyA sites will be organized by gene, not by mRNA - since a given polyA site might be affiliated with multiple mRNA (alternative splicing).
