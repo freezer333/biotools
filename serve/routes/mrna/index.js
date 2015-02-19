@@ -11,3 +11,12 @@ exports.record = function(req, res) {
   };
   res.render("mrna/record", page);
 }
+
+exports.locus = function (req, res) {
+    var loc = {
+        chromosome:'unknown', 
+        position : 'unknown'
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({locus : loc}));
+}
