@@ -9,7 +9,7 @@
 3. We will present through an interactive graph the distribution of highly conserved QGRS, and the distribution of highly conserved U'Rich
 
 ## Support Pre-Requisites
-- Given chromosome locus, find all genese and mRNA that contain it:
+- Given chromosome position, find all genese and mRNA that contain it:
   - if gene:  return position relative to start of gene
   - if mRNA:
       - if exon data, {position (relative to start), region}
