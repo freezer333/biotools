@@ -13,10 +13,12 @@ exports.record = function(req, res) {
 }
 
 exports.locus = function (req, res) {
-    var loc = {
-        chromosome:'unknown', 
-        position : 'unknown'
-    }
+    var accession = req.accession;
+    var position = req.position;
+
+    
+
+
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({locus : loc}));
 }
