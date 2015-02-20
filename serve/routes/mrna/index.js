@@ -13,12 +13,13 @@ exports.record = function(req, res) {
 }
 
 exports.locus = function (req, res) {
-    var accession = req.accession;
-    var position = req.position;
+    var accession = req.params.accession;
+    var position = req.params.position;
+    var resolver = require('../../utils/locus')(db);
+    resolver.mrna_to_chromosome(accession, position, function (result){
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({locus : result}));
+    })
 
     
-
-
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({locus : loc}));
 }

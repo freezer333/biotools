@@ -21,7 +21,7 @@ function resolve_mrna_to_chromosome(mrna, position) {
                 chromosome:mrna.chrom, 
                 chromosome_position : 'unknown',
                 mrna_accession: mrna.accession, 
-                mrna_position: position
+                mrna_position: parseInt(position)
             }
     
     var length = 0;
