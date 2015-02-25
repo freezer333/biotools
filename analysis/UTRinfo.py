@@ -38,10 +38,10 @@ g4lenminscore = [101] * 900000
 g4list = [0] * 101
 
 for record in mcursor:
-    if 'utr_5' in record:
+    if 'utr_3' in record:
         try:
-            end = int(record['utr_5']['end'])
-            start = int(record['utr_5']['start'])
+            end = int(record['utr_3']['end'])
+            start = int(record['utr_3']['start'])
         except ValueError:
             continue
         utr_len = end-start
@@ -49,7 +49,7 @@ for record in mcursor:
 
         if 'g4s' in record:
             for g4 in record['g4s']:
-                if g4['is5Prime']:
+                if g4['is3Prime']:
                     gscore = int(g4['gscore'])
                     if gscore >= 17:
                         g4list[gscore] = g4list[gscore] + 1
@@ -58,8 +58,8 @@ for record in mcursor:
                             g4_19[utr_len] = g4_19[utr_len] + 1
                             if gscore >= 20:
                                 g4_20[utr_len] = g4_20[utr_len] + 1
-                                    if gscore >= 22:
-                                        g4_20[utr_len] = g4_20[utr_len] + 1
+                                if gscore >= 22:
+                                    g4_20[utr_len] = g4_20[utr_len] + 1
                         g4lenscore[utr_len] = g4lenscore[utr_len] + gscore
                         if g4lenminscore[utr_len] > gscore:
                             g4lenminscore[utr_len] = gscore
@@ -98,4 +98,4 @@ for score in g4list:
     i = i + 1
 
 
-book.save("5PrimeInfo.xls")
+book.save("3PrimeInfo.xls")
