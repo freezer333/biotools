@@ -142,7 +142,9 @@ while SeqCount <= 15:
 				cursor = seq1PolyA+1
 				for urich in seq1urich:
 					output.write(data['a'][cursor:urich.loc])
-					output.write("<b style=\"background-color: #EAF2D3\">"+data['a'][urich.loc:urich.loc+5]+"</b>")
+					if (cursor < urich.loc):
+						cursor = urich.loc
+					output.write("<b style=\"background-color: #00FF00\">"+data['a'][cursor:urich.loc+5]+"</b>")
 					cursor = urich.loc+5
 				output.write(data['a'][cursor:])
 				output.write("</td>")
@@ -150,12 +152,14 @@ while SeqCount <= 15:
 				output.write("<tr>\n")
 				output.write("<td>"+ mouse + "</td>\n")
 				output.write("<td>")
-				output.write(data['a'][0:seq2PolyA])
+				output.write(data['b'][0:seq2PolyA])
 				output.write("<b style=\"color: #DC143C\">"+data['b'][seq2PolyA]+"</b>")
-				cursor = seq1PolyA+1
+				cursor = seq2PolyA+1
 				for urich in seq2urich:
 					output.write(data['b'][cursor:urich.loc])
-					output.write("<b style=\"background-color: #EAF2D3\">"+data['b'][urich.loc:urich.loc+5]+"</b>")
+					if (cursor < urich.loc):
+						cursor = urich.loc
+					output.write("<b style=\"background-color: #00FF00\">"+data['b'][cursor:urich.loc+5]+"</b>")
 					cursor = urich.loc+5
 				output.write(data['b'][cursor:])
 				output.write("</td>")
