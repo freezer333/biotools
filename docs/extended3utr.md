@@ -15,8 +15,8 @@
       - if exon data, {position (relative to start), region}
       - if intron, simply return intron
 
-- Given an mRNA position:
-  - Return chromosome position
+- ~~Given an mRNA position:~~
+  - ~~Return chromosome position~~
 
 - Given a gene position:
   - Return chromosome position

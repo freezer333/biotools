@@ -1,4 +1,4 @@
-http://localhost:3000/mrna/NM_001256386.1/locus/5
+
 var db = exports.schemas = require("../../db");
 var resolver = require('../../utils/locus')(db);
 var should = require('should');
