@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 
 module.exports = function (db) {
     return {
@@ -9,27 +11,43 @@ module.exports = function (db) {
                 else {
                     callback(resolve_mrna_to_chromosome(result, position));
                 }
-            })
+            });
+        }, 
+        chromosome_to_gene : function (accession, position, callback) {
+            db.gene.find( 
+                {"$and" : [ {chrom:accession}, 
+                            {start : position}/*, 
+                            {end : {"$gte":position}}*/]}, 
+                function (err, results) {
+                    if ( err ) {
+                        console.log(err);
+                        callback(undefined);
+                    }
+                    else {
+                        callback(results);
+                    }
+                });
         }
 
-    }
-}
+    };
+};
 
 
 function resolve_mrna_to_chromosome(mrna, position) {
     var loc = {
                 chromosome:mrna.chrom, 
-                chromosome_position : 'unknown',
+                chromosome_position : "unknown",
                 mrna_accession: mrna.accession, 
                 mrna_position: parseInt(position)
-            }
+            };
     
     var length = 0;
-
-    if ( mrna.orientation == '+') {
+    var exon = null;
+    var i = 0;
+    if ( mrna.orientation == "+") {
         mrna.exons.sort(plus_compare);
-        for (var i = 0; i < mrna.exons.length; i++ ) {
-            var exon = mrna.exons[i];
+        for (i = 0; i < mrna.exons.length; i++ ) {
+            exon = mrna.exons[i];
             exon.relative_start = length;
             exon.relative_end = length + (exon.end-exon.start);
             length += (exon.end-exon.start);
@@ -39,8 +57,8 @@ function resolve_mrna_to_chromosome(mrna, position) {
     }
     else {
         mrna.exons.sort(minus_compare);
-        for (var i = 0; i < mrna.exons.length; i++ ) {
-            var exon = mrna.exons[i];
+        for (i = 0; i < mrna.exons.length; i++ ) {
+            exon = mrna.exons[i];
             exon.relative_end = length;
             exon.relative_start = length + (exon.end-exon.start);
             length += (exon.end-exon.start);

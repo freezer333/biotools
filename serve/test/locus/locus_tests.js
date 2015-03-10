@@ -4,6 +4,24 @@ var resolver = require('../../utils/locus')(db);
 var should = require('should');
 var assert = require('assert');
 
+describe ('Test chromosome to gene position resolution', function() {
+    before(function (done) {
+      this.timeout(10000);
+      setTimeout(function () {
+          done();
+      }, 1000);
+    });
+     describe('Valid known chromosome', function() {
+        it ('Returns genes in known chromosome', function (done) {
+            resolver.chromosome_to_gene('NC_000067', 195037547, function (results){
+                results.length.should.be.greaterThan(0);
+                console.log(results);
+                done();
+            })
+        })
+    });
+
+})
 describe ('Test mrna position to chromosome position resolution ', function() {
     before(function (done) {
       this.timeout(10000);
