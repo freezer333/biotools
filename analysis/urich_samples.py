@@ -1,8 +1,9 @@
 import urllib.request
-import shutil  
+import shutil
 import requests
 import xlsxwriter
 import random
+import re
 
 
 class Urich:
@@ -20,7 +21,7 @@ def URichFinder(data, char,PolyA):
 			for i in range(count, count+5):
 				if data[char][i] == 'U':
 					uscore +=1
-		if uscore >= 3: 
+		if uscore >= 3:
 			urich.append(Urich(count, uscore, data[char][count:count+5]))
 	return urich
 
@@ -76,9 +77,21 @@ while SeqCount <= 15:
 				response = requests.get(url)
 				if response.status_code == requests.codes.ok :
 				    data = response.json()
-				    #seq2PolyA = data['mrna']['features']['length']
-				    #seq2CDS_start = data['mrna']['features']['cds']['start']
-				    #seq2CDS_end = data['mrna']['features']['cds']['end']
+				    #get mouse cds
+				    eutils = "http://www.ncbi.nlm.nih.gov/entrez/eutils/"
+				    esearch = "esearch.fcgi?db=nucleotide&term=" + mouse
+				    respObj = requests.get(eutils+esearch)
+				    if respObj.status_code == requests.codes.ok :
+                       			searchResult = re.search("\<Id\>(?P<idKey>\d+)\<\/Id\>",respObj.text)
+                        		efetch = "efetch.fcgi?db=nucleotide&id="+searchResult.group('idKey')+"&rettype=ft&retmode=text"
+                        		respObj = requests.get(eutils+efetch)
+                        		if respObj.status_code == requests.codes.ok :
+                            			fetchResult = re.search("(?P<CDSstart>\d+)\t(?P<CDSend>\d+)\tCDS",respObj.text)
+                            			seq2CDS_start = fetchResult.group('CDSstart')
+                            			seq2CDS_end = fetchResult.group('CDSend')
+                            			seq2CDS_start = int(seq2CDS_start)
+                            			seq2CDS_end = int(seq2CDS_end)
+                            			#seq2PolyA = data['mrna']['features']['length']
 				    #print (seq2PolyA)
 				else:
 					continue
@@ -128,7 +141,21 @@ while SeqCount <= 15:
 					if (nt != '-'):
 						temp = temp+1
 					if (temp == seq1CDS_end):
-						seq1CDS = count
+						seq1CDS_end = count
+						break
+				temp = 0;
+				for count, nt in enumerate(data['b']):
+					if (nt != '-'):
+						temp = temp+1
+					if (temp == seq2CDS_start):
+						seq2CDS_start = count
+						break
+				temp = 0;
+				for count, nt in enumerate(data['b']):
+					if (nt != '-'):
+						temp = temp+1
+					if (temp == seq2CDS_end):
+						seq2CDS_end = count
 						break
 				seq1urich = URichFinder(data, 'a', seq1PolyA)
 				seq2urich = URichFinder(data, 'b', seq2PolyA)
@@ -152,7 +179,9 @@ while SeqCount <= 15:
 				output.write("<tr>\n")
 				output.write("<td>"+ mouse + "</td>\n")
 				output.write("<td>")
-				output.write(data['b'][0:seq2PolyA])
+				output.write(data['b'][0:seq2CDS_start])
+				output.write("<b style=\"color: #FFD700\">"+data['b'][seq2CDS_start:seq2CDS_end]+"</b>")
+				output.write(data['b'][seq2CDS_end:seq2PolyA])
 				output.write("<b style=\"color: #DC143C\">"+data['b'][seq2PolyA]+"</b>")
 				cursor = seq2PolyA+1
 				for urich in seq2urich:
