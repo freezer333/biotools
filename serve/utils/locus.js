@@ -14,10 +14,15 @@ module.exports = function (db) {
             });
         }, 
         chromosome_to_gene : function (accession, position, callback) {
-            db.gene.find( 
-                {"$and" : [ {chrom:accession}, 
-                            {start : position}/*, 
-                            {end : {"$gte":position}}*/]}, 
+            var q = {"$and" : 
+                        [ {chrom:accession}, 
+                          {start : {"$lte":position}}, 
+                          {end : {"$gte":position}}
+                        ]
+                    };
+            console.log(JSON.stringify(q));
+            db.gene.find(q 
+                , 
                 function (err, results) {
                     if ( err ) {
                         console.log(err);

@@ -70,8 +70,8 @@ def process_file(file, organism, build):
 
                 record = {
                     "chrom" : chrome,
-                    "start" : fields[3],
-                    "end" : fields[4],
+                    "start" : int(fields[3]),
+                    "end" : int(fields[4]),
                     "gene_id" : gene_id,
                     "gene_name" : name,
                     "orientation" : fields[6],
@@ -121,8 +121,8 @@ def process_file(file, organism, build):
 
                   current_mrna = {
                       "chrom" : chrome,
-                      "start" : fields[3],
-                      "end" : fields[4],
+                      "start" : int(fields[3]),
+                      "end" : int(fields[4]),
                       "gene_id" : gene_id,
                       "accession" : accession_num,
                       "orientation" : fields[6],
@@ -145,7 +145,7 @@ def process_file(file, organism, build):
                   chrome = fields[0].split('.')[0]
                   if current_mrna and current_mrna['accession'] == accession:
                       # print ("Exon for ", accession, " found -> ", fields[3], " - ", fields[4])
-                      current_mrna['exons'].append({"start" : fields[3], "end" : fields[4]})
+                      current_mrna['exons'].append({"start" : int(fields[3]), "end" : int(fields[4])})
 
 
 
