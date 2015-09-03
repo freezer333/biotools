@@ -30,8 +30,8 @@
       {"common_id" : "Y", "url_suffix" : "chrY.fa.gz", "accession" : "NC_000024"}
     ],
   "genes" :
-    {
-      "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/GFF/ref_GRCh38_top_level.gff3.gz",
+    {                                                          
+      "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/GFF/ref_GRCh38.p2_top_level.gff3.gz",
       "build" : "38"
     }
 }
