@@ -15,13 +15,30 @@ describe ('Test chromosome to gene position resolution', function() {
         it ('Returns genes in known chromosome', function (done) {
             resolver.chromosome_to_gene('NC_000067', 195037547, function (results){
                 results.length.should.be.greaterThan(0);
-                console.log(results);
                 done();
             })
         })
     });
+});
 
-})
+describe ('Test chromosome to mrna position resolution', function () {
+    before(function (done) {
+      this.timeout(10000);
+      setTimeout(function () {
+          done();
+      }, 1000);
+    });
+
+    describe('Resolve gene with multiple products', function(){
+      
+      ///  Gene 23133 has 4 mrna products.
+      ///  Gene 23126 has 5 mrna products.
+
+      // Use these as test cases
+    });
+
+});
+
 describe ('Test mrna position to chromosome position resolution ', function() {
     before(function (done) {
       this.timeout(10000);
