@@ -179,6 +179,7 @@ for taxon_id in sorted(taxon_ids) :
       local = base_dir + organism
       if not os.path.isfile(local):
           print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
+          
           with urllib.request.urlopen(seed['genes']['url']) as response, open(local, 'wb') as out_file:
               shutil.copyfileobj(response, out_file)
       purge_organism(organism, build)
