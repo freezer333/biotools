@@ -61,7 +61,13 @@ module.exports = function (db) {
                 });
         }, 
         chromosome_to_gene_locus : function(gene, chromosome_locus) {
-            return (chromosome_locus - gene.start);
+            if ( gene.orientation == "+") {
+                return (chromosome_locus - gene.start + 1);    
+            }
+            else {
+                return gene.end - chromosome_locus + 1;
+            }
+            
         },
         chromosome_to_mrna_locus : function(mrna, chromosome_locus) {
             // Step one, figure out which exon this is in, if any.  Return -1 if not
@@ -70,16 +76,31 @@ module.exports = function (db) {
                 return -1;
             }
 
-            // now total up all exons before this exon:
             var s = 0;
-            for (var i = 0; i < mrna.exons.length; i++ ) {
-                var exon = mrna.exons[i];
-                if (exon.end < chromosome_locus){
-                    s += (exon.end-exon.start) + 1;
+            if ( mrna.orientation == "+") {
+                // now total up all exons before this exon:
+                for (var i = 0; i < mrna.exons.length; i++ ) {
+                    var exon = mrna.exons[i];
+                    if (exon.end < chromosome_locus){
+                        s += (exon.end-exon.start  + 1);
+                    }
                 }
+                // add the difference between this locus and its exon start
+                s += (chromosome_locus - containing_exon.start + 1);    
             }
-            // add the difference between this locus and its exon start
-            s += (chromosome_locus - containing_exon.start);
+            else {
+                for (var i = 0; i < mrna.exons.length; i++ ) {
+                    var exon = mrna.exons[i];
+                    if (exon.start > chromosome_locus){
+                        s += (exon.end-exon.start  + 1);
+                    }
+
+                }
+                // add the difference between this locus and its exon start
+                s += (containing_exon.end - chromosome_locus + 1);    
+            }
+            
+
             return s;
         }
 
