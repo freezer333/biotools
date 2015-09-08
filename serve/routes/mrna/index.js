@@ -28,7 +28,7 @@ exports.ontology = function(req, res) {
 }
 
 
-exports.ontology_enrichment(callback, mrna_query, mrna_filter) {
+exports.ontology_enrichment = function(callback, mrna_query, mrna_filter) {
   var function_map = {}
   var component_map = {}
   var process_map = {}

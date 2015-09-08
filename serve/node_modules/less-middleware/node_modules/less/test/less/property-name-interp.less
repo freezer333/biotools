@@ -6,8 +6,11 @@ pi-test {
     @c_c:    left;
     @d-d4: radius;
     @-:         -;
-    
+
+    @var: ~'@not-variable';
+
     @{a}: 0;
+    @{var}: @var;
     @{prefix}width: 50%;
     *-z-@{a} :1px dashed blue;
     -www-@{a}-@{bb}: 2px;
@@ -34,7 +37,7 @@ pi-test {
         pre-property-@{suffix}    +: middle;
         @{prefix}-property-@{suffix}+:  low;
         @{prefix}-property-@{p}   +  :   @v;
-    
+
         @subterfuge: ~'+';
         pre-property-ish@{subterfuge}: nice try dude;
     }

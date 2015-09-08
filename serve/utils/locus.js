@@ -44,11 +44,31 @@ module.exports = function (db) {
         chromosome_to_gene : function (accession, position, callback) {
             var q = {"$and" : 
                         [ {chrom:accession}, 
-                          {start : {"$lte":position}}, 
-                          {end : {"$gte":position}}
+                          {start : {"$lte":parseInt(position)}}, 
+                          {end : {"$gte":parseInt(position)}}
                         ]
                     };
             db.gene.find(q 
+                , 
+                function (err, results) {
+                    if ( err ) {
+                        console.log(err);
+                        callback(undefined);
+                    }
+                    else {
+                        callback(results);
+
+                    }
+                });
+        }, 
+        chromosome_to_mrna : function (accession, position, callback) {
+            var q = {"$and" : 
+                        [ {chrom:accession}, 
+                          {start : {"$lte":parseInt(position)}}, 
+                          {end : {"$gte":parseInt(position)}}
+                        ]
+                    };
+            db.mrna.find(q 
                 , 
                 function (err, results) {
                     if ( err ) {
