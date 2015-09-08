@@ -1,6 +1,34 @@
 /*jslint node: true */
 "use strict";
 
+//------------------------------------------------------------------------
+// IMPORTANT
+//------------------------------------------------------------------------
+// Exon coordinates are in "1-based" coordinates.  Computer scientists
+// are trained in 0-based coordinates.  It's critical to always remember 
+// this!
+//
+// https://www.biostars.org/p/84686/
+//------------------------------------------------------------------------
+
+
+function exon_compare(a, b) {
+    if (a.start < b.start)
+        return -1;
+    if (a.start > b.start)
+        return 1;
+    return 0;
+}
+function get_exon(exons, locus) {
+    for (var i = 0; i < exons.length; i++ ) {
+        var exon = exons[i];
+        if (exon.start <= locus && exon.end >= locus){
+            return exon;
+        }
+    }
+    return null;
+}
+
 module.exports = function (db) {
     return {
         mrna_to_chromosome: function (accession, position, callback) {
@@ -20,7 +48,6 @@ module.exports = function (db) {
                           {end : {"$gte":position}}
                         ]
                     };
-            console.log(JSON.stringify(q));
             db.gene.find(q 
                 , 
                 function (err, results) {
@@ -32,6 +59,28 @@ module.exports = function (db) {
                         callback(results);
                     }
                 });
+        }, 
+        chromosome_to_gene_locus : function(gene, chromosome_locus) {
+            return (chromosome_locus - gene.start);
+        },
+        chromosome_to_mrna_locus : function(mrna, chromosome_locus) {
+            // Step one, figure out which exon this is in, if any.  Return -1 if not
+            var containing_exon = get_exon(mrna.exons, chromosome_locus);
+            if ( !containing_exon ) {
+                return -1;
+            }
+
+            // now total up all exons before this exon:
+            var s = 0;
+            for (var i = 0; i < mrna.exons.length; i++ ) {
+                var exon = mrna.exons[i];
+                if (exon.end < chromosome_locus){
+                    s += (exon.end-exon.start) + 1;
+                }
+            }
+            // add the difference between this locus and its exon start
+            s += (chromosome_locus - containing_exon.start);
+            return s;
         }
 
     };

@@ -4,6 +4,45 @@ var resolver = require('../../utils/locus')(db);
 var should = require('should');
 var assert = require('assert');
 
+
+
+var test_mrna = {
+  "chrom" : "NC_000067",
+  "gene_id" : "PlusOrientation",
+  "accession" : "PlusOrientation.1",
+  "organism" : "Python",
+  "build" : "38",
+  "orientation" : "+",
+  "exons" : [
+    {
+      "end" : 18,
+      "start" : 12
+    },
+    {
+      "end" : 28,
+      "start" : 23
+    },
+    {
+      "end" : 37,
+      "start" : 32
+    }
+  ],
+  "end" : 37,
+  "start" : 12
+}
+
+var test_gene = {
+  "chrom" : "NC_000067",
+  "gene_id" : "PlusOrientation",
+  "gene_name" : "PlusOrientation",
+  "build" : "38",
+  "orientation" : "+",
+  "organism" : "Python",
+  "end" : 37,
+  "start" : 12
+}
+
+
 describe ('Test chromosome to gene position resolution', function() {
     before(function (done) {
       this.timeout(10000);
@@ -11,7 +50,7 @@ describe ('Test chromosome to gene position resolution', function() {
           done();
       }, 1000);
     });
-     describe('Valid known chromosome', function() {
+    describe('Valid known chromosome', function() {
         it ('Returns genes in known chromosome', function (done) {
             resolver.chromosome_to_gene('NC_000067', 195037547, function (results){
                 results.length.should.be.greaterThan(0);
@@ -19,8 +58,72 @@ describe ('Test chromosome to gene position resolution', function() {
             })
         })
     });
-});
+    describe('Valid test chromosome', function() {
+        it ('Maps into gene with positive orientation', function (done) {
+            var gene_locus = resolver.chromosome_to_gene_locus(test_gene, 24);
+            gene_locus.should.be.exactly(12)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into first exon within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 14);
+            mrna_locus.should.be.exactly(2)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into second exon within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 24);
+            mrna_locus.should.be.exactly(8)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into third exon within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 34);
+            mrna_locus.should.be.exactly(15)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into first position within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 12);
+            mrna_locus.should.be.exactly(0)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into last position within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 37);
+            mrna_locus.should.be.exactly(18)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into first position of second entron within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 23);
+            mrna_locus.should.be.exactly(7)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Maps into last position of second entron within mrna with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 28);
+            mrna_locus.should.be.exactly(12)
+            done();
+        })
+    });
+    describe('Valid test chromosome', function() {
+        it ('Reports -1 if in mrna intron with positive orientation', function (done) {
+            var mrna_locus = resolver.chromosome_to_mrna_locus(test_mrna, 30);
+            mrna_locus.should.be.exactly(-1)
+            done();
+        })
+    });
 
+});
+/*
 describe ('Test chromosome to mrna position resolution', function () {
     before(function (done) {
       this.timeout(10000);
@@ -38,7 +141,7 @@ describe ('Test chromosome to mrna position resolution', function () {
     });
 
 });
-
+*/
 describe ('Test mrna position to chromosome position resolution ', function() {
     before(function (done) {
       this.timeout(10000);
