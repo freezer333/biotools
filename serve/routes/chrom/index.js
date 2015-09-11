@@ -43,7 +43,6 @@ exports.routes.get('/chrom/locusmap/:accession/:locus',
                   accession : s.accession, 
                   locus: resolver.chromosome_to_mrna_locus(s, locus)
               });
-                            
             });
             callback();
           });

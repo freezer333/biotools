@@ -55,9 +55,14 @@ with open(local_path) as f:
         response = requests.get(url)
         if response.status_code == requests.codes.ok :
             data = response.json()
+            status = "NOT FOUND"
             if len(data['mrna']) > 0:
-                with_mrna += 1
+                status = "INTRON"
+                for mrna in data['mrna']:
+                    if mrna['locus'] >= 0:
+                        status = "MAPPED TO " + str(mrna['locus'])
+                        with_mrna += 1
             processed += 1
 
             # MAKE THE POLYA record and insert it into the collection
-            print (with_mrna , " / " , processed, "   -  Accession ", acc)
+            print (with_mrna , " / " , processed, "   -  Accession ", acc, "Locus = ", start_pos, " - ", status)
