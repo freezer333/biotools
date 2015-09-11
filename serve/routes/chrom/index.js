@@ -39,13 +39,11 @@ exports.routes.get('/chrom/locusmap/:accession/:locus',
           resolver.chromosome_to_mrna(accession, locus, function(mrna_list) {
             mrna_list.forEach(function(s) {
               var pos = resolver.chromosome_to_mrna_locus(s, locus);
-              if (pos >= 0 ) {
-                results.mrna.push( {
+              results.mrna.push( {
                   accession : s.accession, 
                   locus: resolver.chromosome_to_mrna_locus(s, locus)
-                });
-              }
-              
+              });
+                            
             });
             callback();
           });
