@@ -75,7 +75,7 @@ yessearch = mmap.mmap(yesfile.fileno(), 0, access=mmap.ACCESS_READ)
 nosearch = mmap.mmap(nofile.fileno(), 0, access=mmap.ACCESS_READ)
 
 for record in mcursor:
-    if 'ontology' in record and 'nucleus' in record['ontology']['components']:
+    if 'ontology' in record:
         #search for accession in file listing mRNA with QGRS
         if yessearch.find(str.encode(record['accession'])) != -1:
             found('components',comp)
