@@ -70,8 +70,8 @@ def process_file(file, organism, build):
 
                 record = {
                     "chrom" : chrome,
-                    "start" : fields[3],
-                    "end" : fields[4],
+                    "start" : int(fields[3]),
+                    "end" : int(fields[4]),
                     "gene_id" : gene_id,
                     "gene_name" : name,
                     "orientation" : fields[6],
@@ -121,8 +121,8 @@ def process_file(file, organism, build):
 
                   current_mrna = {
                       "chrom" : chrome,
-                      "start" : fields[3],
-                      "end" : fields[4],
+                      "start" : int(fields[3]),
+                      "end" : int(fields[4]),
                       "gene_id" : gene_id,
                       "accession" : accession_num,
                       "orientation" : fields[6],
@@ -145,7 +145,7 @@ def process_file(file, organism, build):
                   chrome = fields[0].split('.')[0]
                   if current_mrna and current_mrna['accession'] == accession:
                       # print ("Exon for ", accession, " found -> ", fields[3], " - ", fields[4])
-                      current_mrna['exons'].append({"start" : fields[3], "end" : fields[4]})
+                      current_mrna['exons'].append({"start" : int(fields[3]), "end" : int(fields[4])})
 
 
 
@@ -179,6 +179,7 @@ for taxon_id in sorted(taxon_ids) :
       local = base_dir + organism
       if not os.path.isfile(local):
           print('\t  -  Downloading ' , organism, ' from ftp.ncbi.nlm.nih.gov')
+          
           with urllib.request.urlopen(seed['genes']['url']) as response, open(local, 'wb') as out_file:
               shutil.copyfileobj(response, out_file)
       purge_organism(organism, build)

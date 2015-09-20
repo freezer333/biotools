@@ -59,6 +59,7 @@ app.get('/mrna/:accession/sequence/:start', routes.mrna_sequence)
 app.get('/mrna/:skip/:limit', routes.mrna_list)
 app.get('/mrna/', routes.mrna_list)
 app.get('/mrna', routes.mrna_list)
+app.get('/mrna/:accession/locus/:position', mrna_routes.locus)
 
 app.get('/gui/mrna', mrna_routes.index)
 app.get('/gui/mrna/:accession', mrna_routes.record)

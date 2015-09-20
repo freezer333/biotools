@@ -25,22 +25,20 @@ std::vector<G4>::iterator select_best(vector<G4> fam);
 bool belongsin(G4 g4, vector<G4> family);
 
 
-Handle<Value> find(const Arguments& args) {
-  HandleScope scope;
+void find(const v8::FunctionCallbackInfo<v8::Value>& args) {
+  Isolate* isolate = args.GetIsolate();
 
   if (args.Length() < 1) {
-    ThrowException(Exception::TypeError(String::New("Wrong number of arguments")));
-    return scope.Close(Undefined());
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Wrong number of arguments")));
   }
 
-  String::AsciiValue input(args[0]->ToString());
+  v8::String::Utf8Value input(args[0]->ToString());
   string output = find(*input);
-  return scope.Close(String::New(output.c_str()));
+  args.GetReturnValue().Set(String::NewFromUtf8(isolate, output.c_str()));
 }
 
 void Init(Handle<Object> exports) {
-  exports->Set(String::NewSymbol("find"),
-      FunctionTemplate::New(find)->GetFunction());
+    NODE_SET_METHOD(exports, "find", find);
 }
 
 NODE_MODULE(qgrs, Init)

@@ -22,7 +22,7 @@
     "multiparty": "*",
     "mime": "*",
     "temp": "*",
-    "qgrs": "0.2.6",
+    "qgrs": "file:../util/gccp",
     "underscore": "~1.7.0",
     "http-post": "~0.1.1",
     "debug": "~2.1.1",
