@@ -6,6 +6,7 @@ import urllib.request
 import shutil
 import gzip
 import json
+import re
 
 from pymongo import ASCENDING, DESCENDING
 
@@ -51,7 +52,8 @@ def process_file(file, organism, build):
         if not line.startswith("##") :
             fields = line.split('\t')
 
-            if len(fields) > 2 and fields[2] == 'gene' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
+            #if len(fields) > 2 and fields[2] == 'gene' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
+            if len(fields) > 2 and fields[2] == 'gene'and re.match( "NC_", fields[0]):
                 info = fields[8];
                 mapped_info = parse_info(info);
 
@@ -87,7 +89,8 @@ def process_file(file, organism, build):
 
                 gene_collect.update(spec, record, True)
 
-            if len(fields) > 2 and fields[2] == 'mRNA' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
+            #if len(fields) > 2 and fields[2] == 'mRNA' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
+            if len(fields) > 2 and fields[2] == 'mRNA' and re.match( "NC_", fields[0]):
                 if not current_mrna is None:
                   #  print ("\tInserting mRNA", current_mrna['accession'] , " with " , len(current_mrna['exons']) , " exons")
                   #  print(current_mrna)
@@ -136,7 +139,8 @@ def process_file(file, organism, build):
                   current_mrna = None
 
 
-            if len(fields) > 2 and fields[2] == 'exon' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
+            #if len(fields) > 2 and fields[2] == 'exon' and (fields[1] == 'BestRefSeq' or fields[1] == 'RefSeq'):
+            if len(fields) > 2 and fields[2] == 'exon'and re.match( "NC_", fields[0]):
                 info = fields[8];
 
                 mapped_info = parse_info(info);
