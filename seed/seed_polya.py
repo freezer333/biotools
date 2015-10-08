@@ -50,19 +50,34 @@ with open(local_path) as f:
         ch = line.split()[0]
         acc = get_chrom_accession(ch)
         start_pos = line.split()[1]
+        end_pos = line.split()[2]
 
         url = seq_url + '/chrom/locusmap/' +acc + "/" + start_pos
         response = requests.get(url)
         if response.status_code == requests.codes.ok :
             data = response.json()
             status = "NOT FOUND"
+            final_pos = start_pos
             if len(data['mrna']) > 0:
                 status = "INTRON"
                 for mrna in data['mrna']:
                     if mrna['locus'] >= 0:
                         status = "MAPPED TO " + str(mrna['locus'])
                         with_mrna += 1
+            else:
+                url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
+                response = requests.get(url)
+                if response.status_code == requests.codes.ok :
+                    data = response.json()
+                    status = "NOT FOUND"
+                    final_pos = end_pos
+                    if len(data['mrna']) > 0:
+                        status = "INTRON"
+                        for mrna in data['mrna']:
+                            if mrna['locus'] >= 0:
+                                status = "MAPPED TO " + str(mrna['locus'])
+                                with_mrna += 1
             processed += 1
 
             # MAKE THE POLYA record and insert it into the collection
-            print (with_mrna , " / " , processed, "   -  Accession ", acc, "Locus = ", start_pos, " - ", status)
+            print (with_mrna , " / " , processed, "   -  Accession ", acc, "Locus = ", final_pos, " - ", status)
