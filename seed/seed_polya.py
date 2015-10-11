@@ -64,6 +64,19 @@ with open(local_path) as f:
                     if mrna['locus'] >= 0:
                         status = "MAPPED TO " + str(mrna['locus'])
                         with_mrna += 1
+                    else:
+                        url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
+                        response = requests.get(url)
+                        if response.status_code == requests.codes.ok :
+                            data = response.json()
+                            status = "NOT FOUND"
+                            final_pos = end_pos
+                            if len(data['mrna']) > 0:
+                                status = "INTRON"
+                                for mrna in data['mrna']:
+                                    if mrna['locus'] >= 0:
+                                        status = "MAPPED TO " + str(mrna['locus'])
+                                        with_mrna += 1
             else:
                 url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
                 response = requests.get(url)
