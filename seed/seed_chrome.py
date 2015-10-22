@@ -146,6 +146,7 @@ for taxon_id in sorted(taxon_ids) :
           if not os.path.isfile(local):
               print('  -  Downloading ' , chromosome['accession'], ' from ftp.ncbi.nlm.nih.gov')
               url = seed['url_base'] + chromosome['url_suffix']
+              print(url)
               with urllib.request.urlopen(url) as response, open(local, 'wb') as out_file:
                   shutil.copyfileobj(response, out_file)
           purge(seed['organism'], chromosome['accession'], seed)

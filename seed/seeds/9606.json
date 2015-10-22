@@ -1,7 +1,7 @@
 { "organism" : "Homo sapiens",
-  "build" : "38",
+  "build" : "37",
   "taxon_id" : "9606",
-  "url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/Primary_Assembly/assembled_chromosomes/FASTA/",
+  "url_base" : "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/Primary_Assembly/assembled_chromosomes/FASTA/",
   "chromosomes" :
     [
       {"common_id" : "1", "url_suffix" : "chr1.fa.gz", "accession" : "NC_000001"},
@@ -31,7 +31,7 @@
     ],
   "genes" :
     {                                                          
-      "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/GFF/ref_GRCh38.p2_top_level.gff3.gz",
-      "build" : "38"
+      "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/ARCHIVE/BUILD.37.3/GFF/ref_GRCh37.p5_top_level.gff3.gz",
+      "build" : "37"
     }
 }

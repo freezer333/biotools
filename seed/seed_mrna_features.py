@@ -39,6 +39,8 @@ print ("mRNA Sequence Features (Homo sapien) -> MongoDb")
 print ("----------------------------------------------")
 
 i = 0
+count = 0
+all_count = 0
 for url in urls :
     print("PROCESSING " + url)
     seq_features_file = root + config['human features']['download_filename'] + str(i)
@@ -50,8 +52,7 @@ for url in urls :
     seq_features_file = gzip.open(seq_features_file, 'rb')
 
 
-    count = 0
-    all_count = 0
+    
     features = dict()
     #with open(seq_features_file) as f:
     for data in seq_features_file:
