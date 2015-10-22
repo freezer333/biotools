@@ -328,7 +328,10 @@ function createGeneSchema(mongoose) {
             start: Number,
             end: Number,
             gene_id: String,
-            chrom : String
+            chrom : String,
+            orientation : String,
+            build: String, 
+            organism:String
         }, {collection:'gene'});
     exports.gene = mongoose.model('Gene', schem);
 }

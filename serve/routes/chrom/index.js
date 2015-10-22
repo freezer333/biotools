@@ -37,6 +37,7 @@ exports.routes.get('/chrom/locusmap/:accession/:locus',
       async.parallel ( [
         function(callback) {
           resolver.chromosome_to_mrna(accession, locus, function(mrna_list) {
+            console.log(mrna_list.length + " mrna found");
             mrna_list.forEach(function(s) {
               var pos = resolver.chromosome_to_mrna_locus(s, locus);
               results.mrna.push( {
@@ -49,6 +50,7 @@ exports.routes.get('/chrom/locusmap/:accession/:locus',
         }, 
         function (callback) {
           resolver.chromosome_to_gene(accession, locus, function(gene_list) {
+            console.log(gene_list.length + " mrna found");
             gene_list.forEach(function(s) {
              results.genes.push( {
                 gene_id : s.gene_id, 
