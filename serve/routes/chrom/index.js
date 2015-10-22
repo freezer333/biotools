@@ -40,8 +40,8 @@ exports.routes.get('/chrom/locusmap/:accession/:locus',
             mrna_list.forEach(function(s) {
               var pos = resolver.chromosome_to_mrna_locus(s, locus);
               results.mrna.push( {
-                accession : s.accession, 
-                locus: resolver.chromosome_to_mrna_locus(s, locus)
+                  accession : s.accession, 
+                  locus: resolver.chromosome_to_mrna_locus(s, locus)
               });
             });
             callback();

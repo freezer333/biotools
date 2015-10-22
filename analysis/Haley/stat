@@ -1,0 +1,68 @@
+
+import urllib.request
+import shutil  
+import requests
+from random import randint
+
+from pymongo import MongoClient
+client = MongoClient()
+db = client.chrome
+collect = db.mrna
+
+
+def convert(n):
+    try:
+        return int(n)
+    except ValueError:
+        return float(n + 0.5)
+
+
+check= 0
+hit5= 0
+hit4 = 0
+hit3 = 0
+hit0 = 0
+
+
+
+mcursor = collect.find(spec={'organism' : 'Homo sapiens' },snapshot=True)
+
+for record in mcursor:
+	rand = randint (0,60)
+	check +=1
+	URS_hit = 0
+
+	
+
+	if 'u_rich_downstream' in record:
+	    u_Elements = record ['u_rich_downstream']
+	    for u in u_Elements:
+		    uPos = convert(u['downstream_rel_pos'])
+		    order = convert (u['order'])
+		    if order == 5:
+			    if uPos == rand:
+				    hit5 += 1
+				    URS_hit = 1
+		    elif order == 4:
+			    if uPos == rand or uPos == rand+1:
+				    hit4 += 1
+				    URS_hit = 1
+		    elif order == 3:
+			    if uPos == rand or uPos == rand+1 or uPos == rand+2:
+				    hit3 +=1
+				    URS_hit = 1
+	
+	if URS_hit == 0:
+		hit0 +=1
+
+
+
+
+       
+
+print ('downstream regions looked at:', check, '\n')
+print ('0:', hit0, '\n')
+print ('3:', hit3, '\n')
+print ('4:', hit4, '\n')
+print ('5:', hit5, '\n')
+			

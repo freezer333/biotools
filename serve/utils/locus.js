@@ -82,9 +82,14 @@ module.exports = function (db) {
         }, 
         chromosome_to_gene_locus : function(gene, chromosome_locus) {
             if ( gene.orientation == "+") {
+                console.log("[" + gene["orientation"] + "][+]");
+                console.log(JSON.stringify(gene));
                 return (chromosome_locus - gene.start + 1);    
             }
             else {
+                console.log("[" + gene["orientation"] + "][-]");
+                console.log("[" + gene["gene_name"] + "][-]");
+                console.log(JSON.stringify(gene));
                 return gene.end - chromosome_locus + 1;
             }
             
