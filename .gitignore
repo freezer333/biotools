@@ -4,3 +4,15 @@ external_data*
 *.DS_Store
 seed/tmp/*
 util/gccp/build/*
+
+analysis/.~lock.OntologyInfonew.xls#
+
+serve/npm-debug.log
+
+analysis/OntologyInfonew.xls
+
+analysis/Ontologies2.py
+
+analysis/Ontologies2.py
+
+analysis/Ontologies2.py
