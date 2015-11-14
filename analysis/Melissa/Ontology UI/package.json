@@ -1,0 +1,16 @@
+{
+  "name": "ontology-grapher",
+  "author": "gqrsteam",
+  "dependencies": {
+    "connect": "*",
+    "morgan":"*",
+    "serve-static" :"*",
+    "ejs": "*",
+    "body-parser":"*", 
+    "cookie-parser":"*", 
+    "express-session": "*",
+    "mongoose": "*",
+    "mongodb": "*"
+  }
+}
+

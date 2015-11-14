@@ -209,9 +209,11 @@ db.once('open', function (ref) {
                         newOnts(proc, "processes");
 
                         console.log("Done!");
+                        mongoose.connection.close();
 
                     }else{
                         console.log("These parameters are already in the DB");
+                        mongoose.connection.close();
                     }
                     
                     /*if( thisAnalysis.minonts.indexOf(result.mininput) == -1 || isNew){
