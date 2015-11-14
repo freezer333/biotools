@@ -98,45 +98,44 @@ with open(local_path) as f:
         acc = get_chrom_accession(ch)
         start_pos = line.split()[1]
         end_pos = line.split()[2]
-        if line.split()[6] == "UTR3" and abs(int(end_pos)-int(start_pos)) <= 25 : 
+        status="NOT FOUND"
+        url =""
+        region= line.split()[6]
+        if (region == "UTR3" or region =="Extension") and abs(int(end_pos)-int(start_pos)) <= 25: 
+                url = seq_url + '/chrom/locusmap/' +acc + "/" + start_pos
+                response = requests.get(url)
+                if response.status_code == requests.codes.ok :
+                    data = response.json()
+                    found=0
+                    mapped_mrna = []
+                    #print(data)
+                    final_pos = start_pos
+                    if len(data['mrna']) > 0:
+                        status = "INTRON"
+                        for mrna in data['mrna']:
+                            if mrna['locus'] >= 0:
+                                status = "MAPPED TO " + str(mrna['locus'])
+                                with_mrna += 1
+                                mapped_mrna.append(mrna['accession'])
+                                
 
-            url = seq_url + '/chrom/locusmap/' +acc + "/" + start_pos
-            response = requests.get(url)
-            if response.status_code == requests.codes.ok :
-                data = response.json()
-                found=0
-                mapped_mrna = []
-                #print(data)
-                status = "NOT FOUND"
-                final_pos = start_pos
-                if len(data['mrna']) > 0:
-                    status = "INTRON"
-                    for mrna in data['mrna']:
-                        if mrna['locus'] >= 0:
-                            status = "MAPPED TO " + str(mrna['locus'])
-                            with_mrna += 1
-                            found=1
-                            mapped_mrna.append(mrna['accession'])
-                            
-
-                        #check the end position   
-                        else:
-                            url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
-                            response = requests.get(url)
-                            if response.status_code == requests.codes.ok :
-                                data = response.json()
-                                status = "NOT FOUND"
-                                final_pos = end_pos
-                                if len(data['mrna']) > 0:
-                                    status = "INTRON"
-                                    for mrna in data['mrna']:
-                                        if mrna['locus'] >= 0:
-                                            status = "MAPPED TO " + str(mrna['locus'])
-                                            with_mrna += 1
-                                            found=1
-                                            mapped_mrna.append(mrna['accession'])
+                            #check the end position   
+                            else:
+                                url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
+                                response = requests.get(url)
+                                if response.status_code == requests.codes.ok :
+                                    data = response.json()
+                                    status = "NOT FOUND"
+                                    final_pos = end_pos
+                                    if len(data['mrna']) > 0:
+                                        status = "INTRON"
+                                        for mrna in data['mrna']:
+                                            if mrna['locus'] >= 0:
+                                                status = "MAPPED TO " + str(mrna['locus'])
+                                                with_mrna += 1
+                                                mapped_mrna.append(mrna['accession'])
                                      
-                                  
+                                 
                                             
                 else:
                     url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
@@ -151,45 +150,47 @@ with open(local_path) as f:
                                 if mrna['locus'] >= 0:
                                     status = "MAPPED TO " + str(mrna['locus'])
                                     with_mrna += 1
-                                    found = 1
                                     mapped_mrna.append(mrna['accession'])
-                                 
-
-                if(found ==1):
-                    #extract gene id from data
-                    genes=data['genes']
-                    gene_id=""
-                    for g in genes:
-                        gene_id =g['gene_id'] 
-                    #make sure mrna accessions are distinct
-                    mrna_set= set(mapped_mrna)
-                    seq = get_Seq(start_pos,end_pos,acc)
-                    us= get_urich_motifs(seq)
-                    #the find g4 has lots of extra info, make less cluttered
-                    g4= find(seq)
-                    g_quad = []
-                    for g in g4:
-                        tmp_g = dict()
-                        tmp_g['gscore']= g['gscore']
-                        tmp_g['tetrads']= g['tetrads']
-                        tmp_g['length']= g['length']
-                        tmp_g['sequence']= g['sequence']
-                        tmp_g['start']= g['start']
-                        g_quad.append(tmp_g)
-
-                   
-    
-                    record = {
-                        "gene_id": gene_id,
-                        "start":start_pos,
-                        "end":end_pos,
-                        "mrna": list(mrna_set),
-                        "URS": us,
-                        "g_quad":g_quad
-                    }
-                    db.polyA.insert_one(record)
 
                 processed += 1
 
                 # MAKE THE POLYA record and insert it into the collection
                 print (with_mrna , " / " , processed, "   -  Accession ", acc, "Locus = ", final_pos, " - ", status)
+
+                                 
+        if (status.split()[0] == "MAPPED"):
+            #extract gene id from data
+            genes=data['genes']
+            gene_id=""
+            for g in genes:
+                gene_id =g['gene_id'] 
+                    #make sure mrna accessions are distinct
+            mrna_set= set(mapped_mrna)
+            seq = get_Seq(start_pos,end_pos,acc)
+            us= get_urich_motifs(seq)
+                #the find g4 has lots of extra info, make less cluttered
+            g4= find(seq)
+            g_quad = []
+            for g in g4:
+                tmp_g = dict()
+                tmp_g['gscore']= g['gscore']
+                tmp_g['tetrads']= g['tetrads']
+                tmp_g['length']= g['length']
+                tmp_g['sequence']= g['sequence']
+                tmp_g['start']= g['start']
+                g_quad.append(tmp_g)
+
+                   
+    
+            record = {
+                "gene_id": gene_id,
+                "start":start_pos,
+                "end":end_pos,
+                "mrna": list(mrna_set),
+                "URS": us,
+                "g_quad":g_quad,
+                "region":region
+            }
+            db.polyA.insert_one(record)
+
+               
