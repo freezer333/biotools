@@ -30,5 +30,6 @@
       {
         "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/Mus_musculus/GFF/ref_GRCm38.p3_top_level.gff3.gz",
         "build" : "38"
-      }
+      },
+  "apadb_seed" : "mm10.apadb_v2_final.bed"
 }

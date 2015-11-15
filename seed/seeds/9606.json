@@ -33,5 +33,6 @@
     {                                                          
       "url" :"ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/ARCHIVE/ANNOTATION_RELEASE.105/GFF/ref_GRCh37.p13_top_level.gff3.gz",
       "build" : "37"
-    }
+    },
+  "apadb_seed" : "hg19.apadb_v2_final.bed"
 }
