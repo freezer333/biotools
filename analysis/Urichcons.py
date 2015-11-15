@@ -3,7 +3,7 @@ import shutil
 import requests
 import xlsxwriter
 
-book = xlsxwriter.Workbook("Urich.xlsx")
+book = xlsxwriter.Workbook("UrichPolyA.xlsx")
 sheet = book.add_worksheet("Sheet")
 sheet.write(0, 0, "Accession")
 sheet.write(0, 1, "Homolog")
@@ -16,16 +16,10 @@ sheet.write(0, 7, "HomologUricness")
 sheet.write(0, 8, "Score")
 
 ####################TODO#######################
-# Sequences, visually, test cases
-# Force alignment? Get rid of alignment?
-# Is alignment needed? Use only distance from polyA site, ignoring dashes
-# How well does the sequence align?
 # Location a factor?
 # MOUSE XM_006539421.1 not in DB
 # NM_001145264.1 broke : pymongo.errors.CursorNotFound: cursor id '70360518217' not valid at server
-###################Bugs########################
-# "-uuua" in urich finder
-# does not use urich from db, deal with "-" post alignment
+
 
 class Urich:
 	def __init__ (self, location, urichness, sequence):
@@ -34,13 +28,13 @@ class Urich:
 		self.seq = sequence
 #this is urich finder
 #count-polyA uses relative length after polyA site
-def URichFinder(data, char,PolyA):
+def URichFinder(data, PolyA):
 	urich = []
-	for count, nt in enumerate(data[char], PolyA):
+	for count, nt in enumerate(data, PolyA):
 		uscore = 0
-		if count+4 < len(data[char]):
+		if count+4 < len(data):
 			for i in range(count, count+5):
-				if data[char][i] == 'U':
+				if data[i] == 'U':
 					uscore +=1
 		if uscore >= 3: 
 			urich.append(Urich(count-PolyA, uscore, data[char][count:count+5]))
@@ -93,10 +87,10 @@ from pymongo import MongoClient
 client = MongoClient()
 db = client.chrome
 collect = db.mrna
-aligned = db.alignedseq
+polyA = db.polyA
 
 log = open('urich_log.txt', 'w')
-mcursor = collect.find(spec = {'organism':'Homo sapiens'}, snapshot = True, timeout = False)
+mcursor = collect.find({'organism':'Homo sapiens'}, no_cursor_timeout = True)
 
 #The species we are looking at
 CONS_SPECIES = 'Mus musculus'
@@ -117,117 +111,72 @@ try:
 					if CONS_SPECIES != homolog['tax_name']:
 						continue
 
-					seq1 = None
-					seq2 = None
+					#seq1 = None
+					#seq2 = None
+					seq1PolyA = None
+					seq2PolyA = None
 
-					#checks if the alignement is in the database
 					print(human +"\n" + mouse +"\n")
-					AlignDBcursor = aligned.find(spec = {'principle':human, 'homolog':mouse}, snapshot = True, timeout = False)
 					
-					if AlignDBcursor.count() != 0:
-						data = {'a': '', 'b':''}
-						data['a'] = AlignDBcursor[0]["principle_seq"]
-						data['b'] = AlignDBcursor[0]["homolog_seq"]
-						seq1PolyA = AlignDBcursor[0]["principle_polya"]
-						seq2PolyA = AlignDBcursor[0]["homolog_polya"]
+					
+					url = 'http://localhost:3000/mrna/' + human #+ "/sequence"
+					response = requests.get(url)
+					if response.status_code == requests.codes.ok :
+						data = response.json()
+						seq1PolyA = polyA.find({'mrna' : human }, no_cursor_timeout = True)
+						if seq1PolyA.count() == 0:
+							log.write('Sequence ' + human + ' has no polyA sites mapped\n')
+							continue
+					##	#seq1PolyA = len(data['sequence'])
+					##	#print (seq1PolyA)
 					else:
-
-
-						#get length for polyA site
-						url = 'http://localhost:3000/mrna/' + human + "/sequence"
-						response = requests.get(url)
-						if response.status_code == requests.codes.ok :
-						    data = response.json()
-						    seq1PolyA = len(data['sequence'])
-						    #print (seq1PolyA)
-						else:
-							log.write('Error: Principle sequence not found '+human+'\n')
+						log.write('Error: Principle sequence not found '+human+'\n')
+						continue
+					url = 'http://localhost:3000/mrna/' + mouse #+ "/sequence"
+					response = requests.get(url)
+					if response.status_code == requests.codes.ok :
+						data = response.json()
+						seq2PolyA = polyA.find({'mrna' : mouse } , no_cursor_timeout = True )
+						if seq2PolyA.count() == 0:
+							log.write('Sequence ' + mouse + ' has no polyA sites mapped\n')
 							continue
-						url = 'http://localhost:3000/mrna/' + mouse + "/sequence"
-						response = requests.get(url)
-						if response.status_code == requests.codes.ok :
-						    data = response.json()
-						    seq2PolyA = len(data['sequence'])
-						    #print (seq2PolyA)
-						else:
-							log.write('Error: Homolog sequence not found '+mouse+'\n')
-							continue
-						#retrieve sequence data
-						url = 'http://localhost:3000/mrna/' + human + "/sequence?downstream=65"
-						response = requests.get(url)
-						if response.status_code == requests.codes.ok :
-						    data = response.json()
-						    seq1 = data['sequence'];
+						#seq2PolyA = len(data['sequence'])
+						#print (seq2PolyA)
+					else:
+						log.write('Error: Homolog sequence not found '+mouse+'\n')
+						continue
+					#retrieve sequence data
+					#url = 'http://localhost:3000/mrna/' + human + "/sequence?downstream=65"
+					#response = requests.get(url)
+					#if response.status_code == requests.codes.ok :
+					#	data = response.json()
+					#	seq1 = data['sequence'];
+					#url = 'http://localhost:3000/mrna/' + mouse + "/sequence?downstream=65"
+					#response = requests.get(url)
+					#if response.status_code == requests.codes.ok :
+					#	data = response.json()
+					#	seq2 = data['sequence'];
+					#turn T into U
+					#if seq1 != "":
+					#	seq1 = seq1.replace('T', 'U')
+					#if seq2 != "":
+					#	seq2 = seq2.replace('T', 'U')
+					#else:
+					#	log.write('Error: Sequence data not found '+human+' : '+mouse+'\n')
+					#	continue
+					seq1urich = []
+					seq2urich = []
 
-						url = 'http://localhost:3000/mrna/' + mouse + "/sequence?downstream=65"
-						response = requests.get(url)
-						if response.status_code == requests.codes.ok :
-						    data = response.json()
-						    seq2 = data['sequence'];
-						#turn T into U
-						if seq1 != "":
-							seq1 = seq1.replace('T', 'U')
-						if seq2 != "":
-							seq2 = seq2.replace('T', 'U')
-						else:
-							log.write('Error: Sequence data not found '+human+' : '+mouse+'\n')
-							continue
+					for record in seq1PolyA:
+						for URS in record['URS']:
+							seq1urich.append(Urich(URS['downstream_rel_pos'], URS['order'], URS['seq']))
+					for record in seq2PolyA:
+						for URS in record['URS']:
+							seq2urich.append(Urich(URS['downstream_rel_pos'], URS['order'], URS['seq']))
 
-						seq1urich = []
-						seq2urich = []
 
-						post_data = {'seqa' : seq1,
-							      'seqb' : seq2}
-						try:
-							url = 'http://localhost:3000/alignment/'
-							response = requests.post(url, data=post_data)
-							if response.status_code == requests.codes.ok :
-								data = response.json()
-								#print("Sequence Alignment Result")
-								#print("=======================\nSequence A\n=======================")
-								#print(data['a'])
-								#print("=======================\nSequence B\n=======================")
-								#print(data['b'])
-							else:
-								log.write('Error: Alignment failed: '+human+' : '+mouse+'\n')
-								continue
-
-						except ValueError:
-							log.write('Error: Alignment failed: '+human+' : '+mouse+'\n')
-							print("Alignment failed\n")
-							#keep looping through
-							continue
-
-						#need to find polyA site post alignment
-						#cycle through post alignment sequence (ignoring -'s) until that number is reached?
-						temp = 0;
-						for count, nt in enumerate(data['a']):
-							if (nt != '-'):
-								temp = temp+1
-							if (temp == seq1PolyA):
-								seq1PolyA = count
-								break
-
-						temp = 0;
-						for count, nt in enumerate(data['b']):
-							if (nt != '-'):
-								temp = temp+1
-							if (temp == seq2PolyA):
-								seq2PolyA = count
-								break
-	
-						#insert into alignementDB
-						alignedseq = {"principle": human, 
-								"homolog": mouse,
-								"principle_polya": seq1PolyA,
-								"homolog_polya": seq2PolyA,
-								"principle_seq": data['a'],
-								"homolog_seq": data['b'],
-							}
-						aligned.insert(alignedseq)
-
-					seq1urich = URichFinder(data, 'a', seq1PolyA)
-					seq2urich = URichFinder(data, 'b', seq2PolyA)
+					#seq1urich = URichFinder(data,  seq1PolyA)
+					#seq2urich = URichFinder(data,  seq2PolyA)
 
 					for count,val in enumerate (seq1urich):
 						bestMatch = 0
