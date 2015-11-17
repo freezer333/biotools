@@ -26,8 +26,8 @@ function serve (req, res) {
         render (res, "chart", {});
     }
     else if ( req.url == "/sumbitInfo") {
-        var jobj = getObj(req.body.mingscore, req.body.rnaloc, req.body.minont);
-        res.end(JSON.stringify( jobj ));
+        getObj(req.body.mingscore, req.body.rnaloc, req.body.minont, res);
+        //res.end(JSON.stringify( jobj ));
     }
 }
 
@@ -44,7 +44,7 @@ function render (res, view, model) {
     );
 }
 
-function getObj(mingscore, rnaloc, minont){
+function getObj(mingscore, rnaloc, minont, res){
     mongoose.connect('mongodb://localhost:27017/chrome');
     dataObj = {};
 
@@ -53,7 +53,7 @@ function getObj(mingscore, rnaloc, minont){
     db.once('open', function (ref) {
         console.log('Connected to mongo server.');
         
-        AnalysisSchema = new Schema({
+        var AnalysisSchema = new Schema({
             '_id': Schema.Types.ObjectId,
             'gscore_min': Number, // minimum acceptable g4 gscore
             'g4location': Number, // 5 = 5'-UTR | 3 = 3'-UTR | 1 = CDS
@@ -136,7 +136,7 @@ function getObj(mingscore, rnaloc, minont){
                             for( var g4 in g4list ){
                                 thisg4 = g4list[g4];
                                 if(thisg4.gscore >= mingscore){
-                                    if((thisg4.is5Prime && rnaloc == 5)
+                                    if(/*thisg4["is"+rnaloc] == true*/ (thisg4.is5Prime && rnaloc == 5)
                                        || (thisg4.is3Prime && rnaloc == 3)
                                        || (thisg4.isCDS && rnaloc == 1)){ // REPLACE WITH RNA LOCATION FILTERING
                                         isg4 = true;
@@ -193,7 +193,7 @@ function getObj(mingscore, rnaloc, minont){
                                 if (10 > dic[thisKey[i]].totalnum) continue; // less than 10 causes memory overflow?
                                 Ontology.create({ 'name': thisKey[i], 'type': name, 'validList': dic[thisKey[i]].rnaList, 'validNum': dic[thisKey[i]].validnum, 'invalidNum': (dic[thisKey[i]].totalnum - dic[thisKey[i]].validnum), 'totalNum': dic[thisKey[i]].totalnum, 'analysisid': thisAnalysis._id })
                                 if (minont <= dic[thisKey[i]].totalnum){
-                                    dataObj[thisKey[i]] = dic[thisKey[i]].validnum/dic[thisKey[i]].totalnum;
+                                    dataObj[thisKey[i]] = dic[thisKey[i]].validnum/dic[thisKey[i]].totalnum * 100;
                                 }
                             }  
                         }
@@ -203,19 +203,26 @@ function getObj(mingscore, rnaloc, minont){
 
                         console.log("Done!");
 
-                        return dataObj;
+                        //return dataObj;
+                        res.end(JSON.stringify( dataObj ));
+                        
+                        mongoose.connection.close();
                     }else{
                         Ontology.find({ 'analysisid': andoc._id, 'totalNum': { $gt: minont } }).
                         select({ name: 1, validNum: 1, totalNum: 1 }).
                         exec(function (err, ontList){
                             for( var ont in ontList ){
-                                dataObj[ontList[ont].name] = ontList[ont].validnum/ontList[ont].totalnum;
+                                dataObj[String(ontList[ont].name)] = Number(ontList[ont].validnum/ontList[ont].totalnum * 100);
                             }
-                            return dataObj;
+                            //return dataObj;
+                            res.end(JSON.stringify( dataObj ));
+                            
+                            mongoose.connection.close();
                         });
                     }
                 });
         });
         // mongoose.connection.close(); // is this even needed
     });
+    //return dataObj;
 }
