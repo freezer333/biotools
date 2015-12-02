@@ -44,6 +44,10 @@ function render (res, view, model) {
     );
 }
 
+var AnalysisSchema;
+var OntSchema;
+var MrnaSchema;
+
 function getObj(mingscore, rnaloc, minont, res){
     mongoose.connect('mongodb://localhost:27017/chrome');
     dataObj = {};
@@ -53,35 +57,41 @@ function getObj(mingscore, rnaloc, minont, res){
     db.once('open', function (ref) {
         console.log('Connected to mongo server.');
         
-        var AnalysisSchema = new Schema({
-            '_id': Schema.Types.ObjectId,
-            'gscore_min': Number, // minimum acceptable g4 gscore
-            'g4location': Number, // 5 = 5'-UTR | 3 = 3'-UTR | 1 = CDS
-            'validMRNA': Array, // array of accession numbers
-            'invalidMRNA': Array // array of accession numbers
-        });
+        if(typeof AnalysisSchema === 'undefined'){
+            AnalysisSchema = new Schema({
+                '_id': Schema.Types.ObjectId,
+                'gscore_min': Number, // minimum acceptable g4 gscore
+                'g4location': Number, // 5 = 5'-UTR | 3 = 3'-UTR | 1 = CDS
+                'validMRNA': Array, // array of accession numbers
+                'invalidMRNA': Array // array of accession numbers
+            });
+        }
         var Analysis = mongoose.model('Analysis', AnalysisSchema);
 
-        var Ont = new Schema({
-            'name': String, // ontology name
-            'type': String, // component, function, or process
-            'validList': Array, // list of mRNA accessions with g4 meering parameters
-            'validNum': Number, // number of mRNA with q4 meeting parameters
-            'invalidNum': Number, // number of mRNA with NO q4 meeting parameters
-            'totalNum': Number, // number of mRNA with this ontology term
-            'analysisid': Schema.Types.ObjectId // id of associated analysis
-        });
-        var Ontology = mongoose.model('Ontology', Ont);
+        if(typeof OntSchema === 'undefined'){
+            OntSchema = new Schema({
+                'name': String, // ontology name
+                'type': String, // component, function, or process
+                'validList': Array, // list of mRNA accessions with g4 meering parameters
+                'validNum': Number, // number of mRNA with q4 meeting parameters
+                'invalidNum': Number, // number of mRNA with NO q4 meeting parameters
+                'totalNum': Number, // number of mRNA with this ontology term
+                'analysisid': Schema.Types.ObjectId // id of associated analysis
+            });
+        }
+        var Ontology = mongoose.model('Ontology', OntSchema);
         
-        var MrnaSchema = new Schema({ // mRNA already in database
-            'organism': String,
-            'accession': String,
-            'g4s': Array,
-            'ontology': {
-                'components': Array,
-                'functions': Array,
-                'processes': Array }
-            }, { collection : 'mrna' });
+        if(typeof MrnaSchema === 'undefined'){
+            MrnaSchema = new Schema({ // mRNA already in database
+                'organism': String,
+                'accession': String,
+                'g4s': Array,
+                'ontology': {
+                    'components': Array,
+                    'functions': Array,
+                    'processes': Array }
+                }, { collection : 'mrna' });
+        }
         var Mrna = mongoose.model('Mrna', MrnaSchema);
 
 

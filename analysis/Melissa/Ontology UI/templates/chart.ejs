@@ -18,13 +18,13 @@ ${demo.css}
                 <input type="number" name="min_gscore"/>
 
                 <label for="rnaLoc">mRNA Location (3, 5, 1):  </label>
-                <!--<div>
-                    <input type="radio" name="rnaLoc" value="5Prime">5'-UTR<br>
-                    <input type="radio" name="rnaLoc" value="CDS">CDS<br>
-                    <input type="radio" name="rnaLoc" value="3Prime">3'-UTR<br>
-                    <input type="radio" name="rnaLoc" value="DownStream">Downstream
-                </div> -->
-                <input type="number" name="rnaLoc"/>
+                <select name="rnaLoc">
+                    <option value="5">5'-UTR</option>
+                    <option value="1">CDS</option>
+                    <option value="3">3'-UTR</option>
+                    <option value="0">Downstream Region</option>
+                </select>
+                <!--<input type="number" name="rnaLoc"/>-->
 
                 <label for="min_ont">Minimum mRNA per Ontology:  </label>
                 <input type="number" name="min_ont"/>
@@ -33,7 +33,11 @@ ${demo.css}
             </div>
         </form>
 
+        <div id="loading" style="width:100%;text-align:center;display:none;">
+            <img src='https://litpress.org/images/spinner.gif'>
+        </div>
         <div id="container" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
+        <table id="results" style="width:80%;margin-left:10%;"></table>
 
 	</body>
 </html>
