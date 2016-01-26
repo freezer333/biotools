@@ -48,6 +48,7 @@ def get_Seq(start,end, accession):
     #- orientation
     else:
         query_end= int(start)-200
+        print ("neg")
         url = 'http://localhost:3000/chrom/' + accession + '/' + str(start) + '/' + str(query_end) + "?orientation=-"
 
     response = requests.get(url)
@@ -56,7 +57,28 @@ def get_Seq(start,end, accession):
         return data['seq']
 
     return 'no sequence found'
-        
+
+def get_upStreamSeq(start,end, accession):
+    query_end = "";
+
+    #+ orientation
+    if(start < end):
+        query_start= int(start)-200
+        url='http://localhost:3000/chrom/'+accession+"/"+str(query_start)+'/' + str(start)
+
+    #- orientation
+    else:
+        query_start= int(start)+200
+        print ("neg")
+        url = 'http://localhost:3000/chrom/' + accession + '/' + str(query_start) + '/' + str(start) + "?orientation=-"
+
+    response = requests.get(url)
+    if response.status_code == requests.codes.ok:
+        data = response.json()
+        return data['seq']
+
+    return 'no sequence found'
+
 
 
 
@@ -75,8 +97,22 @@ def get_urich_motifs(seq):
             motifs.append(motif)
         i += 1
     return motifs
-    
 
+def get_polyA_sig(seq):
+    i = 0
+    signals= []
+    while i <= len(seq) - 6:
+        heptamer = seq[i:(i+6)]
+        if heptamer == "AATAAA" or heptamer == "ATTAAA":
+            signal = dict()
+            signal['position'] = i
+            signal['seq']=heptamer
+            signals.append(signal)
+        i+=1
+    return signals
+
+
+organism = "Homo sapiens"
 # check taxon id
 if len(sys.argv) > 1 :
     taxon_ids = sys.argv[1:]
@@ -86,20 +122,23 @@ else :
     print("Currently only supporting 9606 (Homo sapiens) and 10090 (Mus musculus)")
     sys.exit(0);
 for taxon_id in sorted(taxon_ids) :
+    if taxon_id is "10090":
+        organism = "Mus musculus"
+
     with open("seeds/"+ taxon_id + ".json") as json_file:
         seeds = json.load(json_file)
 
 
     config = configparser.ConfigParser()
     config.read('seed_sources.ini')
-    
+
     seq_url = config['chrom']['serve_url']
     #url = config['polyA']['base_url'] + config['polyA']['download_filename']
     local_path = config['local']['download_dir'] + "/" + seeds["apadb_seed"];
-    
-    
+
+
     print("Now processing APADB - make sure your webapp is running and you have the polyA bed file in temp!")
-    
+
     processed = 0
     with_mrna = 0
     with open(local_path) as f:
@@ -111,7 +150,7 @@ for taxon_id in sorted(taxon_ids) :
             status="NOT FOUND"
             url =""
             region= line.split()[6]
-            if (region == "UTR3" or region =="Extension") and abs(int(end_pos)-int(start_pos)) <= 25: 
+            if (region == "UTR3") and abs(int(end_pos)-int(start_pos)) <= 25:
                     url = seq_url + '/chrom/locusmap/' +acc + "/" + start_pos
                     response = requests.get(url)
                     if response.status_code == requests.codes.ok :
@@ -127,9 +166,9 @@ for taxon_id in sorted(taxon_ids) :
                                     status = "MAPPED TO " + str(mrna['locus'])
                                     with_mrna += 1
                                     mapped_mrna.append(mrna['accession'])
-                                    
-    
-                                #check the end position   
+
+
+                                #check the end position
                                 else:
                                     url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
                                     response = requests.get(url)
@@ -144,9 +183,9 @@ for taxon_id in sorted(taxon_ids) :
                                                     status = "MAPPED TO " + str(mrna['locus'])
                                                     with_mrna += 1
                                                     mapped_mrna.append(mrna['accession'])
-                                         
-                                     
-                                                
+
+
+
                     else:
                         url = seq_url + '/chrom/locusmap/' +acc + "/" + end_pos
                         response = requests.get(url)
@@ -161,23 +200,25 @@ for taxon_id in sorted(taxon_ids) :
                                         status = "MAPPED TO " + str(mrna['locus'])
                                         with_mrna += 1
                                         mapped_mrna.append(mrna['accession'])
-    
+
                     processed += 1
-    
+
                     # MAKE THE POLYA record and insert it into the collection
                     print (with_mrna , " / " , processed, "   -  Accession ", acc, "Locus = ", final_pos, " - ", status)
-    
-                                     
+
+
             if (status.split()[0] == "MAPPED"):
                 #extract gene id from data
                 genes=data['genes']
                 gene_id=""
                 for g in genes:
-                    gene_id =g['gene_id'] 
+                    gene_id =g['gene_id']
                         #make sure mrna accessions are distinct
                 mrna_set= set(mapped_mrna)
                 seq = get_Seq(start_pos,end_pos,acc)
+                upstream_seq= get_upStreamSeq(start_pos,end_pos,acc)
                 us= get_urich_motifs(seq)
+                signals = get_polyA_sig(upstream_seq)
                     #the find g4 has lots of extra info, make less cluttered
                 g4= find(seq)
                 g_quad = []
@@ -189,18 +230,18 @@ for taxon_id in sorted(taxon_ids) :
                     tmp_g['sequence']= g['sequence']
                     tmp_g['start']= g['start']
                     g_quad.append(tmp_g)
-    
-                       
-        
+
+
+
                 record = {
                     "gene_id": gene_id,
                     "start":start_pos,
                     "end":end_pos,
                     "mrna": list(mrna_set),
                     "URS": us,
+                    "polyA_signals":signals,
                     "g_quad":g_quad,
-                    "region":region
+                    "region":region,
+                    "organism": organism
                 }
                 db.polyA.insert_one(record)
-
-               
