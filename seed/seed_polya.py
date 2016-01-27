@@ -122,9 +122,8 @@ else :
     print("Currently only supporting 9606 (Homo sapiens) and 10090 (Mus musculus)")
     sys.exit(0);
 for taxon_id in sorted(taxon_ids) :
-    if taxon_id is "10090":
+    if taxon_id == "10090":
         organism = "Mus musculus"
-
     with open("seeds/"+ taxon_id + ".json") as json_file:
         seeds = json.load(json_file)
 
