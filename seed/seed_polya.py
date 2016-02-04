@@ -122,8 +122,9 @@ else :
     print("Currently only supporting 9606 (Homo sapiens) and 10090 (Mus musculus)")
     sys.exit(0);
 for taxon_id in sorted(taxon_ids) :
-    if taxon_id is "10090":
+    if taxon_id == "10090":
         organism = "Mus musculus"
+
 
     with open("seeds/"+ taxon_id + ".json") as json_file:
         seeds = json.load(json_file)
@@ -145,8 +146,19 @@ for taxon_id in sorted(taxon_ids) :
         for line in f:
             ch = line.split()[0]
             acc = get_chrom_accession(ch, seeds)
-            start_pos = line.split()[1]
-            end_pos = line.split()[2]
+            orientation = line.split()[5]
+            if orientation == "+":
+                start_pos = line.split()[1]
+                end_pos = line.split()[2]
+                print ("positive")
+            elif orientation == "-":
+                start_pos = line.split()[2]
+                end_pos = line.split()[1]
+                print ("neg")
+            else:
+                print ("uh oh")
+
+
             status="NOT FOUND"
             url =""
             region= line.split()[6]
@@ -213,13 +225,14 @@ for taxon_id in sorted(taxon_ids) :
                 gene_id=""
                 for g in genes:
                     gene_id =g['gene_id']
-                        #make sure mrna accessions are distinct
+
+                #make sure mrna accessions are distinct
                 mrna_set= set(mapped_mrna)
                 seq = get_Seq(start_pos,end_pos,acc)
                 upstream_seq= get_upStreamSeq(start_pos,end_pos,acc)
                 us= get_urich_motifs(seq)
                 signals = get_polyA_sig(upstream_seq)
-                    #the find g4 has lots of extra info, make less cluttered
+                #the find g4 has lots of extra info, make less cluttered
                 g4= find(seq)
                 g_quad = []
                 for g in g4:
