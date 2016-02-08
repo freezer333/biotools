@@ -18,8 +18,10 @@ objectID = ""
 pGene = ""
 count = 0
 for site in db.polyA.find():
+
     if site is None:
         next
+
     pGene = site['gene_id']
     objectID= site['_id']
 
@@ -44,12 +46,16 @@ for site in db.polyA.find():
 objectID = ""
 pGene = ""
 count = 0
+firstSiteID = None
 for gene in db.gene.find({"organism": "Homo sapiens", 'polyASite' : {'$exists':'true'}, '$where':'this.polyASite.length>0'}):
     pGene = gene['gene_id']
     polyASites = gene['polyASite']
     orientation = gene['orientation']
 
     firstSiteID = polyASites[0]
+
+    if firstSiteId is None:
+        next
     firstSiteEntry = db.polyA.find_one({"_id":firstSiteID})
     firstEnd = firstSiteEntry['end']
     distal = ""
