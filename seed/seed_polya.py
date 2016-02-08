@@ -97,6 +97,23 @@ def get_urich_motifs(seq):
             motifs.append(motif)
         i += 1
     return motifs
+##################################
+#Modification of get_urich_motifs#
+# to take any char for testing   #
+##################################
+def get_nrich_motifs(char,seq):
+    motifs = []
+    i = 0
+    while i <= len(seq) - 5:
+        hexamer = seq[i:(i+5)]
+        if hexamer.count(char) >= 3 :
+            motif = dict()
+            motif['order'] = hexamer.count(char)
+            motif['seq'] = hexamer
+            motif['downstream_rel_pos'] = upstream + i
+            motifs.append(motif)
+        i += 1
+    return motifs
 
 def get_polyA_sig(seq):
     i = 0
@@ -217,6 +234,11 @@ for taxon_id in sorted(taxon_ids) :
                 seq = get_Seq(start_pos,end_pos,acc)
                 upstream_seq= get_upStreamSeq(start_pos,end_pos,acc)
                 us= get_urich_motifs(seq)
+                #######Insert nrich for testing##################
+                ars = get_nrich_motifs('A',seq)
+                grs = get_nrich_motifs('G',seq)
+                crs = get_nrich_motifs('C',seq)
+                #######End nrich#################################
                 signals = get_polyA_sig(upstream_seq)
                     #the find g4 has lots of extra info, make less cluttered
                 g4= find(seq)
@@ -238,6 +260,9 @@ for taxon_id in sorted(taxon_ids) :
                     "end":end_pos,
                     "mrna": list(mrna_set),
                     "URS": us,
+                    "ARS": ars,
+                    "GRS": grs,
+                    "CRS": crs,
                     "polyA_signals":signals,
                     "g_quad":g_quad,
                     "region":region,
