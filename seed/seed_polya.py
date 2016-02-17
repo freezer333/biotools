@@ -49,7 +49,7 @@ def get_Seq(start,end, accession):
     else:
         query_end= int(start)-200
         print ("neg")
-        url = 'http://localhost:3000/chrom/' + accession + '/' + str(start) + '/' + str(query_end) + "?orientation=-"
+        url = 'http://localhost:3000/chrom/' + accession + '/' + str(query_end) + '/' + str(start) + "?orientation=-"
 
     response = requests.get(url)
     if response.status_code == requests.codes.ok:
@@ -70,7 +70,7 @@ def get_upStreamSeq(start,end, accession):
     else:
         query_start= int(start)+200
         print ("neg")
-        url = 'http://localhost:3000/chrom/' + accession + '/' + str(query_start) + '/' + str(start) + "?orientation=-"
+        url = 'http://localhost:3000/chrom/' + accession + '/' + str(start) + '/' + str(query_start) + "?orientation=-"
 
     response = requests.get(url)
     if response.status_code == requests.codes.ok:
@@ -141,11 +141,6 @@ else :
 for taxon_id in sorted(taxon_ids) :
     if taxon_id == "10090":
         organism = "Mus musculus"
-<<<<<<< HEAD
-
-
-=======
->>>>>>> f662e58147a8eac2997a6db5b324666a76d73d9c
     with open("seeds/"+ taxon_id + ".json") as json_file:
         seeds = json.load(json_file)
 
