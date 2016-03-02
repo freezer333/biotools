@@ -79,7 +79,7 @@ function getObj(mingscore, rnaloc, minont, res){
                 'analysisid': Schema.Types.ObjectId // id of associated analysis
             });
         }
-        var Ontology = mongoose.model('Ontology', OntSchema);
+        var OntologyList = mongoose.model('OntologyList', OntSchema);
         
         if(typeof MrnaSchema === 'undefined'){
             MrnaSchema = new Schema({ // mRNA already in database
@@ -201,11 +201,11 @@ function getObj(mingscore, rnaloc, minont, res){
                             var thisKey = Object.keys(dic);
                             for( var i = 0 ; i < thisKey.length ; i++){
                                 if (10 > dic[thisKey[i]].totalnum) continue; // less than 10 causes memory overflow?
-                                Ontology.create({ 'name': thisKey[i], 'type': name, 'validList': dic[thisKey[i]].rnaList, 'validNum': dic[thisKey[i]].validnum, 'invalidNum': (dic[thisKey[i]].totalnum - dic[thisKey[i]].validnum), 'totalNum': dic[thisKey[i]].totalnum, 'analysisid': thisAnalysis._id })
+                                OntologyList.create({ 'name': thisKey[i], 'type': name, 'validList': dic[thisKey[i]].rnaList, 'validNum': dic[thisKey[i]].validnum, 'invalidNum': (dic[thisKey[i]].totalnum - dic[thisKey[i]].validnum), 'totalNum': dic[thisKey[i]].totalnum, 'analysisid': thisAnalysis._id })
                                 if (minont <= dic[thisKey[i]].totalnum){
                                     dataObj[thisKey[i]] = dic[thisKey[i]].validnum/dic[thisKey[i]].totalnum * 100;
                                 }
-                            }  
+                            }
                         }
                         newOnts(comp, "components");
                         newOnts(func, "functions");
@@ -218,7 +218,7 @@ function getObj(mingscore, rnaloc, minont, res){
                         
                         mongoose.connection.close();
                     }else{
-                        Ontology.find({ 'analysisid': andoc._id, 'totalNum': { $gt: minont } }).
+                        OntologyList.find({ 'analysisid': andoc._id, 'totalNum': { $gt: minont } }).
                         select({ name: 1, validNum: 1, totalNum: 1 }).
                         exec(function (err, ontList){
                             for( var ont in ontList ){

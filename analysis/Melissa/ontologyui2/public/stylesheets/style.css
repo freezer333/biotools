@@ -1,0 +1,54 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+label {
+	margin-left:30px;
+	margin-right:5px;
+}
+
+table {
+	border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+    border: 1px solid #cbcbcb;
+}
+table thead {
+	background-color: #e0e0e0;
+    color: #000;
+    text-align: left;
+    vertical-align: bottom;
+}
+
+table th, table td {
+	border-width: 0 0 1px;
+    border-bottom: 1px solid #cbcbcb;
+    padding:10px;
+}
+
+#loading {
+	width:100%;
+	text-align:center;
+	display:none;
+}
+
+#container {
+	min-width: 300px;
+	height: 400px;
+	margin: 0 auto;
+}
+
+#results {
+	width:80%;
+	margin-left:10%;
+}
+
+.mrnalist {
+	height:150px;
+	overflow:auto;
+}

@@ -36,10 +36,10 @@ $(document).ready ( function() {
             dataArray.sort(function(a, b) {
                 return a[1] - b[1];
             });
-            $("#results").html("<tr><th>Ontology Name</th><th>QGRS Prevalence</th></tr>");
+            $("#results").html("<thead><tr><th style='width:50%'>Ontology Name</th><th>QGRS Prevalence</th></tr></thead>");
             for(var i in dataArray){
                 if(i < 0.05*dataArray.length || i > 0.95*dataArray.length){
-                    $("#results").append('<tr><td style="background-color:#cccccc;">'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td></tr>');
+                    $("#results").append('<tr><td style="color:#7cb5ec;">'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td></tr>');
                 }else{
                     $("#results").append('<tr><td>'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td></tr>');
                 }

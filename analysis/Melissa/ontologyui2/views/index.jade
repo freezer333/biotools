@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    form
+        h1= title
+        label(for='min_gscore') Minimum Gscore:
+        input(type='number', name='min_gscore')
+        label(for='rnaLoc') mRNA Location:
+        select(name='rnaLoc')
+            option(value=5) 5'-UTR
+            option(value=1) CDS
+            option(value=3) 3'-UTR
+            option(value=0) Downstream Region
+        label(for='min_ont') Minimum mRNA per Ontology:
+        input(type='number', name='min_ont')
+        label(for='file_input') File:
+        input(type='file', name='file_input', id='file_input')
+        button(type='button') Submit
+
+    #loading: img(src="https://litpress.org/images/spinner.gif")
+    #container
+    table#resultstable
