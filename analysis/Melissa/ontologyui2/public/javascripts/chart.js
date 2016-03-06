@@ -12,8 +12,11 @@ $(document).ready ( function() {
         var locnum = $("select[name*='rnaLoc'] option:selected").val();
         var ontval = $( "input[name*='min_ont']" ).val();
         var locname = $("select[name*='rnaLoc'] option:selected").text();
+        var analysistype = $( "input[name*='file_use']:checked" ).val();
 
-        var geneinput = document.getElementById('file_input');
+        console.log(analysistype);
+
+        /*var geneinput = document.getElementById('file_input');
         genefile = geneinput.files[0];
         var genelist = [];
         if (genefile) {
@@ -81,12 +84,12 @@ $(document).ready ( function() {
                 }); 
             }
             r.readAsText(genefile);
-        }else{
+        }else{*/
             var jax = $.post('submitinfo', {
                 mingscore : ingscore,
                 rnaloc : locnum,
                 minont : ontval,
-                targetgenelist : genelist
+                targetgenelist : analysistype
             });
             jax.done( function (data) {
                 console.log(data);
@@ -122,7 +125,7 @@ $(document).ready ( function() {
                 $("#loading").css("display", "none");
                 $("button").prop("disabled",false);
             }); 
-        }
+        //}
     });
 
 
@@ -162,7 +165,7 @@ $(document).ready ( function() {
                         enabled: false
                     },
                     tooltip: {
-                        pointFormat: '<b>{point.y:.1f}%</b> of mrna associated with this ontology have GQRS'
+                        pointFormat: '<b>{point.y:.1f}%</b> of mrna associated with this ontology have QGRS'
                     },
                     series: [{
                         name: 'QGRS Prevalence',

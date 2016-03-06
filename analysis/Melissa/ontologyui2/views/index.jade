@@ -13,8 +13,13 @@ block content
             option(value=0) Downstream Region
         label(for='min_ont') Minimum mRNA per Ontology:
         input(type='number', name='min_ont')
-        label(for='file_input') File:
-        input(type='file', name='file_input', id='file_input')
+        label(for='file_use') File:
+        input(type='radio', name='file_use', value='all', checked='checked')
+        | All
+        input(type='radio', name='file_use', value='weak')
+        | Weak URS
+        //- label(for='file_input') File:
+        //- input(type='file', name='file_input', id='file_input')
         button(type='button') Submit
 
     #loading: img(src="https://litpress.org/images/spinner.gif")
