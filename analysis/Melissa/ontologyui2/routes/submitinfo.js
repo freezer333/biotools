@@ -17,19 +17,18 @@ router.post('/', function(req, res, next) {
         var isg4 = false; // true if valid g4 is found
         var g4list = thismrna["g4s"];
 
-        // look for first g4 in gene meeting requirements
         var searchin = "gscore";
         if( req.body.mingscore < 17 ){
             var searchin = "tetrads"
         }
+
+        var loc = "is"+String(req.body.rnaloc); // is 5Prime, isDownstream, isCDN, is3Prime
         
+        // look for first g4 in gene meeting requirements
         for( var g4 in g4list ){
             thisg4 = g4list[g4];
             if(thisg4[searchin] >= req.body.mingscore){
-                if(/*thisg4["is"+rnaloc] == true*/ (thisg4.is5Prime && req.body.rnaloc == 5)
-                   || (thisg4.is3Prime && req.body.rnaloc == 3)
-                   || (thisg4.isCDS && req.body.rnaloc == 1)
-                   || (thisg4.isDownstream && req.body.rnaloc == 0)){ // REPLACE WITH RNA LOCATION FILTERING
+                if(thisg4[loc] == true){ 
                     isg4 = true;
                     break;
                 }
@@ -55,10 +54,8 @@ router.post('/', function(req, res, next) {
         if(isg4 == true){
             add = 1;
         }
-        console.log(thismrna.ontology[type])
         for(var ont in thismrna.ontology[type]){
             var thisont = thismrna.ontology[type][ont];
-            //console.log(String(thisont) + " is " + String(typeof thisont) + " in " + String(thismrna.accession))
             if( typelist[thisont] != null && typeof thisont != 'object'){
                 if((typelist[thisont][2]).indexOf(thismrna['accession']) == -1){
                     typelist[thisont][0] = typelist[thisont][0] + add; // num w/ g4
@@ -69,7 +66,7 @@ router.post('/', function(req, res, next) {
                     typelist[thisont][3].push( thismrna['accession'] ); // total list
                 }
             }else{
-                typelist[thisont] = [ add, 1, [], [thismrna['accession']] ]
+                typelist[thisont] = [ add, 1, [], [thismrna['accession']], type ]
                 if(isg4){
                     typelist[thisont][2].push( thismrna['accession'] ); // num w/ g4
                 }
@@ -118,7 +115,7 @@ router.post('/', function(req, res, next) {
                     // in the form [0: number with g4, 1: total number, 2: accession list with g4, 3: total accession list]
 
                     for( var ont in ontList){
-                    	ont_terms[ontList[ont]['term']] = [ 0, ontList[ont]['num_mrna'], [], ontList[ont]['mrna_list'] ];
+                    	ont_terms[ontList[ont]['term']] = [ 0, ontList[ont]['num_mrna'], [], ontList[ont]['mrna_list'], ontList[ont]['type'] ];
                     }
 
 
@@ -161,7 +158,7 @@ router.post('/', function(req, res, next) {
                 validmrna.push(line);
             });
 
-            setTimeout(function(){
+            //setTimeout(function(){
                 Mrna.find({
                     accession: { $in: validmrna },
                     hasontology: true,
@@ -171,8 +168,6 @@ router.post('/', function(req, res, next) {
                     exec(function (err, mrnaList) {
                         for (mrna in mrnaList){
                             thismrna = mrnaList[mrna];
-                            //console.log(thismrna["accession"] + " found")
-                            //if(typeof thismrna.ontology == "undefined" || typeof thismrna.g4s == "undefined"){return;}
                             var isg4 = hasg4(thismrna);
                             
                             addNewTerms(thismrna, 'components', ont_terms, isg4);
@@ -189,7 +184,7 @@ router.post('/', function(req, res, next) {
                     }
                 );
                 
-            }, 2000);
+            //}, 2000);
 
             
         }

@@ -13,6 +13,7 @@ label {
 }
 
 table {
+	width:100%;
 	border-collapse: collapse;
     border-spacing: 0;
     empty-cells: show;
@@ -41,11 +42,6 @@ table th, table td {
 	min-width: 300px;
 	height: 400px;
 	margin: 0 auto;
-}
-
-#results {
-	width:80%;
-	margin-left:10%;
 }
 
 .mrnalist {

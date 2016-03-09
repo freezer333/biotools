@@ -7,10 +7,10 @@ block content
         input(type='number', name='min_gscore')
         label(for='rnaLoc') mRNA Location:
         select(name='rnaLoc')
-            option(value=5) 5'-UTR
-            option(value=1) CDS
-            option(value=3) 3'-UTR
-            option(value=0) Downstream Region
+            option(value='5Prime') 5'-UTR
+            option(value='CDS') CDS
+            option(value='3Prime') 3'-UTR
+            option(value='Downstream') Downstream Region
         label(for='min_ont') Minimum mRNA per Ontology:
         input(type='number', name='min_ont')
         label(for='file_use') File:
@@ -24,4 +24,9 @@ block content
 
     #loading: img(src="https://litpress.org/images/spinner.gif")
     #container
-    table#resultstable
+    h3 Components
+    table#componentstable.resultstable
+    h3 Processes
+    table#processestable.resultstable
+    h3 Functions
+    table#functionstable.resultstable

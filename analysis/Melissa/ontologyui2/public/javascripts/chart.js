@@ -14,8 +14,6 @@ $(document).ready ( function() {
         var locname = $("select[name*='rnaLoc'] option:selected").text();
         var analysistype = $( "input[name*='file_use']:checked" ).val();
 
-        console.log(analysistype);
-
         /*var geneinput = document.getElementById('file_input');
         genefile = geneinput.files[0];
         var genelist = [];
@@ -44,12 +42,12 @@ $(document).ready ( function() {
                     dataArray.sort(function(a, b) {
                         return a[1] - b[1];
                     });
-                    $("#resultstable").html("<thead><tr><th style='width:50%'>Ontology Name</th><th>QGRS Prevalence</th><th>Associated mRNA with G4</th><th>All Associated mRNA</th></tr></thead>");
+                    $(".resultstable").html("<thead><tr><th style='width:50%'>Ontology Name</th><th>QGRS Prevalence</th><th>Associated mRNA with G4</th><th>All Associated mRNA</th></tr></thead>");
                     for(var i in dataArray){
                         if(i < 0.05*dataArray.length || i > 0.95*dataArray.length){
-                            $("#resultstable").append('<tr><td style="color:#7cb5ec;">'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
+                            $(".resultstable").append('<tr><td style="color:#7cb5ec;">'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
                         }else{
-                            $("#resultstable").append('<tr><td>'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
+                            $(".resultstable").append('<tr><td>'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
                         }
 
                         var thisval = data[dataArray[i][0]];
@@ -101,26 +99,31 @@ $(document).ready ( function() {
                 dataArray.sort(function(a, b) {
                     return a[1] - b[1];
                 });
-                $("#resultstable").html("<thead><tr><th style='width:50%'>Ontology Name</th><th>QGRS Prevalence</th><th>Associated mRNA with G4</th><th>All Associated mRNA</th></tr></thead>");
+                $(".resultstable").html("<thead><tr><th style='width:50%'>Ontology Name</th><th>QGRS Prevalence</th><th>Associated mRNA with G4</th><th>All Associated mRNA</th></tr></thead>");
                 for(var i in dataArray){
+                    var onttype = data[dataArray[i][0]][4];
                     if(i < 0.05*dataArray.length || i > 0.95*dataArray.length){
-                        $("#resultstable").append('<tr><td style="color:#7cb5ec;">'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
+                        $("#"+String(onttype)+"table").append('<tr><td style="color:#7cb5ec;">'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
                     }else{
-                        $("#resultstable").append('<tr><td>'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
+                        $("#"+String(onttype)+"table").append('<tr><td>'+dataArray[i][0]+'</td><td>'+dataArray[i][1]+'</td><td><div class="mrnalist" id="accociatedg4_' + i +'"></div></td><td><div class="mrnalist" id="accociatedall_' + i +'"></div></td></tr>');
                     }
 
                     var thisval = data[dataArray[i][0]];
                     for(var g4count in thisval[2]){
                         $("#accociatedg4_" + String(i) ).append(String(thisval[2][g4count])+'<br>');
                     }
+                    $("#accociatedg4_" + String(i) ).after('<div style="text-align:right;">' + (thisval[2]).length + ' accessions</div>');
 
                     for(var allcount in thisval[3]){
                         $("#accociatedall_" + String(i) ).append(String(thisval[3][allcount])+'<br>')
                     }
+                    $("#accociatedall_" + String(i) ).after('<div style="text-align:right;">' + (thisval[3]).length + ' accessions</div>');
                     
                 }
                 qgrschart.series[0].setData(dataArray,true); 
-                qgrschart.setTitle(null, { text: 'minimum of ' + ontval + ' related genes, gscore of ' + ingscore + ', located in ' + locname});
+                var score = "";
+                (ingscore < 17) ? (score = "QGRS containing " + ingscore + " tetrads, " ) : (score = "gscore of " + ingscore + ", " );
+                qgrschart.setTitle(null, { text: 'minimum of ' + ontval + ' related genes, ' + score + 'located in the ' + locname});
                 $("#container").css("display", "block");
                 $("#loading").css("display", "none");
                 $("button").prop("disabled",false);
@@ -140,7 +143,7 @@ $(document).ready ( function() {
                         renderTo: 'container'
                     },
                     title: {
-                        text: 'Prevalence of QGRS in Ontologies'
+                        text: 'Prevalence of mRNA with QGRS among Ontology Terms'
                     },
                     /*subtitle: {
                         text: ' '
