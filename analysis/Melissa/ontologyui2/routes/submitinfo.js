@@ -41,21 +41,25 @@ router.post('/', function(req, res, next) {
 	function addTerms(thismrna, type, typelist){
 		for(var ont in thismrna.ontology[type]){
 			var thisont = thismrna.ontology[type][ont];
-			if( (typelist.indexOf(thisont) != -1) && ((typelist[thisont][2]).indexOf(thismrna['accession']) == -1) ){
-				typelist[thisont][0] = typelist[thisont][0] + 1;
-				typelist[thisont][2].push( thismrna['accession'] );
+			if( typelist[thisont] != null && typeof thisont != 'object'){ // if the ontology is in the list
+                if ( (typelist[thisont][2]).indexOf(thismrna['accession']) == -1 ){ // and mRNA is not already listed
+				    typelist[thisont][0] = typelist[thisont][0] + 1;
+				    typelist[thisont][2].push( thismrna['accession'] );
+                }
 			}
         }
 	}
 
     function addNewTerms(thismrna, type, typelist, isg4){
+        var add = 0;
+        if(isg4 == true){
+            add = 1;
+        }
+        console.log(thismrna.ontology[type])
         for(var ont in thismrna.ontology[type]){
             var thisont = thismrna.ontology[type][ont];
-            var add = 0;
-            if(isg4 == true){
-                add = 1;
-            }
-            if( typelist[thisont] != null ){
+            //console.log(String(thisont) + " is " + String(typeof thisont) + " in " + String(thismrna.accession))
+            if( typelist[thisont] != null && typeof thisont != 'object'){
                 if((typelist[thisont][2]).indexOf(thismrna['accession']) == -1){
                     typelist[thisont][0] = typelist[thisont][0] + add; // num w/ g4
                     typelist[thisont][1] = typelist[thisont][1] + 1; // total num
@@ -104,7 +108,7 @@ router.post('/', function(req, res, next) {
 	    }
         var Mrna = mongoose.model('Mrna', MrnaSchema);
 
-        if(req.body.targetgenelist == 'all'){
+        if(req.body.targetgenelist == 'all'){ // use all mrna
             OntologyList.find({num_mrna: { $gte : Number(req.body.minont)}}).
                 select('term type mrna_list num_mrna'). // select everything
                 exec(function (err1, ontList) {
@@ -112,36 +116,16 @@ router.post('/', function(req, res, next) {
                 	var ont_terms = {};
                     // initialize ontology lists
                     // in the form [0: number with g4, 1: total number, 2: accession list with g4, 3: total accession list]
-                    //var genelist = req.body.targetgenelist;
+
                     for( var ont in ontList){
-                    	// FILTER ONTOLOGY ACCORDING TO TARGET MRNA
-                    	// NEED TO
-                    	/*if( typeof genelist != 'undefined' ){
-                    		var istarget = false;
-                    		for(var ontmrna in ontList[ont]['mrna_list']){
-                    			//for(var targetmrna in genelist){
-                    				var index = genelist.indexOf(ontList[ont]['mrna_list'][ontmrna]);
-                    				if( index > -1  ){
-    	                			//if(String(ontList[ont]['mrna_list'][ontmrna]) == String(genelist[targetmrna])){
-    	                				//console.log(String(genelist[index]) + " = " + ontList[ont]['mrna_list'][ontmrna])
-    	                				istarget = true;
-    	                				break;
-    	                			}
-                    			//}
-                    		}
-                    		if(istarget == false){
-                    			continue;
-                    		}
-                    	}*/
                     	ont_terms[ontList[ont]['term']] = [ 0, ontList[ont]['num_mrna'], [], ontList[ont]['mrna_list'] ];
-                    	//console.log(ontList[ont]['term']);
                     }
 
 
                 	Mrna.find({
     		            organism: 'Homo sapiens',
-    		            ontology: { $exists: true },
-    		            g4s: { $exists: true }
+    		            hasontology: true,
+    		            hasg4s: true
     		            }).
     		            select('g4s accession ontology'). // limited selection
     		            exec(function (err2, mrnaList) {
@@ -151,7 +135,7 @@ router.post('/', function(req, res, next) {
                             for( var mrna in mrnaList){
                             	var isg4 = hasg4(mrnaList[mrna]);
                             	
-                                if(isg4){
+                                if(isg4 == true){
                                 	// deal with ontologies
                                 	addTerms(mrnaList[mrna], 'components', ont_terms);
                                 	addTerms(mrnaList[mrna], 'functions', ont_terms);
@@ -179,23 +163,22 @@ router.post('/', function(req, res, next) {
 
             setTimeout(function(){
                 Mrna.find({
-                    accession: { $in: validmrna }
-                    //ontology: { $exists: true },
-                    //g4s: { $exists: true }
+                    accession: { $in: validmrna },
+                    hasontology: true,
+                    hasg4s: true
                     }).
                     select('g4s accession ontology'). // limited selection
                     exec(function (err, mrnaList) {
                         for (mrna in mrnaList){
                             thismrna = mrnaList[mrna];
                             //console.log(thismrna["accession"] + " found")
-                            if(typeof thismrna.ontology == "undefined" || typeof thismrna.g4s == "undefined"){return;}
+                            //if(typeof thismrna.ontology == "undefined" || typeof thismrna.g4s == "undefined"){return;}
                             var isg4 = hasg4(thismrna);
                             
                             addNewTerms(thismrna, 'components', ont_terms, isg4);
                             addNewTerms(thismrna, 'functions', ont_terms, isg4);
                             addNewTerms(thismrna, 'processes', ont_terms, isg4);
                         }
-                        console.log(ont_terms);
                         for(ontterm in ont_terms){
                             if(ont_terms[ontterm][1] < req.body.minont){
                                 delete ont_terms[ontterm];
