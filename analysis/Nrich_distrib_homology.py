@@ -61,9 +61,6 @@ def UCons(n,m):
 
 ############################
 
-
-book = xlsxwriter.Workbook("Nrich_Distrib_Homology.xlsx")
-sheet = book.add_worksheet("Sheet")
 log = open('nrich_distrib_homology_log.txt', 'w')
 
 MAX_SEARCH_LENGTH = 200+1
@@ -76,16 +73,6 @@ mcursor = collect.find({'organism':'Homo sapiens'}, no_cursor_timeout = True)
 ############
 #DOWNSTREAM#
 ############
-sheet.write(0, 0, "Downstream")
-sheet.write(0, 1, "Human")
-sheet.write(1, 0, "URS Pos")
-sheet.write(1, 1, "# of URS")
-sheet.write(1, 2, "ARS Pos")
-sheet.write(1, 3, "# of ARS")
-sheet.write(1, 4, "CRS Pos")
-sheet.write(1, 5, "# of CRS")
-sheet.write(1, 6, "GRS Pos")
-sheet.write(1, 7, "# of GRS")
 
 #The species we are looking at
 CONS_SPECIES = 'Mus musculus'
@@ -141,6 +128,8 @@ try:
 							index += 1
 							pat1 = Nrich(NRS['downstream_rel_pos'], NRS['order'], NRS['seq'])
 							for pat2 in seq2urich:
+								if UCons(pat1, pat2) == 0:
+									polyA.update_one({"_id": record['_id']}, { "$set": { 'URS.'+ str(index)+'.conserved' : False}})
 								if UCons(pat1, pat2) != 0:
 									polyA.update_one({"_id": record['_id']}, { "$set": { 'URS.'+ str(index)+'.conserved' : True}})
 									ulist[pat1.loc] = ulist[pat1.loc]+1
@@ -150,6 +139,8 @@ try:
 							index += 1
 							pat1 = Nrich(NRS['downstream_rel_pos'], NRS['order'], NRS['seq'])
 							for pat2 in seq2arich:
+								if UCons(pat1, pat2) == 0:
+									polyA.update_one({"_id": record['_id']}, { "$set": { 'ARS.'+ str(index)+'.conserved' : False}})
 								if UCons(pat1, pat2) != 0:
 									polyA.update_one({"_id": record['_id']}, { "$set": { 'ARS.'+ str(index)+'.conserved' : True}})
 									alist[pat1.loc] = alist[pat1.loc]+1
@@ -159,6 +150,8 @@ try:
 							index += 1
 							pat1 = Nrich(NRS['downstream_rel_pos'], NRS['order'], NRS['seq'])
 							for pat2 in seq2crich:
+								if UCons(pat1, pat2) == 0:
+									polyA.update_one({"_id": record['_id']}, { "$set": { 'CRS.'+ str(index)+'.conserved' : False}})
 								if UCons(pat1, pat2) != 0:
 									polyA.update_one({"_id": record['_id']}, { "$set": { 'CRS.'+ str(index)+'.conserved' : True}})
 									clist[pat1.loc] = clist[pat1.loc]+1
@@ -168,6 +161,8 @@ try:
 							index += 1
 							pat1 = Nrich(NRS['downstream_rel_pos'], NRS['order'], NRS['seq'])
 							for pat2 in seq2grich:
+								if UCons(pat1, pat2) == 0:
+									polyA.update_one({"_id": record['_id']}, { "$set": { 'GRS.'+ str(index)+'.conserved' : False}})
 								if UCons(pat1, pat2) != 0:
 									polyA.update_one({"_id": record['_id']}, { "$set": { 'GRS.'+ str(index)+'.conserved' : True}})
 									glist[pat1.loc] = glist[pat1.loc]+1
@@ -193,4 +188,3 @@ except Exception as e:
 #	sheet.write(1+x,7, glist[x])
 
 log.close()
-book.close()
