@@ -1,0 +1,11 @@
+{
+  "name": "gtest",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Scott Frees <scott.frees@gmail.com> (http://scottfrees.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "nan": "^2.4.0",
+    "qgrs2": "file:../addon"
+  }
+}

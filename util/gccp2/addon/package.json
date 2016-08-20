@@ -1,0 +1,14 @@
+{
+  "name": "qgrs2",
+  "version": "v0.0.1",
+  "scripts": {
+    "preinstall": "node-gyp configure && node-gyp build",
+    "preuninstall": "rm -rf build/*"
+  },
+  "main": "build/Release/qgrs2.node",
+  "author": "Scott Frees <scott.frees@gmail.com> (scott.frees@gmail.com)",
+  "license": "MIT",
+  "dependencies": {
+    "nan": "^2.4.0"
+  }
+}
