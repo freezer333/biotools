@@ -141,7 +141,7 @@ else :
 for taxon_id in sorted(taxon_ids) :
     if taxon_id == "10090":
         organism = "Mus musculus"
-    with open("seeds/"+ taxon_id + ".json") as json_file:
+    with open("/Users/Melissa/dev/biotools/seed/seeds/9606.json") as json_file:
         seeds = json.load(json_file)
 
 
