@@ -1,32 +1,45 @@
 extends layout
 
 block content
-    form
-        h1= title
-        label(for='min_gscore') Minimum Gscore:
-        input(type='number', name='min_gscore')
-        label(for='rnaLoc') mRNA Location:
-        select(name='rnaLoc')
-            option(value='5Prime') 5'-UTR
-            option(value='CDS') CDS
-            option(value='3Prime') 3'-UTR
-            option(value='Downstream') Downstream Region
-        label(for='min_ont') Minimum mRNA per Ontology:
-        input(type='number', name='min_ont')
-        label(for='file_use') File:
-        input(type='radio', name='file_use', value='all', checked='checked')
-        | All
-        input(type='radio', name='file_use', value='weak')
-        | Weak URS
-        //- label(for='file_input') File:
-        //- input(type='file', name='file_input', id='file_input')
-        button(type='button') Submit
+    .container
+        form
+            h1= title
+            .row
+                .col-sm-6.col-md-4
+                    label(for='min_gscore') Minimum Gscore:
+                    input(type='number', name='min_gscore')
+                .col-sm-6.col-md-4
+                    label(for='rnaLoc') mRNA Location:
+                    select(name='rnaLoc')
+                        option(value='5Prime') 5'-UTR
+                        option(value='CDS') CDS
+                        option(value='3Prime') 3'-UTR
+                        option(value='Downstream') Downstream Region
+                .col-sm-6.col-md-4
+                    label(for='min_ont') Minimum mRNA per Ontology:
+                    input(type='number', name='min_ont')
+            .row
+                .col-xs-12
+                    label(for='file_use') File:
+                .col-sm-4.col-md-3
+                    input(type='radio', name='file_use', value='all', checked='checked')
+                    | All
+                each txtdoc in ['exp1/0urs.txt', 'exp1/3urs.txt', 'exp1/4urs.txt', 'exp1/5urs.txt', 'exp2/nours.txt', 'exp2/strongurs.txt', 'exp2/weakurs.txt', 'exp3/0urs.txt', 'exp3/3urs.txt', 'exp3/4urs.txt', 'exp3/5urs.txt', 'exp4/nours.txt', 'exp4/strongurs.txt', 'exp4/weakurs.txt', 'exp5/0urs.txt', 'exp5/3urs.txt', 'exp5/4urs.txt', 'exp5/5urs.txt', 'exp6/nours.txt', 'exp6/strongurs.txt', 'exp6/weakurs.txt']
+                    .col-sm-4.col-md-3
+                        input(type='radio', name='file_use', value=txtdoc)
+                        | #{txtdoc}
+                //- label(for='file_input') File:
+                //- input(type='file', name='file_input', id='file_input')
+            button(type='button').btn.btn-primary.btn-lg.btn-block Submit
 
-    #loading: img(src="https://litpress.org/images/spinner.gif")
-    #container
-    h3 Components
-    table#componentstable.resultstable
-    h3 Processes
-    table#processestable.resultstable
-    h3 Functions
-    table#functionstable.resultstable
+        #loading: img(src="https://litpress.org/images/spinner.gif")
+        #resultstablecontainer
+            h3 Components
+            #container_com
+            table#componentstable.resultstable
+            h3 Processes
+            #container_proc
+            table#processestable.resultstable
+            h3 Functions
+            #container_func
+            table#functionstable.resultstable

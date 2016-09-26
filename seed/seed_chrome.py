@@ -129,7 +129,7 @@ else :
 
 for taxon_id in sorted(taxon_ids) :
   try:
-    with open('seeds/' + taxon_id + ".json") as json_file:
+    with open("./seeds/9606.json") as json_file:
         seed = json.load(json_file)
         organism = seed['organism']
         folder = root + organism

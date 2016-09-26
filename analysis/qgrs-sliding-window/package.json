@@ -1,0 +1,10 @@
+{
+  "name": "qgrs-window-count",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "ISC",
+  "dependencies": {
+    "nan": "^2.4.0",
+    "qgrs2": "file:../../util/gccp2/addon"
+  }
+}

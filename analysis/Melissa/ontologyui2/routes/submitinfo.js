@@ -41,9 +41,9 @@ router.post('/', function(req, res, next) {
 		for(var ont in thismrna.ontology[type]){
 			var thisont = thismrna.ontology[type][ont];
 			if( typelist[thisont] != null && typeof thisont != 'object'){ // if the ontology is in the list
-                if ( (typelist[thisont][2]).indexOf(thismrna['accession']) == -1 ){ // and mRNA is not already listed
-				    typelist[thisont][0] = typelist[thisont][0] + 1;
-				    typelist[thisont][2].push( thismrna['accession'] );
+                if ( (typelist[thisont]['list_qgrs']).indexOf(thismrna['accession']) == -1 ){ // and mRNA is not already listed
+				    typelist[thisont]['num_with_qgrs'] = typelist[thisont]['num_with_qgrs'] + 1;
+				    typelist[thisont]['list_qgrs'].push( thismrna['accession'] );
                 }
 			}
         }
@@ -57,18 +57,24 @@ router.post('/', function(req, res, next) {
         for(var ont in thismrna.ontology[type]){
             var thisont = thismrna.ontology[type][ont];
             if( typelist[thisont] != null && typeof thisont != 'object'){
-                if((typelist[thisont][2]).indexOf(thismrna['accession']) == -1){
-                    typelist[thisont][0] = typelist[thisont][0] + add; // num w/ g4
-                    typelist[thisont][1] = typelist[thisont][1] + 1; // total num
+                if((typelist[thisont]['list_qgrs']).indexOf(thismrna['accession']) == -1){
+                    typelist[thisont]['num_with_qgrs'] = typelist[thisont]['num_with_qgrs'] + add; // num w/ g4
+                    typelist[thisont]['num_total'] = typelist[thisont]['num_total'] + 1; // total num
                     if(isg4){
-                        typelist[thisont][2].push( thismrna['accession'] ); // num w/ g4
+                        typelist[thisont]['list_qgrs'].push( thismrna['accession'] ); // list w/ g4
                     }
-                    typelist[thisont][3].push( thismrna['accession'] ); // total list
+                    typelist[thisont]['list_all'].push( thismrna['accession'] ); // total list
                 }
             }else{
-                typelist[thisont] = [ add, 1, [], [thismrna['accession']], type ]
+                typelist[thisont] = {
+                    'num_with_qgrs': add,
+                    'num_total': 1,
+                    'list_qgrs': [], 
+                    'list_all': [thismrna['accession']], 
+                    'type': type
+                };
                 if(isg4){
-                    typelist[thisont][2].push( thismrna['accession'] ); // num w/ g4
+                    typelist[thisont]['list_qgrs'].push( thismrna['accession'] ); // num w/ g4
                 }
             }
         }
@@ -105,17 +111,24 @@ router.post('/', function(req, res, next) {
 	    }
         var Mrna = mongoose.model('Mrna', MrnaSchema);
 
+        var ont_terms = {};
+        // initialize ontology lists
+        // in the form [0: number with g4, 1: total number, 2: accession list with g4, 3: total accession list]
+        // new form: { num_with_qgrs, num_total, list_qgrs, list_all }
+
         if(req.body.targetgenelist == 'all'){ // use all mrna
             OntologyList.find({num_mrna: { $gte : Number(req.body.minont)}}).
                 select('term type mrna_list num_mrna'). // select everything
                 exec(function (err1, ontList) {
 
-                	var ont_terms = {};
-                    // initialize ontology lists
-                    // in the form [0: number with g4, 1: total number, 2: accession list with g4, 3: total accession list]
-
                     for( var ont in ontList){
-                    	ont_terms[ontList[ont]['term']] = [ 0, ontList[ont]['num_mrna'], [], ontList[ont]['mrna_list'], ontList[ont]['type'] ];
+                    	ont_terms[ontList[ont]['term']] = {
+                            'num_with_qgrs': 0,
+                            'num_total': ontList[ont]['num_mrna'], 
+                            'list_qgrs': [], 
+                            'list_all': ontList[ont]['mrna_list'],
+                            'type': ontList[ont]['type']
+                        };
                     }
 
 
@@ -151,42 +164,37 @@ router.post('/', function(req, res, next) {
             );
         }else{
             var validmrna = []; // array of target mrna. ONLY examine these
-            var ont_terms = {};
-            var filePath = path.join(__dirname, 'mrna_withWeak.txt');
+            var pathname = req.body.targetgenelist;
+            var filePath = path.join(__dirname, pathname);
 
             fs.readFileSync(filePath).toString().split('\n').forEach(function (line) {
                 validmrna.push(line);
             });
 
-            //setTimeout(function(){
-                Mrna.find({
-                    accession: { $in: validmrna },
-                    hasontology: true,
-                    hasg4s: true
-                    }).
-                    select('g4s accession ontology'). // limited selection
-                    exec(function (err, mrnaList) {
-                        for (mrna in mrnaList){
-                            thismrna = mrnaList[mrna];
-                            var isg4 = hasg4(thismrna);
-                            
-                            addNewTerms(thismrna, 'components', ont_terms, isg4);
-                            addNewTerms(thismrna, 'functions', ont_terms, isg4);
-                            addNewTerms(thismrna, 'processes', ont_terms, isg4);
-                        }
-                        for(ontterm in ont_terms){
-                            if(ont_terms[ontterm][1] < req.body.minont){
-                                delete ont_terms[ontterm];
-                            }
-                        }
-                        res.json(ont_terms);
-                        mongoose.connection.close();
+            Mrna.find({
+                accession: { $in: validmrna },
+                hasontology: true,
+                hasg4s: true
+                }).
+                select('g4s accession ontology'). // limited selection
+                exec(function (err, mrnaList) {
+                    for (mrna in mrnaList){
+                        thismrna = mrnaList[mrna];
+                        var isg4 = hasg4(thismrna);
+                        
+                        addNewTerms(thismrna, 'components', ont_terms, isg4);
+                        addNewTerms(thismrna, 'functions', ont_terms, isg4);
+                        addNewTerms(thismrna, 'processes', ont_terms, isg4);
                     }
-                );
-                
-            //}, 2000);
-
-            
+                    for(ontterm in ont_terms){
+                        if(ont_terms[ontterm]['num_total'] < req.body.minont){
+                            delete ont_terms[ontterm];
+                        }
+                    }
+                    res.json(ont_terms);
+                    mongoose.connection.close();
+                }
+            ); 
         }
 	});
 });

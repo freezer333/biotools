@@ -1,5 +1,4 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -8,7 +7,6 @@ a {
 }
 
 label {
-	margin-left:30px;
 	margin-right:5px;
 }
 
