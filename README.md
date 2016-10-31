@@ -11,6 +11,11 @@ Go to the Node.js [website](www.nodejs.org) and click "Install".  Once the insta
 $ node --version
 $ v0.10.22
 ```
+Steps for Ubuntu and Mint:
+* https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
+* curl -sL https://deb.nodesource.com/setup_4.x
+* sudo -E bash -sudo apt-get install -y nodejs
+
 # Step 2:  Install MongoDB
 All of the data sources you will be installing to your local machine use MongoDB as their data repository.  If you do not yet have MongoDB installed, vistit their [download page](http://www.mongodb.org/downloads) and download the appropriate version (production release, for you given operating system). You do not need to install MongoDB, simply unzip/extract the zip file to a convenient directory. Please note, as in all programming-oriented cases, DO NOT put code, programs, or anything else in directories with spaces in their path. I recommed C:\dev if you are using Windows and ~/dev (~ stands for your user folder ie. /Users/your_username/ on a mac).
 
@@ -18,7 +23,28 @@ Next, create the following folder (Windows): C:\data\db. On a mac, create /data/
 
 To ensure the DB is up and running, open up your command prompt and change your directory to C:\dev\mongodb\bin (or whatever directory you extracted MongoDB to). Then type "mongod". The database server should start, as indicated by the command prompt messages. The server will stay running, you can shut it down by typing "Ctrl+c".
 
-# Step 3:  Install Python
+If you're accustomed to using SQL, please see the following [MongoDB website](https://docs.mongodb.com/manual/reference/sql-comparison/) that shows parallels between the two database systems.
+
+
+# Step 3:  Install g++
+For Linux/Mint or Ubuntu you can install g++ in one of two ways: command line using the “apt” or "apt-get" command, or a package manager such as Synaptic or Mint's Software Manager. As of Oct 23, 2016 the current version is 4:5.3.1.  There is also g++-5 version in Linux Mint.
+
+Installing g++ is required in order for "npm install" commands to work correctly.
+
+To use the command line:
+* open a terminal session (Ctrl+Alt+T).
+* for Mint enter “sudo apt install g++”
+* for Ubuntu enter “sudo apt-get install g++”
+
+You may be prompted to include additional packages that g++ is dependent on. When prompted, reply with “Y”.
+
+To use Synaptic Package manager:
+* Open Synaptic
+* In the quick filter textbox, enter “g++”.
+* Select the checkbox alongside g++, then click “apply”.
+* When the popup appears it may designate dependencies that g++ requires. Click on “apply”.
+
+# Step 4:  Install Python
 The source code that we will download in later steps *builds* datasets from source files hosted on sites such as NCBI's ftp.  The process of building the datasets is called "seeding".  Most seeding scripts are written in Python (version 3, specifically).
 
 Visit the following pages and complete all steps to install Python3 on your machine:
@@ -29,7 +55,13 @@ Note, for Linux, you will use the package manager that comes along with your dis
 
 Once you've installed Python, please make absolutely sure you have a 3.x version (and not a 2.x) version installed.  Open up your terminal/command prompt and ensure that typing `python3 --version` results in the expected output (i.e. `Python 3.4.1`)
 
-## Step 3a:  Install Dependencies
+Please note the latest editions of Linux (Ubuntu 16.04LTS and Mint 18 "Sarah") already have both version of Python installed. They may not, however, have "pip3" installed. Use the following to install it:
+```
+for Mint, enter the following on a terminal command line:
+sudo apt install python3-pip
+```
+
+## Step 4a:  Install Dependencies
 In order to run all scripts, you need a few python and node modules to be installed on your system.
 
 ### Python Dependencies
@@ -61,7 +93,7 @@ To use the C++ implementation of the qgrs mapping algorithm, you will need to in
 $ sudo npm install node-gyp -g
 ```
 
-# Step 4:  Install git
+# Step 5:  Install git
 The source code for this project is hosted on github.com.  In order get the code, and to submit your changes, you need to install git on your own machine.  Instructions for installing git on Mac OS X, Linux, and Windows can be found [here](http://git-scm.com/book/en/Getting-Started-Installing-Git).
 
 **Alternatively**, if you plan on using a graphical user interface for git, rather than using the command line, take a look at the following - which make this very easy to work with:
@@ -72,6 +104,7 @@ The source code for this project is hosted on github.com.  In order get the code
 These programs will take care of installing git automatically, so you don't need to do it yourself.
 
 If you are using linux, you can choose from some of the clients listed [here](http://git-scm.com/downloads/guis)
+After testing some software packages, [GitKraken](https://www.gitkraken.com/) seems to work well with both Ubuntu and Mint.
 
 If you are not familiar with git, please take a look at some of the following tutorials:
 
@@ -79,7 +112,7 @@ If you are not familiar with git, please take a look at some of the following tu
 * [atlassian](https://www.atlassian.com/git/tutorials/setting-up-a-repository) - read through "setting up a repository" (git clone is most relevant), "saving changes", "inspecting a repository" under "Getting Started" and the syncing section under "Collaborating".
 * [github's interactive tutorial](https://try.github.io/levels/1/challenges/1) - lets you experiment a little on a demo.
 
-# Step 5:  Download the source code
+# Step 6:  Download the source code
 You are now ready to download the source code (some Node.js code, and some python seeding scripts).  Navigate to a directory where you wish to host your code (~/projects, C:/projects) and type the following command to pull the source:
 
 ```
@@ -96,13 +129,13 @@ $ cd serve
 $ npm install
 ```
 
-# Step 6:  Seed the data sources
+# Step 7:  Seed the data sources
 Note, we'll be adding more data sources and seeding scripts continually, so keep an eye on this page!  Also, please note that the order in which you do these steps is absolutely critical!  Some data sources rely on the sources built in previous steps
 
-**Before continuting**, you __must__ start your MongoDB server.  Type `mongod` into your terminal or command prompt.  Please read the output carefully to make sure the server is running without error.  Once you confirmed this, you can proceed in running the seeding scripts.
+**Before continuing**, you __must__ start your MongoDB server.  Type `mongod` into your terminal or command prompt.  Please read the output carefully to make sure the server is running without error.  Once you confirmed this, you can proceed in running the seeding scripts.
 
 ***To execute these scripts, you must navigate to the `biotools/seed` directory.***
-## 6a - Chromosome Sequence Data
+## 7a - Chromosome Sequence Data
 This script builds the sequence database from the FASTA files automatically downloaded from NCBI  
 
 ```
@@ -116,6 +149,10 @@ For example, the following command will build the genomes of *Homo sapiens* and 
 ```
 $ python3 seed_chrome.py 9606 10090
 ```
+
+Running the above Python script will take approximately 10-15 minutes depending on your system. You should see something similar to the following screen capture if the script is running correctly:
+
+![Python screen cap](docs/screencap_seedchrome.jpg)
 
 Successfully built chromosomes are recorded in a Mongo collection called `seedlog`.  If the chromosome has been fully built, it will always be skipped - give a record of the completion is in `seedlog`.  Here is an example of the record in `seedlog` corresponding to chromosome 1 for *Homo sapiens*.
 
@@ -142,8 +179,8 @@ Currently supported organisms (although its easy to create your own seed file...
 * *Drosophila melanogaster* (7227)
 * *Caenorhabditis elegans* (6239)
 
-## 6b - Basic mRNA and Gene Data
-This script will build the gene and mrna data collections from the file download in step 6b.  
+## 7b - Basic mRNA and Gene Data
+This script will build the gene and mrna data collections from the file download in step 7b (7a?).  
 
 ```
 $ python3 seed_gene.py
@@ -158,21 +195,28 @@ $ python3 reseed_chrome.py
 This script will scan all genes and mRNA and download missing chromosomes using entrez url.  Its a good
 idea to do this whenever you add a new set of genes/mrna.
 
-## 6c - mRNA Sequence Features
-This script will attach sequence feature data to many of the mRNA built from step 7b.  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
+## 7c - mRNA Sequence Features
+This script will attach sequence feature data to many of the mRNA built from step 7b (7a?).  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
 
 
 ```
 $ python3 seed_mrna_features.py
 ```
-## 6d - Homologene (optional)
-This script downloads homology data directly from Homologene (NCBI), it will run without any need for you to manually download data.  It creates a MongoDB collection called `homologene` which contains records of homologous pairs of protien coding transcripts for a variety of species.
+
+The above process will take possibly one hour depending on your system. It may even appear to be a runaway process, although it is probably running fine. Please see the following screen caps for expected results.
+
+![screen cap of mrna](docs/seed_mRNA_Runawayproc.jpg)
+
+![screen cap #2 of mrna](docs/seed_mRNA_Runawayproc2.jpg)
+
+## 7d - Homologene (optional)
+This script downloads homology data directly from Homologene (NCBI), it will run without any need for you to manually download data.  It creates a MongoDB collection called `homologene` which contains records of homologous pairs of protein coding transcripts for a variety of species.
 
 ```
 $ python3 seed_homologene.py
 ```
 
-## 6e - U-Rich Elements (optional)
+## 7e - U-Rich Elements (optional)
 This script creates a listing of sub-records in the mrna collection within each mRNA sequence for U-Rich elements.  Elements found withing 5 and 65 nucleotides past the end / poly(A) of the mRNA are recorded.
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
@@ -185,7 +229,7 @@ $ python3 seed_urich.py
 The U-rich element records will be stored in an array named `u_rich_downstream` within each mRNA record analyzed.  Each record contains an attribute named `order` which is 3, 4, or 5 depending on number of U's.  In addition, the 5 bases are listed as a string in `seq` and the position relative to the end of the mRNA (downstream of polyA site) is listed in `downstream_rel_pos`.
 
 
-## 6f - QGRS / G4 Data (optional)
+## 7f - QGRS / G4 Data (optional)
 This script creates QGRS sub-records in the mRNA collection.  QGRS records are only created for mRNA where the feature data is present - specifically where the CDS is known.  The QGRS records are categorized by region - 5'UTR, CDS, 3'UTR, and downstrea (65 bases).  G-Score is calculated for each record, and full architectural data is stored.
 
 To run this script you **must** have your web service running.  In a *separate* terminal/command prompt window, navigate to your `biotools/serve` directory and type `node app.js`.  To verify that the web service is running, open a web browser window and go to http://localhost:3000.  You should see the words "biotools service is running".
@@ -217,7 +261,7 @@ QGRS records are stored in an array named `g4s`.  Each individual QGRS motif is 
 *  `sequence` - motif bases
 
 
-## 6g - Gene Ontology (optional)
+## 7g - Gene Ontology (optional)
 This scripts will create ontology subrecords within the mRNA and gene collections containing lists of associated function, process, and component GO terms.
 
 ```
@@ -225,7 +269,7 @@ $ python3 seed_go.py
 ```
 This script only populated GO terms for human genes/mRNA.
 
-#Step 7: Verifying your data
+#Step 8: Verifying your data
 Once your sources have been seeded, you should get familiar with the layout with MongoDB - although most of the time you will work with the data through web services, occasionally it will be very helpful for you to understand how to work directly in MongoDB. The MongoDB instance is named "chrome".  The collection listings should be as shown below (you enter the "show collections" command)
 
 ```
@@ -250,7 +294,7 @@ The `seq` collection contains chromosome data, however for space considerations,
 }
 ```
 
-Each chromosome sequence record represents up to 10000 bases of a particilar chromosome, identified by the accession number.  The start/end attributes represent the sequence slice position on the chromosome, and the `seq` attribute is the compressed sequence slice.  To get the entire sequence of the chromosome, you would need to search for all the 10000 base-pair slices for that chromosome.  You would then need to decomress the data.  Normally you will access sequence data through the web service, which handles all of these details for you however.
+Each chromosome sequence record represents up to 10000 bases of a particular chromosome, identified by the accession number.  The start/end attributes represent the sequence slice position on the chromosome, and the `seq` attribute is the compressed sequence slice.  To get the entire sequence of the chromosome, you would need to search for all the 10000 base-pair slices for that chromosome.  You would then need to decompress the data.  Normally you will access sequence data through the web service, which handles all of these details for you however.
 
 ## mrna collection
 The `mrna` collection contains mrna records, each of which can hold a variety of attributes.  Typing `db.mrna.find().limit(1).pretty()` will give you a sample result:
@@ -342,7 +386,7 @@ The `homologene` collection contains records representing a group of homologous 
 
 In this listing, you can see all data associated with each transcript.  Linking these listing to mRNA and gene collections can be done through `gene_id` and `mrna_accession_ver`.  Note however, currently this data set only includes mrna/gene/sequence data for humans.
 
-#Step 8:  Create Indexes
+#Step 9:  Create Indexes
 You should create additional indexes to speed up the access time of your MongoDB database.  To do so, open your terminal/command prompts and type
 
 ```
@@ -364,14 +408,14 @@ Additional useful indexes are:
 You can create indexes on any commonly searched attributes to support your projects.
 
 
-# Step 9:  Serving your data
+# Step 10:  Serving your data
 
 The easiest way to start all the services/tools is to simply type
 
 ```
 $ ./biotools start
 ```
-As long as you have Mongodb (mongod), supervisor, and python3 installed and on your path, this script will start up the services for you.  Note - prior to running this scrip, MongoDB shouldn't be running...
+As long as you have Mongodb (mongod), supervisor, and python3 installed and on your path, this script will start up the services for you.  Note - prior to running this script, MongoDB shouldn't be running...
 
 If you do not have supervisor installed, type `$sudo npm install -g supervisor` before running the biotools startup script.
 
@@ -445,7 +489,7 @@ http://localhost:3000/homologene/list
 http://localhost:3000/homologene/list/:skip/:limit
 ```
 
-More useful however is retreiving clusters based on a gene id or mRNA accession number.  Requests to the following URL's will return all homologene records which contain either the gene referenced by the gene id or mRNA referenced by accession number.  This makes it very easy to find genes/mRNA that are homologous to sequences you might be working with.
+More useful however is retrieving clusters based on a gene id or mRNA accession number.  Requests to the following URL's will return all homologene records which contain either the gene referenced by the gene id or mRNA referenced by accession number.  This makes it very easy to find genes/mRNA that are homologous to sequences you might be working with.
 
 ```
 http://localhost:3000/homologene/mrna/:accession
@@ -571,7 +615,7 @@ will return the following JSON object descripting QGRS density for the mRNA, bro
 
 
 
-# Step 10:  Programmatic Access
+# Step 11:  Programmatic Access
 In step 10, you've seen how URLs, when properly constructed, will return JSON results for genomic data.  The system is a REST web service, and can easily be accessed using nearly any programming language.  In addition, entire API's can be written to deliver data from this service in very convenient ways.  I will be developing access API's in Python and Java, and below is some sample code to get you started.
 
 ## Example 1:  Accession sequence data through Python
