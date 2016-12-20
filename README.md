@@ -269,12 +269,28 @@ $ python3 seed_go.py
 ```
 This script only populated GO terms for human genes/mRNA.
 
+
+## 7h - Alternative Splice Sites collection (optional)
+The following script will create alternative splice sites data. The collection is created from the mRNA collection. This script uses the "retrieve_altsplicesites.py" python module which returns exon from/to positions as well as an "alternative splice site Y/N" flag. The first argument is organism, the second (optional) parameter will print detailed information as the program runs; this should only be used for debugging/testing.
+
+```
+$ python3 seed_altsplice.py 'Homo sapiens' 'Y'
+```
+
+You can also call the module as a standalone program to print out alternative splice sites. The first argument is gene accessions number and is mandatory. The second is "print Y/N". If using as a standalone interactive program it is recommended to use "Y".
+
+```
+$ python3 retrieve_altsplicesites.py '6003' 'Y'
+```
+
 #Step 8: Verifying your data
 Once your sources have been seeded, you should get familiar with the layout with MongoDB - although most of the time you will work with the data through web services, occasionally it will be very helpful for you to understand how to work directly in MongoDB. The MongoDB instance is named "chrome".  The collection listings should be as shown below (you enter the "show collections" command)
 
 ```
 $ mongo chrome
 > show collections
+alignments
+exons
 gene
 homologene
 mrna
@@ -385,6 +401,60 @@ The `homologene` collection contains records representing a group of homologous 
 ```
 
 In this listing, you can see all data associated with each transcript.  Linking these listing to mRNA and gene collections can be done through `gene_id` and `mrna_accession_ver`.  Note however, currently this data set only includes mrna/gene/sequence data for humans.
+
+
+## exons collection
+The `exons` collection contains mRNA documents that reference whether a particular from/to position is considered an alternative splice site. The data was generated from the `mrna` collection.
+
+Typing `db.exons.find({"gene_id":'862'}).pretty()` will give you a lot of data; here is a partial set of results:
+
+```
+{
+	"_id" : ObjectId("58589ad09b704dc5ffe93dee"),
+	"organism" : "Homo sapiens",
+	"chrom" : "NC_000008",
+	"exons_end" : 92972745,
+	"alternative_spliced" : "N",
+	"mRNA" : [
+		"NM_001198625.1",
+		"NM_001198626.1",
+		"NM_001198627.1",
+		"NM_001198628.1",
+		"NM_001198629.1",
+		"NM_001198630.1",
+		"NM_001198631.1",
+		"NM_001198632.1",
+		"NM_001198633.1",
+		"NM_001198634.1",
+		"NM_001198679.1",
+		"NM_004349.3",
+		"NM_175634.2",
+		"NM_175635.2",
+		"NM_175636.2"
+	],
+	"orientation" : "-",
+	"exons_start" : 92967195,
+	"gene_id" : "862",
+	"build" : "37"
+}
+..................................
+{
+	"_id" : ObjectId("58589ad09b704dc5ffe93e7a"),
+	"organism" : "Homo sapiens",
+	"chrom" : "NC_000008",
+	"exons_end" : 93088365,
+	"alternative_spliced" : "Y",
+	"mRNA" : [
+		"NM_001198625.1",
+		"NM_001198626.1"
+	],
+	"orientation" : "-",
+	"exons_start" : 93088193,
+	"gene_id" : "862",
+	"build" : "37"
+}
+```
+
 
 #Step 9:  Create Indexes
 You should create additional indexes to speed up the access time of your MongoDB database.  To do so, open your terminal/command prompts and type
