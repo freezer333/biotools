@@ -53,28 +53,53 @@ def get_data(arg_organism, arg_gene='', arg_print=''):
                 print("\nEntire tuple returned from retrieve_altsplicesites module: ",x,"\nreturn_list:  ",return_list)
 
             # 3. load dictionary based on information returned from module call
+            #    reworks the entries to store mRNA accession into a list
+            dict_exons = {}  # reset dictionary entries if multiple genes are initially read step #1
             for y in return_list:
                 # check if entry exists in dict_exons,
-                # if it does, retrieve the value
-                # Then append current mRNA to value
-                if((str(y[1]) + str(y[2]) + str(y[3]) + str(y[4])) in dict_exons):
-                    wrk_mrna = dict_exons[(str(y[1]) + str(y[2]) + str(y[3]) + str(y[4]))]
+                # if it does, retrieve the value and place in wrk_mrna,
+                #    otherwise initialize wrk_mrna list
+                # Then append current mRNA to wrk_mrna and update the key's value
+                # NOTE: use '-' as a separator between key components
+                tmp_key = str(y[1]) +'-'+ str(y[2]) +'-'+ str(y[3]) +'-'+ str(y[4])
+                if(tmp_key in dict_exons):
+                    wrk_mrna = dict_exons[tmp_key]
                 else:
                     wrk_mrna = []
                 wrk_mrna.append(y[0])
-                dict_exons[(str(y[1]) + str(y[2]) + str(y[3]) + str(y[4]))] = wrk_mrna
+                dict_exons[tmp_key] = wrk_mrna
                 if(arg_print == 'Y'):
                     print('Individual read of list/tuple from module: ',y[0],' ',y[1],' ', y[2],' ', y[3],' ',y[4])
-                    print("Key ", (str(y[1]) + str(y[2]) + str(y[3]) + str(y[4])), " is in dict_exons: ", dict_exons[(str(y[1]) + str(y[2]) + str(y[3]) + str(y[4]))])
+                    print("Key ", tmp_key, " is in dict_exons, value is: ", dict_exons[tmp_key])
+            # once dict_exons is fully loaded, print debugging info
+            if(arg_print == 'Y'):
+                print("\nAfter dictionary is built, print the following:")
+                print("Summarized wrk_mrna: ", wrk_mrna)
+                print("Summarized Keys in dict_exons: ", dict_exons.keys())
+                print("Summarized Values in dict_exons: ", dict_exons.values())
 
-                # 4. retrieve mRNA collection document info by gene_id
-                readthis = collect_mrna.find({"gene_id":str(y[1]), "accession":str(y[0]), "exons.start":int(y[2]), "exons.end":int(y[3])},{"_id":0, "organism":1, "orientation":1, "build":1, "chrom":1 })
-                for z in readthis:
+            # 4. retrieve mRNA collection document info, summarized by gene_id, organism, etc.
+            #  This aggregate method call should return only one row
+            readthis = collect_mrna.aggregate([ {"$match":{"gene_id":x['_id']['gid'], "organism":x['_id']['org'] }}, {"$group":{"_id":{"gene_id":"$gene_id", "organism":"$organism", "orientation":"$orientation", "build":"$build", "chrom":"$chrom" }}}  ])
+            tmp_counter = 0
+            for z in readthis:
+                tmp_counter += 1
+                if(arg_print == 'Y'):
+                    print("Within z loop, list/tuple of second loop: ",z, "\ntmp_counter: ",tmp_counter," should only be 1  !!!!!!")
+
+                #5. write the full "exons" collection document
+                #   loop thru dictionary keys and values, match-up with previous
+                #   "readthis" aggregate in Step #4 
+                for k in dict_exons:
+                    # parse out the '-' used as a separator between key fields
+                    wk_splitkey = k.split('-')
+                    wk_mRNA = dict_exons[k]
                     if(arg_print == 'Y'):
-                        print("Within z loop, list/tuple of second loop: ",z)
+                        print("K: ", k, "value: ", dict_exons[k])
+                        print("split key: ",wk_splitkey)
 
-                    #5. now write the full "exons" collection document
-                    insert_confirm = collect_exons.insert({"gene_id":str(y[1]), "exons_start":int(y[2]), "exons_end":int(y[3]), "mRNA":dict_exons[(str(y[1]) + str(y[2]) + str(y[3]) + str(y[4]))], "organism":z['organism'], "orientation":z['orientation'], "build":z['build'], "chrom":z['chrom'], "alternative_spliced":str(y[4]) })
+                    ### FINALLY insert the row into the exons collection
+                    insert_confirm = collect_exons.insert({"gene_id":z['_id']['gene_id'], "exons_start":int(wk_splitkey[1]), "exons_end":int(wk_splitkey[2]), "mRNA":wk_mRNA, "organism":z['_id']['organism'], "orientation":z['_id']['orientation'], "build":z['_id']['build'], "chrom":z['_id']['chrom'], "alternative_spliced":wk_splitkey[3] })
 
 
 #-------------------------------------------------------------------------
