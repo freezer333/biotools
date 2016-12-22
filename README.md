@@ -274,7 +274,7 @@ This script only populated GO terms for human genes/mRNA.
 The following script will create alternative splice sites data. The collection is created from the mRNA collection. This script uses the "retrieve_altsplicesites.py" python module which returns exon from/to positions as well as an "alternative splice site Y/N" flag. The first argument is organism, the second (optional) parameter will print detailed information as the program runs; this should only be used for debugging/testing.
 
 ```
-$ python3 seed_altsplice.py 'Homo sapiens' 'Y'
+$ python3 seed_altsplice.py 'Homo sapiens'
 ```
 
 You can also call the module as a standalone program to print out alternative splice sites. The first argument is gene accessions number and is mandatory. The second is "print Y/N". If using as a standalone interactive program it is recommended to use "Y".
