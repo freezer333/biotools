@@ -154,6 +154,13 @@ Running the above Python script will take approximately 10-15 minutes depending 
 
 ![Python screen cap](docs/screencap_seedchrome.jpg)
 
+If the download process fails (e.g., connectivity to NCBI briefly failed), you can restart the command and it will pick-up where it left off. For example the first screen cap shows that the process failed; the next screen cap shows the successful completion of the seed:
+
+![Failed seed_chrome process](docs/failed_seed_chrome.jpg)
+
+![Failed seed_chrome process](docs/completion_seed_chrome.jpg)
+
+
 Successfully built chromosomes are recorded in a Mongo collection called `seedlog`.  If the chromosome has been fully built, it will always be skipped - give a record of the completion is in `seedlog`.  Here is an example of the record in `seedlog` corresponding to chromosome 1 for *Homo sapiens*.
 
 ```
@@ -180,10 +187,10 @@ Currently supported organisms (although its easy to create your own seed file...
 * *Caenorhabditis elegans* (6239)
 
 ## 7b - Basic mRNA and Gene Data
-This script will build the gene and mrna data collections from the file download in step 7b (7a?).  
+This script will build the gene and mrna data collections from the file download in step 7a.  
 
 ```
-$ python3 seed_gene.py
+$ python3 seed_gene.py 9606
 ```
 
 Note About 1 out of every 500 or so genes and mRNA are linking back to chromosome accession numbers not found in the organism’s primary assembly.  To get these missing chromosomes use the following script:
@@ -196,7 +203,7 @@ This script will scan all genes and mRNA and download missing chromosomes using 
 idea to do this whenever you add a new set of genes/mrna.
 
 ## 7c - mRNA Sequence Features
-This script will attach sequence feature data to many of the mRNA built from step 7b (7a?).  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
+This script will attach sequence feature data to many of the mRNA built from step 7b.  The sequence features include organism name, mRNA description, and CDS data.  Note - currently this script is limited to *Homo sapien* transcripts.
 
 
 ```
@@ -271,13 +278,17 @@ This script only populated GO terms for human genes/mRNA.
 
 
 ## 7h - Alternative Splice Sites collection (optional)
-The following script will create alternative splice sites data. The collection is created from the mRNA collection. This script uses the "retrieve_altsplicesites.py" python module which returns exon from/to positions as well as an "alternative splice site Y/N" flag. The first argument is organism, the second (optional) parameter will print detailed information as the program runs; this should only be used for debugging/testing.
+The following script will create alternative splice sites data. The collection is created from the mRNA collection. This script uses the "retrieve_altsplicesites.py" python module which returns exon from/to positions as well as an "alternative splice site Y/N" flag. The first argument is organism, the second (optional) argument is gene_id, and the third (optional) parameter will print detailed information as the program runs; this should only be used for debugging or testing since it prints a lot of information.
 
 ```
 $ python3 seed_altsplice.py 'Homo sapiens'
+-- or --
+$ python3 seed_altsplice.py 'Homo sapiens' 6003
+-- or --
+$ python3 seed_altsplice.py 'Homo sapiens' 6003 Y
 ```
 
-You can also call the module as a standalone program to print out alternative splice sites. The first argument is gene accessions number and is mandatory. The second is "print Y/N". If using as a standalone interactive program it is recommended to use "Y".
+You can also call the module as a standalone program to print alternative splice sites. The first argument is gene accessions number and is mandatory. The second is "print Y/N". If you are using this as a standalone interactive program it is recommended to use "Y".
 
 ```
 $ python3 retrieve_altsplicesites.py '6003' 'Y'
@@ -406,7 +417,7 @@ In this listing, you can see all data associated with each transcript.  Linking 
 ## exons collection
 The `exons` collection contains mRNA documents that reference whether a particular from/to position is considered an alternative splice site. The data was generated from the `mrna` collection.
 
-Typing `db.exons.find({"gene_id":'862'}).pretty()` will give you a lot of data; here is a partial set of results:
+Typing `db.exons.find({"gene_id":'862'}).pretty()` will print a lot of data; here is a partial set of results:
 
 ```
 {
