@@ -13,7 +13,7 @@
 # 3. load dictionary based on information returned from module call,
 #    key:from/to exon, alt splice flag  value: mRNA accession#s
 # 4. retrieve detailed mRNA collection info
-# 5. combine subet of mRNA info with dictionary info, INSERT to exons collection
+# 5. combine subset of mRNA info with dictionary info, INSERT to exons collection
 #    (mRNA accession numbers now in list)
 #
 
@@ -44,9 +44,12 @@ def get_data(arg_organism, arg_gene='', arg_print=''):
     else:
         result = collect_mrna.aggregate([{"$match":{"organism":arg_organism, "gene_id":arg_gene}}, {"$group":{"_id":{"gid":"$gene_id", "org":"$organism"}}}])
 
+    count = 0
     # 2. retrieve alt splice site info for gene_id
     for x in result:
         return_list = alt.get_altsplice(x['_id']['gid'])
+        print('Splice siting ' + x['_id']['gid'] + ' - ' + str(count))
+        count = count+1
         # if anything is returned, continue
         if(return_list):
             if(arg_print == 'Y'):
