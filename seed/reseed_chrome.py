@@ -60,8 +60,8 @@ def reseed_chrom(organism, accession) :
 
 def reseed():
     start = time.time()
-    mcursor = gene_collect.find(spec={},snapshot=True, timeout=False)
-    rcursor = mrna_collect.find(spec={},snapshot=True, timeout=False)
+    mcursor = gene_collect.find(filter={}, modifiers={"$snapshot": True}, no_cursor_timeout=True)
+    rcursor = mrna_collect.find(filter={}, modifiers={"$snapshot": True}, no_cursor_timeout=True)
     count = 0
     mis_count = 0
     processed = set()
@@ -70,7 +70,7 @@ def reseed():
             "accession" : record['chrom']
         }
         if record['chrom'] not in processed:
-            c_cursor = seq_collect.find(spec=spec, snapshot=True, timeout=False)
+            c_cursor = seq_collect.find(filter={}, modifiers={"$snapshot": True}, no_cursor_timeout=True)
             if ( c_cursor.count() == 0) :
 
                 start = time.time()
@@ -95,7 +95,7 @@ def reseed():
             "accession" : record['chrom']
         }
         if record['chrom'] not in processed:
-            c_cursor = seq_collect.find(spec=spec, snapshot=True, timeout=False)
+            c_cursor = seq_collect.find(filter={}, modifiers={"$snapshot": True}, no_cursor_timeout=True)
             if ( c_cursor.count() == 0) :
                 start = time.time()
                 print ('Missing',  '{0: <15}'.format(record['accession']), '{0: <15}'.format(record['organism']),'{0: <15}'.format(record['chrom']))

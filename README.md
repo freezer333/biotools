@@ -294,7 +294,7 @@ You can also call the module as a standalone program to print alternative splice
 $ python3 retrieve_altsplicesites.py '6003' 'Y'
 ```
 
-#Step 8: Verifying your data
+# Step 8: Verifying your data
 Once your sources have been seeded, you should get familiar with the layout with MongoDB - although most of the time you will work with the data through web services, occasionally it will be very helpful for you to understand how to work directly in MongoDB. The MongoDB instance is named "chrome".  The collection listings should be as shown below (you enter the "show collections" command)
 
 ```
