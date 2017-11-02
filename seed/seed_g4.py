@@ -67,24 +67,24 @@ def findRange(g4):
 
 def process_mrna(count, mrna, start_time):
     url = seq_url + '/qgrs/mrna/' + mrna['accession'] + '/map?downstream=200'
-    if 'length' not in mrna :  #added by the features script - with cds
-        print("Skipping, no length")
-        return False
-    if 'cds' not in mrna :
-        print("Skipping, no cds")
-        return False
-    if valid_position(mrna['cds']['start']) < 0 :
-        print("Skipping, bad cds start")
-        return False
-    if valid_position(mrna['cds']['end']) < 0 :
-        print("Skipping, bad cds end")
-        return False
+    #if 'length' not in mrna :  #added by the features script - with cds
+    #    print("Skipping, no length")
+    #    return False
+    #if 'cds' not in mrna :
+    #    print("Skipping, no cds")
+    #    return False
+    #if valid_position(mrna['cds']['start']) < 0 :
+    #    print("Skipping, bad cds start")
+    #    return False
+    #if valid_position(mrna['cds']['end']) < 0 :
+    #    print("Skipping, bad cds end")
+    #    return False
     if 'g4s' in mrna and skip_existing:
         print('Skipping ', mrna['accession'], " - g4s already exist")
         return True
 
 
-    end = int(mrna['length'])
+    #end = int(mrna['length'])
     time_sum = 0
     before = time.time()
     response = requests.get(url)
@@ -99,14 +99,14 @@ def process_mrna(count, mrna, start_time):
             id = 1
             for g4 in g4s :
                 g4['id'] = mrna['accession'] + '.' + str(id)
-                cds_start = int(mrna['cds']['start'])
-                cds_end = int(mrna['cds']['end'])
-                g4_start = int(g4['start'])
-                g4_end = g4_start + int(g4['length'])
-                g4['is5Prime'] = g4_start <= cds_start
-                g4['isCDS'] = g4_start >= cds_start and g4_start <= cds_end or g4_end >= cds_start and g4_end <= cds_end
-                g4['is3Prime'] = g4_start >= cds_end and g4_start <= end or g4_end >= cds_end and g4_end <= end
-                g4['isDownstream'] = g4_end >= end
+                #cds_start = int(mrna['cds']['start'])
+                #cds_end = int(mrna['cds']['end'])
+                #g4_start = int(g4['start'])
+                #g4_end = g4_start + int(g4['length'])
+                #g4['is5Prime'] = g4_start <= cds_start
+                #g4['isCDS'] = g4_start >= cds_start and g4_start <= cds_end or g4_end >= cds_start and g4_end <= cds_end
+                #g4['is3Prime'] = g4_start >= cds_end and g4_start <= end or g4_end >= cds_end and g4_end <= end
+                #g4['isDownstream'] = g4_end >= end
 
                 # we won't put the overlaps in the database
                 g4['range'] = findRange(g4);

@@ -39,11 +39,18 @@ splice_sites = db['splice_sites']
 
 alts = 0
 non_alts = 0
-
+qgrs_start = 0
+qgrs_end = 0
+qgrs_mid = 0
+num_exons = 0
 
 def process_exon(exon):
     global alts
     global non_alts
+    global qgrs_start
+    global qgrs_end
+    global qgrs_mid
+    global num_exons
     site = dict()
     site['gene_id'] = exon['gene_id']
     site['organism'] = exon['organism']
@@ -64,12 +71,18 @@ def process_exon(exon):
         is_alt_spliced = True
     site['is_alt_spliced'] = is_alt_spliced
 
+    if is_alt_spliced:
+        alts = alts + 1
+    else:
+        non_alts = non_alts + 1
+
     window = 100
     url = seq_url + '/chrom/' + exon['chrom'] + '/' + str(exon['exons_start'] - window) + "/" + str(
-        exon['exons_start'] + window) + "?orientation=" + site['orientation']
+        exon['exons_end'] + window) + "?orientation=" + site['orientation']
     response = requests.get(url)
     if response.status_code == requests.codes.ok:
         data = response.json()
+        exon_length = exon['exons_end']-exon['exons_start']
         site['sequence'] = data['seq']
         qgrs = g.find(data['seq'], 3, 17)
         for q in qgrs:
@@ -78,6 +91,15 @@ def process_exon(exon):
             q['tetrad2'] = q['tetrad2'] - window
             q['tetrad3'] = q['tetrad3'] - window
             q['tetrad4'] = q['tetrad4'] - window
+            if q['start'] < 100:
+                q['splice'] = 'begin'
+                qgrs_start = qgrs_start + 1
+            elif q['start'] > (exon_length-100):
+                q['splice'] = 'end'
+                qgrs_end = qgrs_end + 1
+            else  :  
+                q['splice'] = 'no'
+                qgrs_mid = qgrs_mid + 1
         site['qgrs'] = qgrs
 
     url = seq_url + '/gene/' + site['gene_id']
@@ -99,14 +121,12 @@ def process_exon(exon):
             p['mrna'] = product
             p['contains'] = (product in exon['mRNA'])
             _products.append(p)
-            if p['contains'] == False:
-                alts = alts + 1
-            else:
-                non_alts = non_alts + 1
-            print(alts, " alternative spliced out of total",
-                  (alts + non_alts),  "->", alts / (alts + non_alts) * 100)
+            
+            
         site['products'] = _products
-
+    num_exons = num_exons + 1
+    print(num_exons, " ->", '{0:.3f}'.format((alts / (alts + non_alts))*100), "% alt spliced",
+                  (alts + non_alts),  "->", qgrs_start, ' / ', qgrs_end, ' / ', qgrs_mid)
     splice_sites.insert(site)
     # print('Processed exon from gene ' + site['gene_id'])
     return True

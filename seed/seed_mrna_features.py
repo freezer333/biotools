@@ -15,7 +15,7 @@ config = configparser.ConfigParser()
 config.read('seed_sources.ini')
 
 urls = config['human features']['url'].split(",")
-
+print(urls)
 #------------------------------------------------------------
 # Sequence features download variables
 #------------------------------------------------------------
@@ -43,7 +43,9 @@ count = 0
 all_count = 0
 for url in urls :
     print("PROCESSING " + url)
-    seq_features_file = root + config['human features']['download_filename'] + str(i)
+    name = url.split('/')[-1]
+    seq_features_file = root +name
+    print(seq_features_file)
     if not os.path.isfile(seq_features_file):
         print("\t+ Downloading source file from:  ", url)
         with urllib.request.urlopen(url) as response, open(seq_features_file, 'wb') as out_file:
@@ -64,12 +66,13 @@ for url in urls :
                 # save features
                 all_count += 1
                 up = dict()
-
+                status = "Not Found"
                 if collect.find_and_modify(
                           {'accession' : features['accession']},
                           {'$set': features}) != None :
                     count+= 1
-                print ('Saved ', count, ' / ' , all_count, ' mrna features')
+                    status = "Fount"
+                print ('Saved ', count, ' / ' , all_count, ' mrna features', " -- ", status, features['accession'])
                 features = dict()
 
             features['length'] = fields[2];

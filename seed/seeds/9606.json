@@ -2,225 +2,126 @@
   "organism": "Homo sapiens",
   "build": "38",
   "taxon_id": "9606",
-<<<<<<< HEAD
   "url_base": "ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian/Homo_sapiens/latest_assembly_versions/GCA_000001405.26_GRCh38.p11/GCA_000001405.26_GRCh38.p11_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
   "chromosomes": [
     {
       "common_id": "1",
       "url_suffix": "chr1.fna.gz",
-=======
-  "url_base": "ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_genbank/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/Primary_Assembly/assembled_chromosomes/FASTA/",
-  "chromosomes": [{
-      "common_id": "1",
-      "url_suffix": "chr1.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000001"
     },
     {
       "common_id": "2",
-<<<<<<< HEAD
       "url_suffix": "chr2.fna.gz",
-=======
-      "url_suffix": "chr2.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000002"
     },
     {
       "common_id": "3",
-<<<<<<< HEAD
       "url_suffix": "chr3.fna.gz",
-=======
-      "url_suffix": "chr3.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000003"
     },
     {
       "common_id": "4",
-<<<<<<< HEAD
       "url_suffix": "chr4.fna.gz",
-=======
-      "url_suffix": "chr4.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000004"
     },
     {
       "common_id": "5",
-<<<<<<< HEAD
       "url_suffix": "chr5.fna.gz",
-=======
-      "url_suffix": "chr5.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000005"
     },
     {
       "common_id": "6",
-<<<<<<< HEAD
       "url_suffix": "chr6.fna.gz",
-=======
-      "url_suffix": "chr6.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000006"
     },
     {
       "common_id": "7",
-<<<<<<< HEAD
       "url_suffix": "chr7.fna.gz",
-=======
-      "url_suffix": "chr7.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000007"
     },
     {
       "common_id": "8",
-<<<<<<< HEAD
       "url_suffix": "chr8.fna.gz",
-=======
-      "url_suffix": "chr8.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000008"
     },
     {
       "common_id": "9",
-<<<<<<< HEAD
       "url_suffix": "chr9.fna.gz",
-=======
-      "url_suffix": "chr9.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000009"
     },
     {
       "common_id": "10",
-<<<<<<< HEAD
       "url_suffix": "chr10.fna.gz",
-=======
-      "url_suffix": "chr10.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000010"
     },
     {
       "common_id": "11",
-<<<<<<< HEAD
       "url_suffix": "chr11.fna.gz",
-=======
-      "url_suffix": "chr11.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000011"
     },
     {
       "common_id": "12",
-<<<<<<< HEAD
       "url_suffix": "chr12.fna.gz",
-=======
-      "url_suffix": "chr12.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000012"
     },
     {
       "common_id": "13",
-<<<<<<< HEAD
       "url_suffix": "chr13.fna.gz",
-=======
-      "url_suffix": "chr13.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000013"
     },
     {
       "common_id": "14",
-<<<<<<< HEAD
       "url_suffix": "chr14.fna.gz",
-=======
-      "url_suffix": "chr14.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000014"
     },
     {
       "common_id": "15",
-<<<<<<< HEAD
       "url_suffix": "chr15.fna.gz",
-=======
-      "url_suffix": "chr15.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000015"
     },
     {
       "common_id": "16",
-<<<<<<< HEAD
       "url_suffix": "chr16.fna.gz",
-=======
-      "url_suffix": "chr16.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000016"
     },
     {
       "common_id": "17",
-<<<<<<< HEAD
       "url_suffix": "chr17.fna.gz",
-=======
-      "url_suffix": "chr17.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000017"
     },
     {
       "common_id": "18",
-<<<<<<< HEAD
       "url_suffix": "chr18.fna.gz",
-=======
-      "url_suffix": "chr18.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000018"
     },
     {
       "common_id": "19",
-<<<<<<< HEAD
       "url_suffix": "chr19.fna.gz",
-=======
-      "url_suffix": "chr19.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000019"
     },
     {
       "common_id": "20",
-<<<<<<< HEAD
       "url_suffix": "chr20.fna.gz",
-=======
-      "url_suffix": "chr20.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000020"
     },
     {
       "common_id": "21",
-<<<<<<< HEAD
       "url_suffix": "chr21.fna.gz",
-=======
-      "url_suffix": "chr21.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000021"
     },
     {
       "common_id": "22",
-<<<<<<< HEAD
       "url_suffix": "chr22.fna.gz",
-=======
-      "url_suffix": "chr22.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000022"
     },
     {
       "common_id": "X",
-<<<<<<< HEAD
       "url_suffix": "chrX.fna.gz",
-=======
-      "url_suffix": "chrX.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000023"
     },
     {
       "common_id": "Y",
-<<<<<<< HEAD
       "url_suffix": "chrY.fna.gz",
-=======
-      "url_suffix": "chrY.fa.gz",
->>>>>>> e766f1b2f21d03692450cbb05577c755ec303265
       "accession": "NC_000024"
     }
   ],
