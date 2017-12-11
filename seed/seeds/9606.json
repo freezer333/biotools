@@ -1,10 +1,15 @@
 {
   "organism": "Homo sapiens",
-  "build": "38",
+  "build": "37",
   "taxon_id": "9606",
+<<<<<<< HEAD
   "url_base": "ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian/Homo_sapiens/latest_assembly_versions/GCA_000001405.26_GRCh38.p11/GCA_000001405.26_GRCh38.p11_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
   "chromosomes": [
     {
+=======
+  "url_base": "https://pages.ramapo.edu/~sfrees/biotools-data/chromosome_data/Homo%20sapiens/",
+  "chromosomes": [{
+>>>>>>> d5351ce4b40e54add40ef86ea376d21fb33ac1e0
       "common_id": "1",
       "url_suffix": "chr1.fna.gz",
       "accession": "NC_000001"
@@ -126,8 +131,8 @@
     }
   ],
   "genes": {
-    "url": "ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/GFF/ref_GRCh38.p7_top_level.gff3.gz",
-    "build": "38"
+    "url": "https://pages.ramapo.edu/~sfrees/biotools-data/top_level_annotations/Homo%20sapiens",
+    "build": "37"
   },
   "apadb_seed": "hg19.apadb_v2_final.bed"
 }
