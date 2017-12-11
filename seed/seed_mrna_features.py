@@ -44,12 +44,12 @@ all_count = 0
 for url in urls:
     print("PROCESSING " + url)
 #<<<<<<< HEAD
-#    name = url.split('/')[-1]
-#    seq_features_file = root +name
-#    print(seq_features_file)
+    name = url.split('/')[-1]
+    seq_features_file = root +name
+    print(seq_features_file)
 #=======
-    seq_features_file = root + config['human features']['download_filename']
-    seq_features_file = seq_features_file + str(i)
+#    seq_features_file = root + config['human features']['download_filename']
+#   seq_features_file = seq_features_file + str(i)
 #>>>>>>> d5351ce4b40e54add40ef86ea376d21fb33ac1e0
     if not os.path.isfile(seq_features_file):
         print("\t+ Downloading source file from:  ", url)
@@ -71,19 +71,19 @@ for url in urls:
                 up = dict()
                 status = "Not Found"
                 if collect.find_and_modify(
-<<<<<<< HEAD
-                          {'accession' : features['accession']},
-                          {'$set': features}) != None :
-                    count+= 1
-                    status = "Fount"
-                print ('Saved ', count, ' / ' , all_count, ' mrna features', " -- ", status, features['accession'])
-=======
+#<<<<<<< HEAD
+#                          {'accession' : features['accession']},
+#                          {'$set': features}) != None :
+#                    count+= 1
+#                    status = "Fount"
+#                print ('Saved ', count, ' / ' , all_count, ' mrna features', " -- ", status, features['accession'])
+#=======
                     {'accession': features['accession']},
                         {'$set': features}) != None:
                     count += 1
                 print('Saved ', count, ' / ', all_count,
                       ' mrna features - ', url)
->>>>>>> d5351ce4b40e54add40ef86ea376d21fb33ac1e0
+#>>>>>>> d5351ce4b40e54add40ef86ea376d21fb33ac1e0
                 features = dict()
 
             features['length'] = fields[2]
