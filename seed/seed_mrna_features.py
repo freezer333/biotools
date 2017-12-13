@@ -71,18 +71,13 @@ for url in urls:
                 up = dict()
                 status = "Not Found"
                 if collect.find_and_modify(
-#<<<<<<< HEAD
-#                          {'accession' : features['accession']},
-#                          {'$set': features}) != None :
-#                    count+= 1
-#                    status = "Fount"
-#                print ('Saved ', count, ' / ' , all_count, ' mrna features', " -- ", status, features['accession'])
-#=======
                     {'accession': features['accession']},
                         {'$set': features}) != None:
                     count += 1
+                    status = "FOUND   ";
+
                 print('Saved ', count, ' / ', all_count,
-                      ' mrna features - ', url)
+                      ' mrna features - ', features['accession'], status)
 #>>>>>>> d5351ce4b40e54add40ef86ea376d21fb33ac1e0
                 features = dict()
 
