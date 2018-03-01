@@ -5,15 +5,15 @@ These instructions are for undergraduate bioinformatics students, the first few 
 # Step 1:  Install Node.js
 The data sources run locally as a web service on your machine.  The web services are served from a Node.js application, which is very easy to run.  Later in this document you will see how to initialize the services, in this step you should simply ensure that Node.js is installed and running.
 
-Go to the Node.js [website](www.nodejs.org) and click "Install".  Once the installer is downloaded and executed, you can confirm that node is installed properly by opening up your terminal (command prompt) and typing "node --version".  The version of your node installation should print out (any version above 0.10.xx) will be fine.
+Go to the Node.js [website](www.nodejs.org) and click "Install".  Choose the latest LTS version to download.  Once the installer is downloaded and executed, you can confirm that node is installed properly by opening up your terminal (command prompt) and typing "node --version".  The version of your node installation should print out (any version above 6.xx) will be fine.
 
 ```
 $ node --version
-$ v0.10.22
+$ v8.4
 ```
 Steps for Ubuntu and Mint:
 * https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
-* curl -sL https://deb.nodesource.com/setup_4.x
+* curl -sL https://deb.nodesource.com/setup_8.x
 * sudo -E bash -sudo apt-get install -y nodejs
 
 # Step 2:  Install MongoDB
